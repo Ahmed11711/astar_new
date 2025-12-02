@@ -123,6 +123,9 @@ class AuthController extends Controller
         );
 
         $balance->increment('balance', 10);
+        $user=User::where('email',$validatedData['email'])->first();
+        $user->referred_by=$affiliateUser->affiliate_code;
+        $user->save();
 
         return $this->successResponse([], 'Affiliate code is valid, balance updated', 200);
     }
@@ -132,6 +135,12 @@ class AuthController extends Controller
         $user = auth()->user();
 
         $validatedData = $request->validated();
+
+        if($request->hasFile('profile_image')){
+            $file = $request->file('profile_image');
+            $path = $file->store('profile_images', 'public');
+            $validatedData['profile_image'] = $path;
+        }
 
         if (isset($validatedData['password'])) {
             $validatedData['password'] = bcrypt($validatedData['password']);

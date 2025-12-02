@@ -31,6 +31,7 @@ class User extends Authenticatable implements JWTSubject
         'address',
         'role',
         'fcm_token',
+        'referred_by',
     ];
     /**
      * The attributes that should be hidden for serialization.

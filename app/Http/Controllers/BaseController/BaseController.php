@@ -52,8 +52,7 @@ public function index(Request $request): JsonResponse
             });
         }
 
-        // الفلاتر
-        $excluded = ['search', 'page', 'per_page'];
+         $excluded = ['search', 'page', 'per_page'];
         foreach ($request->except($excluded) as $key => $value) {
             if ($value === null || $value === '') continue;
             if (Schema::hasColumn($query->getModel()->getTable(), $key)) {
@@ -172,7 +171,7 @@ public function index(Request $request): JsonResponse
 
                 /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
                 // $disk = Storage::disk($this->uploadDisk);
-                $validated[$field] = "https://back.zayamrock.com/storage/app/public/" . $path;
+                $validated[$field] = "https://api.regtai.com/storage/app/public/" . $path;
 
 
             } catch (\Throwable $e) {

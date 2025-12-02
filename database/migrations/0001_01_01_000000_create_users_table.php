@@ -18,6 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('affiliate_code')->unique();
+            $table->string('referred_by')->nullable();
             $table->string('otp', 6)->nullable();
             $table->boolean('is_verified')->default(false);
             $table->string('phone')->nullable();

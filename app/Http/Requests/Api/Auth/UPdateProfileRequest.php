@@ -23,6 +23,9 @@ class UPdateProfileRequest extends BaseRequest
                 Rule::unique('users', 'email')->ignore($userId),
             ],
             'password' => 'sometimes|string|min:6',
+            'phone'=>'sometimes|string|max:20',
+            'address'=>'sometimes|string|max:500',
+            'profile_image'=>'sometimes|file|max:2048',
         ];
     }
 }
