@@ -10,7 +10,7 @@ Route::prefix('v1/')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('verify-email', [AuthController::class, 'verifyEmail']);
     Route::post('verify-affiliate', [AuthController::class, 'verifyAffiliate']);
-    Route::post('resend-otp', [AuthController::class, 'resendOtp']);
+    // Route::post('resend-otp', [AuthController::class, 'resendOtp']);
    
 
 
