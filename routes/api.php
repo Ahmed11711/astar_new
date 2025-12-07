@@ -28,8 +28,9 @@ Route::prefix('v1/')->group(function () {
        // without auth routes
         Route::get('my-affiliate', [AffiliateController::class, 'myAffiliate']);
         Route::get('notification',[NotificationsController::class,'index']);
+                Route::get('withdraw', [WithdrawController::class, 'index']);
+
         Route::post('withdraw', [WithdrawController::class, 'Withdraw']);
-        Route::get('withdraw', [WithdrawController::class, 'index']);
         Route::post('add-balance', [WithdrawController::class, 'addBalance']);
    });
 });
