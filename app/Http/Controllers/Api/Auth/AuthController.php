@@ -17,6 +17,7 @@ use App\Http\Requests\Api\Auth\resendOtpRequest;
 use App\Http\Requests\Api\Auth\VerifyEmailRequest;
 use App\Http\Requests\Api\Auth\UPdateProfileRequest;
 use App\Http\Requests\Api\Auth\VerifyAffiliateRequest;
+use App\Models\withdraw;
 
 class AuthController extends Controller
 {
@@ -39,6 +40,7 @@ class AuthController extends Controller
             $user->balance_affiliate = $userBalance->affiliate_balance ?? 0;
             $user->myLink = config('app.url') . '/' . $user->affiliate_code;
             $user->count=User::where('referred_by',$user->affiliate_code)->count() ?? 0;
+            $user->count_withdraw_pending=withdraw::where('user_id',$user->id)->where('status','pending')->count() ?? 0;
 
 
             return $this->successResponse([
