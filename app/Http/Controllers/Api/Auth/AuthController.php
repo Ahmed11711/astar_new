@@ -86,7 +86,13 @@ class AuthController extends Controller
     public function me(Request $request)
     {
         $user = auth()->user();
-        $user->balance = UserBalance::where('user_id', $user->id)->value('balance') ?? 0;
+         $userBalance = UserBalance::where('user_id', $user->id)->first();
+            $user->balance = $userBalance->balance ?? 0;
+            $user->balance_affiliate = $userBalance->affiliate_balance ?? 0;
+            $user->myLink = config('app.url') . '/' . $user->affiliate_code;
+            $user->count=User::where('referred_by',$user->affiliate_code)->count() ?? 0;
+            $user->count_withdraw_pending=withdraw::where('user_id',$user->id)->where('status','pending')->count() ?? 0;
+
 
         return $this->successResponse([
             'user' => $user,
