@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Repositories\setting\settingRepositoryInterface;
+use App\Repositories\setting\settingRepository;
+
 use App\Repositories\Company\CompanyRepositoryInterface;
 use App\Repositories\Company\CompanyRepository;
 
@@ -27,6 +30,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(withdrawRepositoryInterface::class, withdrawRepository::class);
         $this->app->bind(notificationsRepositoryInterface::class, notificationsRepository::class);
         $this->app->bind(CompanyRepositoryInterface::class, CompanyRepository::class);
+        $this->app->bind(settingRepositoryInterface::class, settingRepository::class);
 }
 
     /**

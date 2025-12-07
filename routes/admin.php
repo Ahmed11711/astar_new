@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\setting\settingController;
 use App\Http\Controllers\Admin\Company\CompanyController;
 use App\Http\Controllers\Admin\notifications\notificationsController;
 use App\Http\Controllers\Admin\withdraw\withdrawController;
@@ -16,10 +17,13 @@ Route::prefix('admin/v1')->middleware(CheckJwtTokenByAdmin::class)->group(functi
     Route::apiResource('notifications', notificationsController::class)->names('notifications');
     Route::get('my-affiliate', [AuthController::class, 'myAffiliate']);
         Route::apiResource('companies', CompanyController::class)->names('company');
+            Route::apiResource('settings', settingController::class)->names('setting');
+
 
 });
 
 
 Route::prefix('v1')->group(function () {
     
+    Route::apiResource('notifications', notificationsController::class)->names('notifications');
 });
