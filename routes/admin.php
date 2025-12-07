@@ -16,8 +16,8 @@ Route::prefix('admin/v1')->middleware(CheckJwtTokenByAdmin::class)->group(functi
     Route::apiResource('withdraws', withdrawController::class)->names('withdraw');
     Route::apiResource('notifications', notificationsController::class)->names('notifications');
     Route::get('my-affiliate', [AuthController::class, 'myAffiliate']);
-        Route::apiResource('companies', CompanyController::class)->names('company');
-            Route::apiResource('settings', settingController::class)->names('setting');
+    Route::apiResource('companies', CompanyController::class)->names('company');
+    Route::apiResource('settings', settingController::class)->names('setting');
 
 
 });
@@ -25,5 +25,4 @@ Route::prefix('admin/v1')->middleware(CheckJwtTokenByAdmin::class)->group(functi
 
 Route::prefix('v1')->group(function () {
     
-    Route::apiResource('notifications', notificationsController::class)->names('notifications');
 });

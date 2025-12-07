@@ -34,7 +34,12 @@ class AuthController extends Controller
             $user->save();
             $user->token = $token;
 
-            $user->balance = UserBalance::where('user_id', $user->id)->value('balance') ?? 0;
+            $userBalance = UserBalance::where('user_id', $user->id)->first();
+            $user->balance = $userBalance->balance ?? 0;
+            $user->balance_affiliate = $userBalance->affiliate_balance ?? 0;
+            $user->myLink = app()->url('/') . '/' . $user->affiliate_code;
+
+
             return $this->successResponse([
                 'user'  => $user,
             ], 'Login successful', 200);
