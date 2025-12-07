@@ -33,7 +33,8 @@ Route::prefix('v1/')->group(function () {
 
         Route::post('withdraw', [WithdrawController::class, 'Withdraw']);
         Route::post('add-balance', [WithdrawController::class, 'addBalance']);
-        Route::get('company',[CompanyCOntroller::class,'index']);
+        Route::get('companies',[CompanyCOntroller::class,'index']);
+        Route::get('settings',[CompanyCOntroller::class,'setting']);
    });
 });
 
