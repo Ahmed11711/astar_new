@@ -14,6 +14,16 @@ Route::prefix('v1/')->group(function () {
       'code' => Artisan::output()
     ]);
   });
+
+  Route::get('run-migrate-refresh', function () {
+    Artisan::call('migrate:refresh', [
+      '--force' => true,
+    ]);
+
+    return response()->json([
+      'output' => Artisan::output(),
+    ]);
+  });
 });
 
 require __DIR__ . '/admin.php';

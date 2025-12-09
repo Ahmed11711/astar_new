@@ -30,7 +30,3 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('teams', TeamController::class)->names('team');
     Route::apiResource('blogs', BlogController::class)->names('blog');
 });
-
-Route::get('/v1/test', function () {
-    return response()->json(['ok' => true]);
-});

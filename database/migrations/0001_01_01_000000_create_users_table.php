@@ -19,6 +19,16 @@ return new class extends Migration
             $table->string('last_name');
             $table->string('email')->unique();
 
+            $table->string('phone')->nullable();
+
+            $table->boolean('is_email_verified')->default(false);
+
+            $table->enum('student_type', [
+                'individual',
+                'school',
+                'teacher',
+            ])->default('individual');
+
             $table->enum('role', [
                 'admin',
                 'school',
@@ -27,15 +37,8 @@ return new class extends Migration
                 'data_entry'
             ]);
 
-            $table->unsignedBigInteger('school_id')->nullable();
-            $table->unsignedBigInteger('teacher_id')->nullable();
-
             $table->boolean('is_active')->default(true);
-
             $table->timestamps();
-
-            // $table->foreign('school_id')->references('id')->on('schools')->nullOnDelete();
-            // $table->foreign('teacher_id')->references('id')->on('teachers')->nullOnDelete();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
