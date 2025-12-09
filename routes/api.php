@@ -8,30 +8,32 @@ use App\Http\Controllers\Api\HelperForFront\ApiHelperFrontController;
 
 Route::prefix('v1/')->group(function () {
 
-  Route::get('run-migrate', function () {
-    Artisan::call('migrate', ['--force' => true]);
+ Route::get('run-migrate', function () {
+  Artisan::call('migrate', ['--force' => true]);
 
-    return response()->json([
-      'code' => Artisan::output()
-    ]);
-  });
+  return response()->json([
+   'code' => Artisan::output()
+  ]);
+ });
 
-  Route::get('run-migrate-refresh', function () {
-    Artisan::call('migrate:refresh', [
-      '--force' => true,
-    ]);
+ Route::get('run-migrate-refresh', function () {
+  Artisan::call('migrate:refresh', [
+   '--force' => true,
+  ]);
 
-    return response()->json([
-      'output' => Artisan::output(),
-    ]);
-  });
+  return response()->json([
+   'output' => Artisan::output(),
+  ]);
+ });
 
+ Route::get('test', function () {
+  return 555;
+ });
 
-
-  Route::prefix('global/')->group(function () {
-    Route::get('grades', [ApiHelperFrontController::class, 'getGrades']);
-    Route::get('all-school-teacher', [ApiHelperFrontController::class, 'allTeacherAndSchool']);
-  });
+ Route::prefix('global/')->group(function () {
+  Route::get('grades', [ApiHelperFrontController::class, 'getGrades']);
+  Route::get('all-school-teacher', [ApiHelperFrontController::class, 'allTeacherAndSchool']);
+ });
 });
 
 require __DIR__ . '/admin.php';
