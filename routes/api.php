@@ -26,9 +26,12 @@ Route::prefix('v1/')->group(function () {
     ]);
   });
 
+  Route::get('test', function () {
+    return 555;
+  });
 
-  Route::prefix('global', function () {
-    Route::get('grades' . [ApiHelperFrontController::class, 'getGrades']);
+  Route::prefix('global')->group(function () {
+    Route::get('grades', [ApiHelperFrontController::class, 'getGrades']);
   });
 });
 
