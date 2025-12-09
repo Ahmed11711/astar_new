@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Repositories\StudentRegistrations\StudentRegistrationsRepositoryInterface;
+use App\Repositories\StudentRegistrations\StudentRegistrationsRepository;
+
 use App\Repositories\Blog\BlogRepositoryInterface;
 use App\Repositories\Blog\BlogRepository;
 
@@ -39,6 +42,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(SubtopicRepositoryInterface::class, SubtopicRepository::class);
         $this->app->bind(TeamRepositoryInterface::class, TeamRepository::class);
         $this->app->bind(BlogRepositoryInterface::class, BlogRepository::class);
+        $this->app->bind(StudentRegistrationsRepositoryInterface::class, StudentRegistrationsRepository::class);
 }
 
     /**

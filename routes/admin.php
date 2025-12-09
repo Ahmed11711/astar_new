@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\StudentRegistrations\StudentRegistrationsController;
 use App\Http\Controllers\Admin\Blog\BlogController;
 use App\Http\Controllers\Admin\Team\TeamController;
 use App\Http\Controllers\Admin\Subtopic\SubtopicController;
@@ -29,4 +30,5 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('subtopics', SubtopicController::class)->names('subtopic');
     Route::apiResource('teams', TeamController::class)->names('team');
     Route::apiResource('blogs', BlogController::class)->names('blog');
+    Route::apiResource('student_registrations', StudentRegistrationsController::class)->names('student_registrations');
 });

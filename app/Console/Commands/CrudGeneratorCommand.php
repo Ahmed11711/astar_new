@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Log;
 
 class CrudGeneratorCommand extends Command
 {
-        protected $signature = 'crud:generate {model} ';
+        protected $signature = 'ahmed {model} ';
 
         protected $description = 'Generate CRUD (Controller, Requests, Resource, Repository) inside an HMVC Module';
 

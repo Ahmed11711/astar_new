@@ -19,6 +19,7 @@ return new class extends Migration
                 'teacher',
             ]);
             $table->unsignedBigInteger('user_id');
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }
