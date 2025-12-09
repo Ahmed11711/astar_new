@@ -13,21 +13,29 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+
+            $table->string('username')->unique();
+            $table->string('first_name');
+            $table->string('last_name');
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->string('affiliate_code')->unique();
-            $table->string('referred_by')->nullable();
-            $table->string('otp', 6)->nullable();
-            $table->boolean('is_verified')->default(false);
-            $table->string('phone')->nullable();
-            $table->string('profile_image')->nullable();
-            $table->string('address')->nullable();
-            $table->enum('role', ['admin', 'user'])->default('user');
-            $table->text('fcm_token')->nullable();
-            $table->rememberToken();
+
+            $table->enum('role', [
+                'admin',
+                'school',
+                'teacher',
+                'user',
+                'data_entry'
+            ]);
+
+            $table->unsignedBigInteger('school_id')->nullable();
+            $table->unsignedBigInteger('teacher_id')->nullable();
+
+            $table->boolean('is_active')->default(true);
+
             $table->timestamps();
+
+            // $table->foreign('school_id')->references('id')->on('schools')->nullOnDelete();
+            // $table->foreign('teacher_id')->references('id')->on('teachers')->nullOnDelete();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

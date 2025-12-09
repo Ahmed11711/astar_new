@@ -2,21 +2,27 @@
 
 namespace App\Providers;
 
-use App\Repositories\setting\settingRepositoryInterface;
-use App\Repositories\setting\settingRepository;
+use App\Repositories\Blog\BlogRepositoryInterface;
+use App\Repositories\Blog\BlogRepository;
 
-use App\Repositories\Company\CompanyRepositoryInterface;
-use App\Repositories\Company\CompanyRepository;
+use App\Repositories\Team\TeamRepositoryInterface;
+use App\Repositories\Team\TeamRepository;
 
-use App\Repositories\notifications\notificationsRepositoryInterface;
-use App\Repositories\notifications\notificationsRepository;
+use App\Repositories\Subtopic\SubtopicRepositoryInterface;
+use App\Repositories\Subtopic\SubtopicRepository;
 
-use App\Repositories\withdraw\withdrawRepositoryInterface;
-use App\Repositories\withdraw\withdrawRepository;
+use App\Repositories\Topic\TopicRepositoryInterface;
+use App\Repositories\Topic\TopicRepository;
 
-use App\Repositories\User\UserRepositoryInterface;
-use App\Repositories\User\UserRepository;
+use App\Repositories\Subject\SubjectRepositoryInterface;
+use App\Repositories\Subject\SubjectRepository;
 
+use App\Repositories\grade\gradeRepositoryInterface;
+use App\Repositories\grade\gradeRepository;
+
+use App\Repositories\school\schoolRepositoryInterface;
+use App\Repositories\school\schoolRepository;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -26,11 +32,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void {
 //
-        $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
-        $this->app->bind(withdrawRepositoryInterface::class, withdrawRepository::class);
-        $this->app->bind(notificationsRepositoryInterface::class, notificationsRepository::class);
-        $this->app->bind(CompanyRepositoryInterface::class, CompanyRepository::class);
-        $this->app->bind(settingRepositoryInterface::class, settingRepository::class);
+        $this->app->bind(schoolRepositoryInterface::class, schoolRepository::class);
+        $this->app->bind(gradeRepositoryInterface::class, gradeRepository::class);
+        $this->app->bind(SubjectRepositoryInterface::class, SubjectRepository::class);
+        $this->app->bind(TopicRepositoryInterface::class, TopicRepository::class);
+        $this->app->bind(SubtopicRepositoryInterface::class, SubtopicRepository::class);
+        $this->app->bind(TeamRepositoryInterface::class, TeamRepository::class);
+        $this->app->bind(BlogRepositoryInterface::class, BlogRepository::class);
 }
 
     /**
@@ -38,6 +46,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Model::unguard();
     }
 }

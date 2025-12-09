@@ -1,6 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\Blog\BlogController;
+use App\Http\Controllers\Admin\Team\TeamController;
+use App\Http\Controllers\Admin\Subtopic\SubtopicController;
+use App\Http\Controllers\Admin\Topic\TopicController;
+use App\Http\Controllers\Admin\Subject\SubjectController;
+use App\Http\Controllers\Admin\grade\gradeController;
+use App\Http\Controllers\Admin\school\schoolController;
 use App\Http\Controllers\Admin\setting\settingController;
 use App\Http\Controllers\Admin\Company\CompanyController;
 use App\Http\Controllers\Admin\notifications\notificationsController;
@@ -10,22 +17,16 @@ use App\Http\Controllers\Admin\Auth\AuthController;
 use App\Http\Controllers\Admin\User\UserController;
 use App\Models\User;
 
-Route::post('admin/v1/login', [AuthController::class, 'login'])->name('admin.login');
-Route::prefix('admin/v1')->middleware(CheckJwtTokenByAdmin::class)->group(function () {
-    Route::apiResource('users', UserController::class)->names('user');
-    Route::apiResource('withdraws', withdrawController::class)->names('withdraw');
-    Route::apiResource('notifications', notificationsController::class)->names('notifications');
-    Route::get('my-affiliate', [AuthController::class, 'myAffiliate']);
-    Route::apiResource('companies', CompanyController::class)->names('company');
-    Route::apiResource('settings', settingController::class)->names('setting');
-    Route::get('all-emails',function(){
-        return User::select(['id','email'])->get();
-    });
-
-
-});
+Route::prefix('admin/v1')->middleware(CheckJwtTokenByAdmin::class)->group(function () {});
 
 
 Route::prefix('v1')->group(function () {
-    
+
+    Route::apiResource('schools', schoolController::class)->names('school');
+    Route::apiResource('grades', gradeController::class)->names('grade');
+    Route::apiResource('subjects', SubjectController::class)->names('subject');
+    Route::apiResource('topics', TopicController::class)->names('topic');
+    Route::apiResource('subtopics', SubtopicController::class)->names('subtopic');
+    Route::apiResource('teams', TeamController::class)->names('team');
+    Route::apiResource('blogs', BlogController::class)->names('blog');
 });
