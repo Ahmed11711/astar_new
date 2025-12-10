@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\successStories\successStoriesController;
+use App\Http\Controllers\Admin\trusted\trustedController;
 use App\Http\Controllers\Admin\StudentRegistrations\StudentRegistrationsController;
 use App\Http\Controllers\Admin\Blog\BlogController;
 use App\Http\Controllers\Admin\Team\TeamController;
@@ -31,4 +33,6 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('teams', TeamController::class)->names('team');
     Route::apiResource('blogs', BlogController::class)->names('blog');
     Route::apiResource('student_registrations', StudentRegistrationsController::class)->names('student_registrations');
+    Route::apiResource('trusteds', trustedController::class)->names('trusted');
+    Route::apiResource('success_stories', successStoriesController::class)->names('success_stories');
 });
