@@ -27,31 +27,37 @@ class ExamPaperService
     'meta'             => $data['meta'] ?? [],
    ]);
 
-   $this->insertQuestions($paper->id, $data['questions']);
+   // نمرر subject_id و topic للكل
+   $this->insertQuestions(
+    $paper->id,
+    $data['questions'],
+    null,
+    $paper->subject_id,
+    $data['topic'] ?? null
+   );
 
    return $paper->load('questions');
   });
  }
 
- private function insertQuestions($paperId, $questions, $parentId = null)
+ private function insertQuestions($paperId, $questions, $parentId = null, $subjectId = null, $topicId = null)
  {
   foreach ($questions as $q) {
 
-   // 1) create main question
    $question = Question::create([
-    'exam_paper_id'        => $paperId,
-    'subject_id'           => $q['subject_id'] ?? null,
-    'topic_id'             => $q['topic_id'] ?? null,
-    'question_type'        => $q['question_type'],
-    'question_string'      => $q['question_string'] ?? null,
-    'question_number'      => $q['question_number'],
-    'question_max_score'   => $q['question_max_score'] ?? null,
-    // 'parent_question_id'   => $parentId,
-    'marking_scheme'       => $q['marking_scheme'] ?? [],
-    'has_options'          => isset($q['options']) ? 1 : 0,
+    'exam_paper_id'      => $paperId,
+    'subject_id'         => $subjectId,      // ثابت من الـ paper
+    'topic_id'           => $topicId,        // ثابت من الفرونت
+    'question_type'      => $q['question_type'],
+    'question_string'    => $q['question_string'] ?? null,
+    'question_number'    => $q['question_number'],
+    'question_max_score' => $q['question_max_score'] ?? null,
+    'marking_scheme'     => $q['marking_scheme'] ?? [],
+    'has_options'        => !empty($q['options']),
+    'parent_question_id' => $parentId,
    ]);
 
-   // 2) insert options
+   // insert options
    if (!empty($q['options'])) {
     $opts = [];
     foreach ($q['options'] as $o) {
@@ -64,9 +70,15 @@ class ExamPaperService
     QuestionOption::insert($opts);
    }
 
-   // 3) insert sub-questions recursively
+   // recursive for sub-questions
    if (!empty($q['sub_questions'])) {
-    $this->insertQuestions($paperId, $q['sub_questions'], $question->id);
+    $this->insertQuestions(
+     $paperId,
+     $q['sub_questions'],
+     $question->id,
+     $subjectId,
+     $topicId
+    );
    }
   }
  }
