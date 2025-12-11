@@ -54,7 +54,7 @@ class ExamPaperService
     'question_max_score' => $q['question_max_score'] ?? null,
     'marking_scheme'     => $q['marking_scheme'] ?? [],
     'has_options'        => !empty($q['options']),
-    'parent_question_id' => $parentId,
+    // 'parent_question_id' => $parentId,
    ]);
 
    // insert options
