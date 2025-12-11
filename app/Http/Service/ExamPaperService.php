@@ -46,7 +46,7 @@ class ExamPaperService
     'question_string'      => $q['question_string'] ?? null,
     'question_number'      => $q['question_number'],
     'question_max_score'   => $q['question_max_score'] ?? null,
-    'parent_question_id'   => $parentId,
+    // 'parent_question_id'   => $parentId,
     'marking_scheme'       => $q['marking_scheme'] ?? [],
     'has_options'          => isset($q['options']) ? 1 : 0,
    ]);
