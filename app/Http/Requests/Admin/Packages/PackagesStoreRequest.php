@@ -47,7 +47,7 @@ class PackagesStoreRequest extends BaseRequest
 
     Rule::excludeIf(fn() => $this->assign_type === AssignTypeEnum::SYSTEM->value),
 
-    Rule::exists('users', 'id'),
+    // Rule::exists('users', 'id'),
    ],
   ];
  }
