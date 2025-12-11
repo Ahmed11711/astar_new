@@ -20,6 +20,8 @@ use App\Http\Controllers\exampleController;
 use App\Http\Middleware\CheckJwtTokenByAdmin;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\FeaturePackage\FeaturePackageController;
+use App\Http\Controllers\Admin\Feature\FeatureController;
 use App\Http\Controllers\Admin\paper\paperController;
 
 
@@ -40,5 +42,7 @@ Route::prefix('v1')->group(function () {
  Route::apiResource('success-stories', successStoriesController::class)->names('success_stories');
  Route::apiResource('users', UserController::class)->names('user');
  Route::post('exam', [exampleController::class, 'store']);
-    Route::apiResource('papers', paperController::class)->names('paper');
+ Route::apiResource('papers', paperController::class)->names('paper');
+ Route::apiResource('features', FeatureController::class)->names('feature');
+    Route::apiResource('feature_packages', FeaturePackageController::class)->names('feature_package');
 });

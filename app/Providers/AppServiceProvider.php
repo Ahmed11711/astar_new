@@ -2,6 +2,14 @@
 
 namespace App\Providers;
 
+use App\Repositories\FeaturePackage\FeaturePackageRepositoryInterface;
+use App\Repositories\FeaturePackage\FeaturePackageRepository;
+
+
+
+use App\Repositories\Feature\FeatureRepositoryInterface;
+use App\Repositories\Feature\FeatureRepository;
+
 use App\Repositories\paper\paperRepositoryInterface;
 use App\Repositories\paper\paperRepository;
 
@@ -42,30 +50,32 @@ use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
-    public function register(): void {
+ /**
+  * Register any application services.
+  */
+ public function register(): void {
 //
-        $this->app->bind(schoolRepositoryInterface::class, schoolRepository::class);
-        $this->app->bind(gradeRepositoryInterface::class, gradeRepository::class);
-        $this->app->bind(SubjectRepositoryInterface::class, SubjectRepository::class);
-        $this->app->bind(TopicRepositoryInterface::class, TopicRepository::class);
-        $this->app->bind(SubtopicRepositoryInterface::class, SubtopicRepository::class);
-        $this->app->bind(TeamRepositoryInterface::class, TeamRepository::class);
-        $this->app->bind(BlogRepositoryInterface::class, BlogRepository::class);
-        $this->app->bind(StudentRegistrationsRepositoryInterface::class, StudentRegistrationsRepository::class);
-        $this->app->bind(trustedRepositoryInterface::class, trustedRepository::class);
-        $this->app->bind(successStoriesRepositoryInterface::class, successStoriesRepository::class);
-        $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
-        $this->app->bind(paperRepositoryInterface::class, paperRepository::class);
+  $this->app->bind(schoolRepositoryInterface::class, schoolRepository::class);
+  $this->app->bind(gradeRepositoryInterface::class, gradeRepository::class);
+  $this->app->bind(SubjectRepositoryInterface::class, SubjectRepository::class);
+  $this->app->bind(TopicRepositoryInterface::class, TopicRepository::class);
+  $this->app->bind(SubtopicRepositoryInterface::class, SubtopicRepository::class);
+  $this->app->bind(TeamRepositoryInterface::class, TeamRepository::class);
+  $this->app->bind(BlogRepositoryInterface::class, BlogRepository::class);
+  $this->app->bind(StudentRegistrationsRepositoryInterface::class, StudentRegistrationsRepository::class);
+  $this->app->bind(trustedRepositoryInterface::class, trustedRepository::class);
+  $this->app->bind(successStoriesRepositoryInterface::class, successStoriesRepository::class);
+  $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
+  $this->app->bind(paperRepositoryInterface::class, paperRepository::class);
+  $this->app->bind(FeatureRepositoryInterface::class, FeatureRepository::class);
+        $this->app->bind(FeaturePackageRepositoryInterface::class, FeaturePackageRepository::class);
 }
 
-    /**
-     * Bootstrap any application services.
-     */
-    public function boot(): void
-    {
-        Model::unguard();
-    }
+ /**
+  * Bootstrap any application services.
+  */
+ public function boot(): void
+ {
+  Model::unguard();
+ }
 }
