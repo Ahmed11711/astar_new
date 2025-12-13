@@ -27,6 +27,8 @@ class LoginController extends Controller
     return response()->json(['error' => 'Invalid credentials'], 401);
    }
 
+   return $token;
+
    // Get the authenticated user.
    $user = auth()->user();
 
