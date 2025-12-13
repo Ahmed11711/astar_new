@@ -24,8 +24,9 @@ class CreateAccountController extends Controller
     'email',
     'role',
     'student_type',
-    'phone'
-   ]) + ['is_active' => true, 'password' => Hash::make($request->password ?? '123456')]);
+    'phone',
+    'password'
+   ]) + ['is_active' => true,]);
 
    if ($user->role === 'student') {
     $assignedId = $request->school_id ?? $request->teacher_id;
