@@ -17,32 +17,25 @@ class LoginController extends Controller
 
  public function login(LoginRequest $request)
  {
+  $credentials = $request->only('email', 'password');
+
   try {
-   Log::info('Login attempt for email: ' . $request->email);
-
-   // تحقق من وجود المستخدم
-   $user = User::where('email', $request->email)->first();
-
-   if (!$user || !Hash::check($request->password, $user->password)) {
-    Log::warning('Invalid credentials for email: ' . $request->email);
+   // استخدام guard api عند محاولة الـ attempt
+   if (!$token = auth()->guard('api')->attempt($credentials)) {
     return $this->errorResponse('Invalid credentials', 401);
    }
 
-   // إنشاء التوكن مباشرة من المستخدم
-   $access_token  = JWTAuth::fromUser($user);
-   $refresh_token = JWTAuth::refresh($access_token);
+   $user = auth()->guard('api')->user();
 
-   // إرفاق التوكنات بالمستخدم
-   $user->access_token  = $access_token;
-   $user->refresh_token = $refresh_token;
+   $user->access_token  = $token;
+   $user->refresh_token = auth()->guard('api')->refresh($token);
 
-   Log::info('Login successful for email: ' . $request->email);
    return $this->successResponse(new LoginResource($user));
-  } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
-   Log::error('JWT error: ' . $e->getMessage());
+  } catch (JWTException $e) {
+   \Log::error('JWT error: ' . $e->getMessage());
    return $this->errorResponse('Could not create token', 500);
   } catch (\Exception $e) {
-   Log::error('General error: ' . $e->getMessage());
+   \Log::error('General error: ' . $e->getMessage());
    return $this->errorResponse('An unexpected error occurred', 500);
   }
  }
