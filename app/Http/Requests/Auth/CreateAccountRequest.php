@@ -16,6 +16,7 @@ class CreateAccountRequest extends BaseRequest
    'email'       => ['required', 'email', 'unique:users,email'],
    'phone'       => ['nullable', 'string', 'max:20'],
    'role'        => ['required', Rule::in(['student', 'teacher', 'school', 'data_entry'])],
+   'password'    => ['required', 'string', 'min:6'],
 
    'student_type' => [
     Rule::requiredIf(fn() => $this->role === 'student'),

@@ -24,7 +24,6 @@ class LoginController extends Controller
 
    $user = auth()->user();
 
-   // إضافة الـ tokens على الـ user object مؤقتًا للـ Resource
    $user->access_token  = $token;
    $user->refresh_token = JWTAuth::refresh($token);
 
