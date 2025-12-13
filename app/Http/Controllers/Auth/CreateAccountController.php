@@ -17,16 +17,17 @@ class CreateAccountController extends Controller
  public function createAccount(CreateAccountRequest $request)
  {
   return DB::transaction(function () use ($request) {
-   $user = User::create($request->only([
-    'username',
-    'first_name',
-    'last_name',
-    'email',
-    'role',
-    'student_type',
-    'phone',
-    'password'
-   ]) + ['is_active' => true,]);
+   $user = User::create([
+    'username'     => $request->username,
+    'first_name'   => $request->first_name,
+    'last_name'    => $request->last_name,
+    'email'        => $request->email,
+    'role'         => $request->role,
+    'student_type' => $request->student_type,
+    'phone'        => $request->phone,
+    'password'     => $request->password,
+    'is_active'    => true,
+   ]);
 
    if ($user->role === 'student') {
     $assignedId = $request->school_id ?? $request->teacher_id;
