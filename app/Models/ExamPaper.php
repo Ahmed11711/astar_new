@@ -18,21 +18,20 @@ class ExamPaper extends Model
   return $this->hasMany(Question::class, 'exam_paper_id');
  }
 
-    public function subject()
-    {
-        return $this->belongsTo(Subject::class, 'subject_id');
-    }
+ public function subject()
+ {
+  return $this->belongsTo(Subject::class, 'subject_id');
+ }
 
 
-    public function grade()
-    {
-        return $this->belongsTo(Grade::class, 'grade_id');
-    }
+ public function grade()
+ {
+  return $this->belongsTo(grade::class, 'grade_id');
+ }
 
 
-    public function paper()
-    {
-        return $this->belongsTo(Paper::class, 'paper_id');
-    }
-
+ public function paper()
+ {
+  return $this->belongsTo(Paper::class, 'paper_id');
+ }
 }
