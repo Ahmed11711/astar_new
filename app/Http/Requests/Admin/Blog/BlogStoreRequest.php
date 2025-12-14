@@ -17,7 +17,7 @@ class BlogStoreRequest extends BaseRequest
    'title' => 'required|string|max:255',
    'slug' => 'required|string|max:255|unique:blogs,slug',
    'content' => 'required|string',
-   'img' => 'nullable|max:255|file',
+   'img' => 'nullable|file',
    'author_id' => 'nullable|integer',
    'is_published' => 'required|integer',
   ];
