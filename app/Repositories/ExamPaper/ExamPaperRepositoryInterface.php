@@ -6,5 +6,5 @@ use App\Repositories\BaseRepository\BaseRepositoryInterface;
 
 interface ExamPaperRepositoryInterface extends BaseRepositoryInterface
 {
-    //
+ public function allData($id);
 }

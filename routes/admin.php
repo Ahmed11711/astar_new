@@ -50,6 +50,7 @@ Route::prefix('v1')->group(function () {
  Route::apiResource('features', FeatureController::class)->names('feature');
  Route::apiResource('feature_packages', FeaturePackageController::class)->names('feature_package');
  Route::apiResource('packages', PackagesController::class)->names('packages');
- Route::apiResource('exams', ExamPaperController::class)->names('exam_paper')->except(['store']);
+ Route::apiResource('exams', ExamPaperController::class)->names('exam_paper')->except(['store', 'show']);
  Route::post('exams', [UpdateExamPaperController::class, 'store']);
+ Route::get('exams/{id}', [UpdateExamPaperController::class, 'show']);
 });
