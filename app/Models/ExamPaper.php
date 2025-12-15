@@ -32,6 +32,6 @@ class ExamPaper extends Model
 
  public function paper()
  {
-  return $this->belongsTo(Paper::class, 'paper_id');
+  return $this->belongsTo(paper::class, 'paper_id');
  }
 }
