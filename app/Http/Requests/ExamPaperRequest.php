@@ -23,7 +23,7 @@ class ExamPaperRequest extends BaseRequest
 //    'paper_id'          =>'required|exists:table,column',
    'year'              => 'nullable|integer',
    'month'             => 'nullable|string',
-   'is_active'         => 'nullable|boolean',
+  //  'is_active'         => 'nullable|boolean',
    'total_marks'       => 'nullable|integer',
    'duration_minutes'  => 'nullable|integer',
    'meta'              => 'nullable|array',
