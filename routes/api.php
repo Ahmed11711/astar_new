@@ -22,7 +22,7 @@ Route::prefix('v1/')->group(function () {
  });
 });
 
-Route::get('test-server',function(){
+Route::get('test-servers',function(){
     return "done";
 });
 
