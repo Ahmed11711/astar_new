@@ -22,6 +22,10 @@ Route::prefix('v1/')->group(function () {
  });
 });
 
+Route::get('ss',function(){
+    return "sss";
+});
+
 
 // Route::get('run-migrate', function () {
 //  Artisan::call('migrate', ['--force' => true]);
