@@ -15,6 +15,7 @@ class EducationSeeder extends Seeder
   $grades = [
    ['name' => 'Grade 1', 'order' => '1'],
    ['name' => 'Grade 2', 'order' => '2'],
+   //
   ];
 
   foreach ($grades as $grade) {
