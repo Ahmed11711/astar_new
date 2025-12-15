@@ -16,7 +16,6 @@ Route::prefix('v1/')->group(function () {
   Route::post('login', [LoginController::class, 'login']);
  });
 
-
  Route::prefix('global/')->group(function () {
   Route::get('grades', [ApiHelperFrontController::class, 'getGrades']);
   Route::get('all-school-teacher', [ApiHelperFrontController::class, 'allTeacherAndSchool']);

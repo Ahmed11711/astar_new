@@ -31,7 +31,7 @@ use Illuminate\Support\Facades\Route;
 
 // Route::prefix('admin/v1')->middleware(CheckJwtTokenByAdmin::class)->group(function () {});
 
-
+ 
 Route::prefix('v1')->group(function () {
 
  Route::apiResource('schools', schoolController::class)->names('school');

@@ -120,7 +120,7 @@ public function successResponsePaginate($data, string $message = '', int $code =
         return response()->json([
             'status' => true,
             'message' => $message,
-            'data' => $data->collection, // الموارد بعد التحويل
+            'data' => $data->collection, 
             'meta' => [
                 'current_page' => $paginator->currentPage(),
                 'last_page' => $paginator->lastPage(),
