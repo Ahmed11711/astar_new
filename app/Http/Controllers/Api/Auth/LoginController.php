@@ -17,8 +17,7 @@ class LoginController extends Controller
 
  public function login(Request $request)
  {
-  return 5;
-  $credentials = $request->only('email', 'password');
+  return $credentials = $request->only('email', 'password');
 
   if (! $token = auth('api')->attempt($credentials)) {
    return $this->errorResponse('Invalid credentials', 401);
