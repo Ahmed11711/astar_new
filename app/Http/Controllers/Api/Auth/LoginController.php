@@ -23,6 +23,7 @@ class LoginController extends Controller
    return $this->errorResponse('Invalid credentials', 401);
   }
 
+
   $user = auth('api')->user();
 
   $user->access_token = $token;
