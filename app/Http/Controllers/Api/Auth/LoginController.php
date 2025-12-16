@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Auth\LoginResource;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
+use Tymon\JWTAuth\Facades\JWTAuth;
+
 
 
 
@@ -15,17 +17,16 @@ class LoginController extends Controller
 
  use ApiResponseTrait;
 
+
  public function login(Request $request)
  {
-  return $credentials = $request->only('email', 'password');
+  $credentials = $request->only('email', 'password');
 
-  if (! $token = auth('api')->attempt($credentials)) {
+  if (! $token = JWTAuth::attempt($credentials)) {
    return $this->errorResponse('Invalid credentials', 401);
   }
 
-
-  $user = auth('api')->user();
-
+  $user = JWTAuth::user();
   $user->access_token = $token;
   $user->refresh_token = null;
 
