@@ -33,10 +33,33 @@ class LoginController extends Controller
 
    // (optional) Attach the role to the token.
    $token = JWTAuth::claims(['role' => $user->role])->fromUser($user);
+   $user->access_token = $token;
+   $user->refresh_token = null;
 
-   return response()->json(compact('token'));
+   // return response()->json(compact('token'));
+   return $this->successResponse(
+    new LoginResource($user),
+    'Login Successfully'
+   );
   } catch (JWTException $e) {
    return response()->json(['error' => 'Could not create token'], 500);
   }
  }
+ // public function login(Request $request)
+ // {
+ //  $credentials = $request->only('email', 'password');
+
+ //  if (! $token = JWTAuth::attempt($credentials)) {
+ //   return $this->errorResponse('Invalid credentials', 401);
+ //  }
+
+ //  $user = JWTAuth::user();
+ //  $user->access_token = $token;
+ //  $user->refresh_token = null;
+
+ //  return $this->successResponse(
+ //   new LoginResource($user),
+ //   'Login Successfully'
+ //  );
+ // }
 }
