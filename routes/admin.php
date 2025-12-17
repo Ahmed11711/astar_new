@@ -25,6 +25,7 @@ use App\Http\Controllers\Admin\withdraw\withdrawController;
 use App\Http\Controllers\DataEntry\DataEntryController;
 use App\Http\Controllers\exampleController;
 use App\Http\Middleware\CheckJwtTokenByAdmin;
+use App\Http\Middleware\RoleToken;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
@@ -50,7 +51,15 @@ Route::prefix('v1')->group(function () {
  Route::apiResource('features', FeatureController::class)->names('feature');
  Route::apiResource('feature_packages', FeaturePackageController::class)->names('feature_package');
  Route::apiResource('packages', PackagesController::class)->names('packages');
- Route::apiResource('exams', ExamPaperController::class)->names('exam_paper')->except(['store', 'show']);
- Route::post('exams', [UpdateExamPaperController::class, 'store']);
- Route::get('exams/{id}', [UpdateExamPaperController::class, 'show']);
+
+
+Route::middleware(RoleToken::class)->defaults('roles', ['admin', 'data_entry'])->group(function () {
+      Route::apiResource('exams', ExamPaperController::class)->names('exam_paper')
+            ->except(['store', 'show']);
+      Route::post('exams', [UpdateExamPaperController::class, 'store']);
+    Route::get('exams/{id}', [UpdateExamPaperController::class, 'show']);
+
+    });
+
+
 });

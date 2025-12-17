@@ -36,6 +36,12 @@ class CreateAccountRequest extends BaseRequest
 ],
 
 
+   'pakage_id' => [
+    Rule::requiredIf(fn() => $this->role === 'student'),
+    'exists:packages,id',
+   ],
+
+
    'subject_ids' => [
     'sometimes',
     'array',
