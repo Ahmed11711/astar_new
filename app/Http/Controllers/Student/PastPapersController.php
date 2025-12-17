@@ -9,10 +9,10 @@ use Illuminate\Http\Request;
 
 class PastPapersController extends Controller
 {
+
     public function index()
     {
-
-        $papers = paper::get();
+        $papers = Paper::with('examPaper')->get();
         return $papers;
     }
 }
