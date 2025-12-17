@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Auth\LoginController;
-use App\Http\Controllers\Api\HelperForFront\ApiHelperFrontController;
+use App\Http\Controllers\Api\HelperForFront\FrontAuthController;
 use App\Http\Controllers\Auth\CreateAccountController;
 use App\Http\Middleware\CheckJwtToken;
 use Illuminate\Support\Facades\Artisan;
@@ -18,8 +18,9 @@ Route::prefix('v1/')->group(function () {
     });
 
     Route::prefix('global/')->group(function () {
-        Route::get('grades', [ApiHelperFrontController::class, 'getGrades']);
-        Route::get('all-school-teacher', [ApiHelperFrontController::class, 'allTeacherAndSchool']);
+        Route::get('grades', [FrontAuthController::class, 'getGrades']);
+        Route::get('all-school-teacher', [FrontAuthController::class, 'allTeacherAndSchool']);
+        Route::get('packages', [FrontAuthController::class, 'getPackageByAccount']);
     });
 });
 
