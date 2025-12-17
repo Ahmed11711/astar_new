@@ -17,12 +17,12 @@ class MeResource extends JsonResource
             'is_active'  => (bool) $this->is_active,
 
             'profile' => [
-                'role'               => $this->profile?->role,
-                'student_type'       => $this->profile?->student_type,
-                'educational_stage'  => $this->profile?->educational_stage,
-                'phone'              => $this->profile?->phone,
-                'locale'             => $this->profile?->locale,
-                'school_id'          => $this->profile?->school_id,
+                'role'               => $this->role ?? null,
+                'student_type'       => $this->student_type ?? null,
+                'educational_stage'  => $this->educational_stage ?? null,
+                'phone'              => $this->phone ?? null,
+                'locale'             => $this->locale ?? null,
+                'school_id'          => $this->school_id ?? null,
             ],
 
             'subscription' => [
