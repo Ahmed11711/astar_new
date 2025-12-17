@@ -9,6 +9,14 @@ use Illuminate\Support\Facades\Route;
 
 
 
+Route::get('run-migrate', function () {
+    //
+    Artisan::call('migrate', ['--force' => true]);
+
+    return response()->json([
+        'code' => Artisan::output()
+    ]);
+});
 Route::prefix('v1/')->group(function () {
 
     Route::prefix('auth/')->group(function () {
