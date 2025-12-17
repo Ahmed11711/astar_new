@@ -11,15 +11,16 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1/')->group(function () {
 
- Route::prefix('auth/')->group(function () {
-  Route::post('create-account', [CreateAccountController::class, 'createAccount']);
-  Route::post('login', [LoginController::class, 'login']);
- });
+    Route::prefix('auth/')->group(function () {
+        Route::post('create-account', [CreateAccountController::class, 'createAccount']);
+        Route::post('login', [LoginController::class, 'login']);
+        Route::get('me', [LoginController::class, 'me'])->middleware(CheckJwtToken::class);
+    });
 
- Route::prefix('global/')->group(function () {
-  Route::get('grades', [ApiHelperFrontController::class, 'getGrades']);
-  Route::get('all-school-teacher', [ApiHelperFrontController::class, 'allTeacherAndSchool']);
- });
+    Route::prefix('global/')->group(function () {
+        Route::get('grades', [ApiHelperFrontController::class, 'getGrades']);
+        Route::get('all-school-teacher', [ApiHelperFrontController::class, 'allTeacherAndSchool']);
+    });
 });
 
 
@@ -31,15 +32,15 @@ Route::prefix('v1/')->group(function () {
 //  ]);
 // });
 Route::get('/generate-jwt-secret', function () {
- // ينفذ الأمر
- // Artisan::call('jwt:secret');
- Artisan::call('jwt:secret', ['--force' => true]);
+    // ينفذ الأمر
+    // Artisan::call('jwt:secret');
+    Artisan::call('jwt:secret', ['--force' => true]);
 
 
- return response()->json([
-  'status' => 'success',
-  'output' => Artisan::output(),
- ]);
+    return response()->json([
+        'status' => 'success',
+        'output' => Artisan::output(),
+    ]);
 });
 
 // Route::get('run-migrate-refresh', function () {

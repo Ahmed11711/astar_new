@@ -55,7 +55,7 @@ Route::prefix('v1')->group(function () {
 
 Route::group([
     'middleware' => RoleToken::class,
-    'roles' => ['admin',],
+    'roles' => ['admin','data_entry'],
 ], function () {
 
     Route::apiResource('exams', ExamPaperController::class)
