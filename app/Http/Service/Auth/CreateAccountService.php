@@ -77,7 +77,7 @@ class CreateAccountService
             'ends_at'    => Carbon::now()->addDays(
                 optional($this->getPackageDuration($data['package_id'])) ?? 30
             ),
-            'is_active'  => true,
+            'active'  => true,
         ]);
     }
 
