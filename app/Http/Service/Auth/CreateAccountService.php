@@ -71,7 +71,7 @@ class CreateAccountService
         if (!isset($data['package_id'])) return;
 
         StudentPackage::create([
-            'user_id'    => $user->id,
+            'student_id'    => $user->id,
             'package_id' => $data['package_id'],
             'starts_at'  => Carbon::now(),
             'ends_at'    => Carbon::now()->addDays(
