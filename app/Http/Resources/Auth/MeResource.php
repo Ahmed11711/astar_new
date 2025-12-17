@@ -16,6 +16,8 @@ class MeResource extends JsonResource
             'last_name'  => $this->last_name,
             'is_active'  => (bool) $this->is_active,
 
+
+
             'profile' => [
                 'role'               => $this->role ?? null,
                 'student_type'       => $this->student_type ?? null,
