@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\HelperForFront;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Student\PackageResource;
 use App\Http\Service\HelperService\UserRoleService;
 use App\Models\grade;
 use App\Models\Packages;
@@ -43,6 +44,16 @@ class FrontAuthController extends Controller
 
     public function getPackageByAccount(Request $request)
     {
-        return Packages::forAccount($request->assign_id)->get();
+        $query = Packages::query();
+
+        if ($request->filled('assign_id')) {
+            $query->where('assignable_id', $request->assign_id);
+        } else {
+            $query->where('assign_type', 'system');
+        }
+
+        $dd = $query->with('featuresPackage')->get();
+
+        return PackageResource::collection($dd);
     }
 }
