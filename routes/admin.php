@@ -32,44 +32,40 @@ use Illuminate\Support\Facades\Route;
 
 // Route::prefix('admin/v1')->middleware(CheckJwtTokenByAdmin::class)->group(function () {});
 
- 
+
 Route::prefix('v1')->group(function () {
 
- Route::apiResource('schools', schoolController::class)->names('school');
- Route::apiResource('grades', gradeController::class)->names('grade');
- Route::apiResource('subjects', SubjectController::class)->names('subject');
- Route::apiResource('topics', TopicController::class)->names('topic');
- Route::apiResource('subtopics', SubtopicController::class)->names('subtopic');
- Route::apiResource('teams', TeamController::class)->names('team');
- Route::apiResource('blogs', BlogController::class)->names('blog');
- Route::apiResource('student_registrations', StudentRegistrationsController::class)->names('student_registrations');
- Route::apiResource('trusteds', trustedController::class)->names('trusted');
- Route::apiResource('success-stories', successStoriesController::class)->names('success_stories');
- Route::apiResource('users', UserController::class)->names('user');
- // Route::get('examss', [DataEntryController::class, 'index']);
- Route::apiResource('papers', paperController::class)->names('paper');
- Route::apiResource('features', FeatureController::class)->names('feature');
- Route::apiResource('feature_packages', FeaturePackageController::class)->names('feature_package');
- Route::apiResource('packages', PackagesController::class)->names('packages');
+    Route::apiResource('schools', schoolController::class)->names('school');
+    Route::apiResource('grades', gradeController::class)->names('grade');
+    Route::apiResource('subjects', SubjectController::class)->names('subject');
+    Route::apiResource('topics', TopicController::class)->names('topic');
+    Route::apiResource('subtopics', SubtopicController::class)->names('subtopic');
+    Route::apiResource('teams', TeamController::class)->names('team');
+    Route::apiResource('blogs', BlogController::class)->names('blog');
+    Route::apiResource('student_registrations', StudentRegistrationsController::class)->names('student_registrations');
+    Route::apiResource('trusteds', trustedController::class)->names('trusted');
+    Route::apiResource('success-stories', successStoriesController::class)->names('success_stories');
+    Route::apiResource('users', UserController::class)->names('user');
+    // Route::get('examss', [DataEntryController::class, 'index']);
+    Route::apiResource('papers', paperController::class)->names('paper');
+    Route::apiResource('features', FeatureController::class)->names('feature');
+    Route::apiResource('feature_packages', FeaturePackageController::class)->names('feature_package');
+    Route::apiResource('packages', PackagesController::class)->names('packages');
 
 
-Route::group([
-    'middleware' => RoleToken::class,
-    'roles' => ['admin','data_entry'],
-], function () {
+    Route::group([
+        'middleware' => RoleToken::class,
+        'roles' => ['admin', 'data_entry'],
+    ], function () {
 
-    Route::apiResource('exams', ExamPaperController::class)
-        ->names('exam_paper')
-        ->except(['store', 'show']);
+        Route::apiResource('exams', ExamPaperController::class)
+            ->names('exam_paper')
+            ->except(['store', 'show']);
 
-    Route::post('exams', [UpdateExamPaperController::class, 'store']);
-    Route::get('exams/{id}', [UpdateExamPaperController::class, 'show']);
-    Route::get('test',function(){
-        return 55;
+        Route::post('exams', [UpdateExamPaperController::class, 'store']);
+        Route::get('exams/{id}', [UpdateExamPaperController::class, 'show']);
+        Route::get('test', function () {
+            return 55;
+        });
     });
-
-});
-
-
-
 });
