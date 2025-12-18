@@ -11,68 +11,68 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
- /** @use HasFactory<\Database\Factories\UserFactory> */
- use HasFactory, Notifiable;
+    /** @use HasFactory<\Database\Factories\UserFactory> */
+    use HasFactory, Notifiable;
 
- /**
-  * The attributes that are mass assignable.
-  *
-  * @var list<string>
-  */
- protected $fillable = [
-  'username',
-  'first_name',
-  'last_name',
-  'email',
-  'phone',
-  'is_email_verified',
-  'student_type',
-  'role',
-  'is_active',
- ];
- public function getJWTIdentifier()
- {
-  return $this->getKey();
- }
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
+    protected $fillable = [
+        'username',
+        'first_name',
+        'last_name',
+        'email',
+        'phone',
+        'is_email_verified',
+        'student_type',
+        'role',
+        'is_active',
+    ];
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
 
- public function getJWTCustomClaims()
- {
-  return [];
- }
- public function grades()
- {
-  return $this->belongsToMany(Grade::class, 'user_grade', 'user_id', 'grade_id');
- }
- /**
-  * The attributes that should be hidden for serialization.
-  *
-  * @var list<string>
-  */
- protected $hidden = [
-  'password',
-  'remember_token',
- ];
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
+    public function grades()
+    {
+        return $this->belongsToMany(Grade::class, 'user_grade', 'user_id', 'grade_id');
+    }
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var list<string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
 
- /**
-  * Get the attributes that should be cast.
-  *
-  * @return array<string, string>
-  */
- protected function casts(): array
- {
-  return [
-   'email_verified_at' => 'datetime',
-   // 'password' => 'hashed',
-   //
-  ];
- }
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+            //
+        ];
+    }
 
- // relation for get package schools
+    // relation for get package schools
 
 
 
- public function scopeTeachersAndStudents($query)
- {
-  return $query->whereIn('role', ['school', 'teacher']);
- }
+    public function scopeTeachersAndStudents($query)
+    {
+        return $query->whereIn('role', ['school', 'teacher']);
+    }
 }

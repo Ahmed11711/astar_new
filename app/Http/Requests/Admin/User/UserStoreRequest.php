@@ -27,11 +27,4 @@ class UserStoreRequest extends BaseRequest
             'is_active' => 'required|integer',
         ];
     }
-
-    protected function passedValidation()
-    {
-        $this->merge([
-            'password' => Hash::make($this->password),
-        ]);
-    }
 }
