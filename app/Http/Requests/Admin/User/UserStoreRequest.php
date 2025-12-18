@@ -15,7 +15,7 @@ class UserStoreRequest extends BaseRequest
     public function rules(): array
     {
         return [
-            'username' => 'required|string|max:255|unique:users,username',
+            'username' => 'required|string|max:255',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
