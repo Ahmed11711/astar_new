@@ -40,7 +40,7 @@ class User extends Authenticatable implements JWTSubject
         return [
             'user_id' => $this->id,
             'name' => $this->name,
-            // 'grade_id' => $this->grades()->first()?->id,
+            'grade_id' => $this->grades()->first()?->id ?? null,
 
         ];
     }
