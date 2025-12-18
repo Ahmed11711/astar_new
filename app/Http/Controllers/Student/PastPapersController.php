@@ -23,8 +23,12 @@ class PastPapersController extends Controller
         $userId = $request->user_id;
         $question_id = $id;
 
-        $papers = ExamPaper::where('id', $question_id)->with('questions')->get();
+        $examPaper = ExamPaper::with([
+            'questions.options',
+            'questions.audios',
+            'questions.images',
+        ])->findOrFail($question_id);
 
-        return $papers;
+        return $examPaper;
     }
 }
