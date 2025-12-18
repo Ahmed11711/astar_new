@@ -18,6 +18,6 @@ Route::prefix('v1/student')->group(function () {
 
 
         Route::get('past-papers', [PastPapersController::class, 'index']);
-        Route::get('past-papers/{examPaper}', [PastPapersController::class, 'show']);
+        Route::get('past-paper/{examPaper}', [PastPapersController::class, 'show']);
     });
 });
