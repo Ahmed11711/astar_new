@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Student\Dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Models\Topic;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -12,7 +13,7 @@ class DashboardController extends Controller
         $userId = $request->user_id;
         $subjectIds = $request->student_subject_ids;
 
-        $topics = \App\Models\Topic::whereIn('subject_id', $subjectIds)
+        $topics = Topic::whereIn('subject_id', $subjectIds)
             ->with(['questions.answers' => function ($query) use ($userId) {
                 $query->where('user_id', $userId);
             }])

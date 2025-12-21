@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\otpcontroller;
+use App\Http\Controllers\Student\Ai\AiChateController;
 use App\Http\Controllers\Student\AnswerController;
 use App\Http\Controllers\Student\AttmpateWithAnswerController;
 use App\Http\Controllers\Student\Dashboard\DashboardController;
@@ -26,6 +27,7 @@ Route::prefix('v1/student')->group(function () {
 
 
 
+        Route::apiResource('chat-ai', AiChateController::class);
         Route::get('dashboard', [DashboardController::class, 'index']);
         Route::get('past-papers', [PastPapersController::class, 'index']);
         Route::get('past-paper/{examPaper}', [PastPapersController::class, 'show']);
