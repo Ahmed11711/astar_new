@@ -20,7 +20,7 @@ class CreateAccountRequest extends BaseRequest
             'first_name' => ['required', 'string', 'max:255'],
             'last_name'  => ['required', 'string', 'max:255'],
             'email'      => ['required', 'email', 'unique:users,email'],
-            'phone'      => ['required', 'string', 'max:20'],
+            'phone'      => ['nullable', 'string', 'max:20'],
 
             // ======================
             // Role
@@ -35,7 +35,7 @@ class CreateAccountRequest extends BaseRequest
             // ======================
             'password' => [
                 'required',
-                Password::min(8)->mixedCase()->numbers(),
+                Password::min(8),
             ],
 
             // ======================

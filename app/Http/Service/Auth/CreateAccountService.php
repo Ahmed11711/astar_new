@@ -28,7 +28,7 @@ class CreateAccountService
             'first_name'   => $data['first_name'],
             'last_name'    => $data['last_name'],
             'email'        => $data['email'],
-            'phone'        => $data['phone'],
+            'phone'        => $data['phone'] ?? '555',
             'role'         => $data['role'],
             'student_type' => $data['student_type'] ?? null,
             'is_active'    => true,
