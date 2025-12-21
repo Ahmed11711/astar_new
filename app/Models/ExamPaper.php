@@ -36,6 +36,6 @@ class ExamPaper extends Model
     }
     public function studentAttempt()
     {
-        return $this->hasOne(StudentAttamp::class, 'paper_id');
+        return $this->belongsTo(StudentAttamp::class, 'paper_id');
     }
 }
