@@ -46,7 +46,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function grades()
     {
-        return $this->belongsToMany(Grade::class, 'user_grades', 'user_id', 'grade_id');
+        return $this->belongsToMany(grade::class, 'user_grades', 'user_id', 'grade_id');
     }
     /**
      * The attributes that should be hidden for serialization.
