@@ -24,6 +24,7 @@ class PackageResource extends JsonResource
             'duration_days' => $this->duration_days,
             'assignable_id' => $this->assignable_id,
             'assign_type' => $this->assign_type,
+            'is_user_package' => $this->is_user_package ?? null,
             'features_package' => FeaturePackageResource::collection($this->featuresPackage),
         ];
     }

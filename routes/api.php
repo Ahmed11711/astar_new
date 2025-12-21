@@ -52,7 +52,6 @@ Route::get('run-migrate', function () {
     ]);
 });
 Route::get('/generate-jwt-secret', function () {
-    // ينفذ الأمر
     // Artisan::call('jwt:secret');
     Artisan::call('jwt:secret', ['--force' => true]);
 
