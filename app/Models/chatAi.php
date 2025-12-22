@@ -12,12 +12,12 @@ class chatAi extends Model
     // العلاقة مع الردود
     public function replies()
     {
-        return $this->hasMany(ChatAi::class, 'parent_id');
+        return $this->hasMany(chatAi::class, 'parent_id');
     }
 
     // العلاقة للاب (optional)
     public function parent()
     {
-        return $this->belongsTo(ChatAi::class, 'parent_id');
+        return $this->belongsTo(chatAi::class, 'parent_id');
     }
 }

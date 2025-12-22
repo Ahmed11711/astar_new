@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Student\Ai;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Student\Ai\AiChateRequest;
-use App\Models\ChatAi;
+use App\Models\chatAi;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
