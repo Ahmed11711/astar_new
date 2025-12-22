@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Student\Dashboard;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\CarbonPeriod;
 
 class DashboardController extends Controller
 {
@@ -13,10 +14,17 @@ class DashboardController extends Controller
         $userId = $request->user_id;
         $subjectIds = $request->student_subject_ids;
 
+        // الفترة الأسبوعية (يمكن تعديلها حسب الحاجة)
+        $from = $request->from ?? now()->subWeek()->startOfDay();
+        $to   = $request->to   ?? now()->endOfDay();
+        $period = CarbonPeriod::create($from->format('Y-m-d'), $to->format('Y-m-d'));
+
+        // 1️⃣ جلب كل Subjects
         $subjects = DB::table('subjects')
             ->whereIn('id', $subjectIds)
             ->get();
 
+        // 2️⃣ جلب Topics و SubTopics مع إجمالي الأسئلة والدرجات والإجابات
         $topicsData = DB::table('topics')
             ->leftJoin('questions as topic_questions', 'topic_questions.topic_id', '=', 'topics.id')
             ->leftJoin('subtopics', 'subtopics.topic_id', '=', 'topics.id')
@@ -44,33 +52,70 @@ class DashboardController extends Controller
             ->groupBy('topics.id', 'topics.name', 'topics.subject_id', 'subtopics.id', 'subtopics.name')
             ->get();
 
+        // 3️⃣ جلب الإجابات اليومية للمستخدم لكل SubTopic
+        $dailyAnswers = DB::table('answers')
+            ->join('questions', 'questions.id', '=', 'answers.question_id')
+            ->join('subtopics', 'subtopics.id', '=', 'questions.subtopics_id')
+            ->where('answers.user_id', $userId)
+            ->whereBetween('answers.created_at', [$from, $to])
+            ->select(
+                'subtopics.id as subtopic_id',
+                DB::raw('DATE(answers.created_at) as day'),
+                DB::raw('COUNT(*) as answered_count')
+            )
+            ->groupBy('subtopics.id', DB::raw('DATE(answers.created_at)'))
+            ->orderBy('day')
+            ->get();
 
-        $result = $subjects->map(function ($subject) use ($topicsData) {
+        // 4️⃣ ترتيب البيانات لكل Subject > Topic > SubTopic + daily array
+        $result = $subjects->map(function ($subject) use ($topicsData, $dailyAnswers, $period) {
 
             $subjectTopics = $topicsData->where('subject_id', $subject->id)
                 ->groupBy('topic_id');
 
-            $topics = $subjectTopics->map(function ($topicGroup) {
+            $topics = $subjectTopics->map(function ($topicGroup) use ($dailyAnswers, $period) {
 
                 $topic = $topicGroup->first();
 
-                $subtopics = $topicGroup->filter(fn($t) => $t->subtopic_id !== null)->map(function ($sub) {
+                $subtopics = $topicGroup->filter(fn($t) => $t->subtopic_id !== null)->map(function ($sub) use ($dailyAnswers, $period) {
+
+                    $cumulativeAnswered = 0;
+                    $dailyData = [];
+
+                    foreach ($period as $date) {
+                        $day = $date->format('Y-m-d');
+                        $answeredToday = $dailyAnswers
+                            ->where('subtopic_id', $sub->subtopic_id)
+                            ->where('day', $day)
+                            ->sum('answered_count');
+
+                        $cumulativeAnswered += $answeredToday;
+                        $remaining = max($sub->total_questions - $cumulativeAnswered, 0);
+
+                        $dailyData[] = [
+                            'day' => $day,
+                            'answered' => (int)$answeredToday,
+                            'remaining' => (int)$remaining,
+                        ];
+                    }
+
                     return [
-                        'subtopic_name'      => $sub->subtopic_name,
-                        'total_marks'        => (int)$sub->total_marks,
-                        'student_marks'      => (int)$sub->student_marks,
+                        'subtopic_name' => $sub->subtopic_name,
+                        'total_marks' => (int)$sub->total_marks,
+                        'student_marks' => (int)$sub->student_marks,
                         'answered_questions' => (int)$sub->answered_questions,
-                        'total_questions'    => (int)$sub->total_questions,
+                        'total_questions' => (int)$sub->total_questions,
+                        'daily' => $dailyData,
                     ];
                 })->values();
 
                 return [
-                    'topic_name'         => $topic->topic_name,
-                    'total_marks'        => (int)$topic->total_marks,
-                    'student_marks'      => (int)$topic->student_marks,
+                    'topic_name' => $topic->topic_name,
+                    'total_marks' => (int)$topic->total_marks,
+                    'student_marks' => (int)$topic->student_marks,
                     'answered_questions' => (int)$topic->answered_questions,
-                    'total_questions'    => (int)$topic->total_questions,
-                    'subtopics'          => $subtopics,
+                    'total_questions' => (int)$topic->total_questions,
+                    'subtopics' => $subtopics,
                 ];
             })->values();
 
@@ -78,10 +123,10 @@ class DashboardController extends Controller
             $subjectAnsweredQuestions = $topics->sum('answered_questions');
 
             return [
-                'subject_name'              => $subject->name,
-                'subject_id'                => $subject->id,
-                'topics'                    => $topics,
-                'subject_total_questions'   => $subjectTotalQuestions,
+                'subject_name' => $subject->name,
+                'subject_id' => $subject->id,
+                'topics' => $topics,
+                'subject_total_questions' => $subjectTotalQuestions,
                 'subject_answered_questions' => $subjectAnsweredQuestions,
             ];
         });
