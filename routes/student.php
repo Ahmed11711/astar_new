@@ -32,6 +32,8 @@ Route::prefix('v1/student')->group(function () {
         Route::get("my-package", [PakageController::class, 'getPackageByAccount']);
         Route::post("upgrade-my-package", [PakageController::class, 'upgrade']);
         Route::get('dashboard', [DashboardController::class, 'index']);
+        Route::get('dashboard-chart', [DashboardController::class, 'topicProgressPerDay']);
+
         Route::get('past-papers', [PastPapersController::class, 'index']);
         Route::get('past-paper/{examPaper}', [PastPapersController::class, 'show']);
         Route::post('attamepate', [AttmpateWithAnswerController::class, 'createAttamepate']);

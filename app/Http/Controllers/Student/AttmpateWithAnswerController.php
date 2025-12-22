@@ -25,6 +25,7 @@ class AttmpateWithAnswerController extends Controller
         $activeAttempt = StudentAttamp::query()
             ->where('user_id', $userId)
             ->where('exam_id', $data['exam_id'])
+            ->where('is_saved', 0)
             // ->whereNull('finished_at')
             ->first();
 

@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Student\Dashboard;
 
 use App\Http\Controllers\Controller;
-use App\Models\Topic;
-use App\Models\SubTopic;
-use Illuminate\Http\Request;
 use App\Models\Subject;
+use App\Models\SubTopic;
+use App\Models\Topic;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 
 
 class DashboardController extends Controller
@@ -75,5 +77,49 @@ class DashboardController extends Controller
         });
 
         return response()->json($result);
+    }
+
+
+
+
+    public function topicProgressPerDay(Request $request)
+    {
+        $userId = $request->user_id;
+
+        $from = $request->from ?? now()->subWeek()->startOfDay();
+        $to   = $request->to   ?? now()->endOfDay();
+
+        $data = DB::table('topics')
+            ->join('subtopics', 'subtopics.topic_id', '=', 'topics.id')
+            ->join('questions', 'questions.subtopics_id', '=', 'subtopics.id')
+            ->leftJoin('answers', function ($join) use ($userId, $from, $to) {
+                $join->on('answers.question_id', '=', 'questions.id')
+                    ->where('answers.user_id', $userId)
+                    ->whereBetween('answers.created_at', [$from, $to]);
+            })
+            ->groupBy(
+                'topics.id',
+                'topics.name',
+                'subtopics.id',
+                'subtopics.name',
+                DB::raw('DATE(answers.created_at)')
+            )
+            ->select(
+                'topics.id as topic_id',
+                'topics.name as topic_name',
+                'subtopics.id as subtopic_id',
+                'subtopics.name as subtopic_name',
+
+                DB::raw('DATE(answers.created_at) as day'),
+                DB::raw('COUNT(DISTINCT answers.question_id) as answered_questions')
+            )
+            ->orderBy('day')
+            ->get();
+
+        return response()->json([
+            'from' => $from,
+            'to'   => $to,
+            'data' => $data,
+        ]);
     }
 }
