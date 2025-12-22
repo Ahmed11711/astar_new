@@ -21,7 +21,7 @@ class Topic extends BaseModel
 
     public function subTopics()
     {
-        return $this->hasMany(SubTopic::class, 'topic_id');
+        return $this->hasMany(Subtopic::class, 'topic_id');
     }
 
     public function subTopic()
