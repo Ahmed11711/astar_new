@@ -40,7 +40,7 @@ class AnswerController extends Controller
         })->toArray();
 
         DB::transaction(function () use ($upsertData, $attempt, $request) {
-            Answer::upsert(
+            answer::upsert(
                 $upsertData,
                 ['attempt_id', 'question_id', 'question_index', 'user_id'],
                 ['response', 'is_flagged', 'updated_at']
