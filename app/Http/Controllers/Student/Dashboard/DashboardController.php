@@ -18,14 +18,16 @@ class DashboardController extends Controller
             ->get();
 
         $topicsData = DB::table('topics')
+            ->leftJoin('questions as topic_questions', 'topic_questions.topic_id', '=', 'topics.id')
             ->leftJoin('subtopics', 'subtopics.topic_id', '=', 'topics.id')
-            ->leftJoin('questions', function ($join) {
-                $join->on('questions.topic_id', '=', 'topics.id')
-                    ->orOn('questions.subtopics_id', '=', 'subtopics.id');
+            ->leftJoin('questions as sub_questions', 'sub_questions.subtopics_id', '=', 'subtopics.id')
+            ->leftJoin('answers as topic_answers', function ($join) use ($userId) {
+                $join->on('topic_answers.question_id', '=', 'topic_questions.id')
+                    ->where('topic_answers.user_id', $userId);
             })
-            ->leftJoin('answers', function ($join) use ($userId) {
-                $join->on('answers.question_id', '=', 'questions.id')
-                    ->where('answers.user_id', $userId);
+            ->leftJoin('answers as sub_answers', function ($join) use ($userId) {
+                $join->on('sub_answers.question_id', '=', 'sub_questions.id')
+                    ->where('sub_answers.user_id', $userId);
             })
             ->whereIn('topics.subject_id', $subjectIds)
             ->select(
@@ -34,13 +36,14 @@ class DashboardController extends Controller
                 'topics.subject_id',
                 'subtopics.id as subtopic_id',
                 'subtopics.name as subtopic_name',
-                DB::raw('COUNT(DISTINCT questions.id) as total_questions'),
-                DB::raw('COUNT(DISTINCT answers.id) as answered_questions'),
-                DB::raw('SUM(questions.question_max_score) as total_marks'),
-                DB::raw('SUM(COALESCE(answers.mark_score,0)) as student_marks')
+                DB::raw('COUNT(DISTINCT topic_questions.id) + COUNT(DISTINCT sub_questions.id) as total_questions'),
+                DB::raw('COUNT(DISTINCT topic_answers.id) + COUNT(DISTINCT sub_answers.id) as answered_questions'),
+                DB::raw('SUM(COALESCE(topic_questions.question_max_score,0)) + SUM(COALESCE(sub_questions.question_max_score,0)) as total_marks'),
+                DB::raw('SUM(COALESCE(topic_answers.mark_score,0)) + SUM(COALESCE(sub_answers.mark_score,0)) as student_marks')
             )
             ->groupBy('topics.id', 'topics.name', 'topics.subject_id', 'subtopics.id', 'subtopics.name')
             ->get();
+
 
         $result = $subjects->map(function ($subject) use ($topicsData) {
 
