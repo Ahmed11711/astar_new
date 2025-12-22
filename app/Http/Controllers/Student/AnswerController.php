@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Student\Answer\SaveAnswerRequest;
-use App\Models\Answer;
+use App\Models\answer;
 use App\Models\StudentAttamp;
 use Illuminate\Support\Facades\DB;
 
