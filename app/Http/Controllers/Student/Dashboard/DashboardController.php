@@ -16,7 +16,7 @@ class DashboardController extends Controller
 
         // الفترة الأسبوعية (يمكن تعديلها حسب الحاجة)
         $from = $request->from ?? now()->subWeek()->startOfDay();
-        $to   = $request->to   ?? now()->endOfDay();
+        $to   = $request->to ?? now()->endOfDay();
         $period = CarbonPeriod::create($from->format('Y-m-d'), $to->format('Y-m-d'));
 
         // 1️⃣ جلب كل Subjects
@@ -24,7 +24,7 @@ class DashboardController extends Controller
             ->whereIn('id', $subjectIds)
             ->get();
 
-        // 2️⃣ جلب Topics و SubTopics مع إجمالي الأسئلة والدرجات والإجابات
+        // 2️⃣ جلب Topics و SubTopics مع إجمالي الأسئلة والدرجات وإجابات المستخدم
         $topicsData = DB::table('topics')
             ->leftJoin('questions as topic_questions', 'topic_questions.topic_id', '=', 'topics.id')
             ->leftJoin('subtopics', 'subtopics.topic_id', '=', 'topics.id')
@@ -109,16 +109,23 @@ class DashboardController extends Controller
                     ];
                 })->values();
 
+                // جمع marks من SubTopics
+                $topicTotalMarks = (int)$topic->total_marks + $subtopics->sum('total_marks');
+                $topicStudentMarks = (int)$topic->student_marks + $subtopics->sum('student_marks');
+
                 return [
                     'topic_name' => $topic->topic_name,
-                    'total_marks' => (int)$topic->total_marks,
-                    'student_marks' => (int)$topic->student_marks,
+                    'total_marks' => $topicTotalMarks,
+                    'student_marks' => $topicStudentMarks,
                     'answered_questions' => (int)$topic->answered_questions,
                     'total_questions' => (int)$topic->total_questions,
                     'subtopics' => $subtopics,
                 ];
             })->values();
 
+            // جمع marks من كل Topics
+            $subjectTotalMarks = $topics->sum('total_marks');
+            $subjectStudentMarks = $topics->sum('student_marks');
             $subjectTotalQuestions = $topics->sum('total_questions');
             $subjectAnsweredQuestions = $topics->sum('answered_questions');
 
@@ -128,6 +135,8 @@ class DashboardController extends Controller
                 'topics' => $topics,
                 'subject_total_questions' => $subjectTotalQuestions,
                 'subject_answered_questions' => $subjectAnsweredQuestions,
+                'subject_total_marks' => $subjectTotalMarks,
+                'subject_student_marks' => $subjectStudentMarks,
             ];
         });
 
