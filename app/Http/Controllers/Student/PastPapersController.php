@@ -44,7 +44,7 @@ class PastPapersController extends Controller
             'studentAttempt' => function ($query) use ($userId) {
                 $query->where('user_id', $userId);
             },
-            'questions.asnwer' => function ($query) use ($userId) {
+            'questions.lastAnswer' => function ($query) use ($userId) {
                 $query->where('user_id', $userId);
             },
         ])->findOrFail($id);
