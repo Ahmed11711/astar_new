@@ -34,8 +34,12 @@ class ExamPaper extends Model
     {
         return $this->belongsTo(paper::class, 'paper_id');
     }
+    // public function studentAttempt()
+    // {
+    //     return $this->belongsTo(StudentAttamp::class, 'paper_id');
+    // }
     public function studentAttempt()
     {
-        return $this->belongsTo(StudentAttamp::class, 'paper_id');
+        return $this->hasMany(StudentAttamp::class, 'exam_id');
     }
 }

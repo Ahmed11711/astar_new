@@ -20,6 +20,9 @@ class PastPapersController extends Controller
         $gradeId    = $request->student_grade_id;
         $subjectIds = $request->student_subject_ids;
 
+
+
+
         $papers = ExamPaper::query()
             ->where('grade_id', $gradeId)
             ->whereIn('subject_id', $subjectIds)
