@@ -13,14 +13,13 @@ class StudentAttamp extends Model
         return $this->belongsTo(ExamPaper::class, 'exam_id');
     }
 
-    public function سس()
+    public function answers()
     {
         return $this->hasMany(answer::class, 'attempt_id');
     }
-    public function answers()
+    public function lastAnswer()
     {
-        return $this->hasOne(Answer::class, 'question_id')
-            ->where('user_id', auth()->id() ?? null) // لو حابب فلتر على الطالب الحالي
-            ->latest('created_at'); // آخر إجابة حسب وقت الإنشاء
+        return $this->hasOne(answer::class, 'question_id')
+            ->latest('created_at'); // آخر إجابة
     }
 }

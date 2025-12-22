@@ -63,7 +63,7 @@ class PastPapersController extends Controller
             'examPaper.questions.options',
             'examPaper.questions.audios',
             'examPaper.questions.images',
-            'examPaper.questions.answers' => function ($query) use ($userId) {
+            'examPaper.questions.lastAnswer' => function ($query) use ($userId) {
                 $query->where('user_id', $userId);
             },
         ])->findOrFail($attemptId);
