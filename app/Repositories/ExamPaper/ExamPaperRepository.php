@@ -16,8 +16,16 @@ class ExamPaperRepository extends BaseRepository implements ExamPaperRepositoryI
     public function allData($id)
     {
         $data = $this->model
-            ->with(['questions.options', 'subject', 'grade', 'paper'])
+            ->with([
+                'subject',
+                'grade',
+                'paper',
+                'questions.options',
+                'questions.audios',
+                'questions.images',
+            ])
             ->find($id);
+
 
         if (!$data) {
             return null;
