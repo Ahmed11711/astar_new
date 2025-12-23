@@ -54,6 +54,8 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('features', FeatureController::class)->names('feature');
     Route::apiResource('feature_packages', FeaturePackageController::class)->names('feature_package');
     Route::apiResource('packages', PackagesController::class)->names('packages');
+    Route::apiResource('social_media', SocialMediaController::class)->names('social_media');
+
 
 
     Route::group([
@@ -67,6 +69,5 @@ Route::prefix('v1')->group(function () {
 
         Route::post('exams', [UpdateExamPaperController::class, 'store']);
         Route::get('exams/{id}', [UpdateExamPaperController::class, 'show']);
-        Route::apiResource('social_media', SocialMediaController::class)->names('social_media');
     });
 });
