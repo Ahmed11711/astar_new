@@ -13,7 +13,7 @@ class FeaturePackageResource extends JsonResource
             'package_id' => $this->package_id,
             'package_title' => $this->package->name ?? "",
             'feature_id' => $this->feature_id,
-            'feature_name' => $this->feature->label ?? "",
+            'feature_name' => $this->feature->key ?? "",
             'value' => $this->value,
             'lable' => $this->lable ?? null,
             'created_at' => $this->created_at,

@@ -11,7 +11,7 @@ class FeatureResource extends JsonResource
         return [
             'id' => $this->id,
             'key' => $this->key,
-            'label' => $this->label,
+            // 'label' => $this->label,
             'type' => $this->type,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
