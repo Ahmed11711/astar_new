@@ -27,8 +27,7 @@ use App\Repositories\User\UserRepository;
 use App\Repositories\successStories\successStoriesRepositoryInterface;
 use App\Repositories\successStories\successStoriesRepository;
 
-use App\Repositories\trusted\trustedRepositoryInterface;
-use App\Repositories\trusted\trustedRepository;
+
 
 use App\Repositories\StudentRegistrations\StudentRegistrationsRepositoryInterface;
 use App\Repositories\StudentRegistrations\StudentRegistrationsRepository;
@@ -72,7 +71,6 @@ class AppServiceProvider extends ServiceProvider
     $this->app->bind(TeamRepositoryInterface::class, TeamRepository::class);
     $this->app->bind(BlogRepositoryInterface::class, BlogRepository::class);
     $this->app->bind(StudentRegistrationsRepositoryInterface::class, StudentRegistrationsRepository::class);
-    $this->app->bind(trustedRepositoryInterface::class, trustedRepository::class);
     $this->app->bind(successStoriesRepositoryInterface::class, successStoriesRepository::class);
     $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
     $this->app->bind(paperRepositoryInterface::class, paperRepository::class);

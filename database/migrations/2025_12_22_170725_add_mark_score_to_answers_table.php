@@ -12,8 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('answers', function (Blueprint $table) {
-            $table->integer('mark_score')->nullable()->after('question_id'); // عمود قابل أن يكون NULL
-
+            $table->integer('mark_score')->nullable()->after('question_id');
         });
     }
 

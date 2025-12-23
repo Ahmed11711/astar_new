@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\Auth\AuthController;
 use App\Http\Controllers\Admin\Blog\BlogController;
 use App\Http\Controllers\Admin\Company\CompanyController;
+use App\Http\Controllers\Admin\Dashboard\DashboardController;
 use App\Http\Controllers\Admin\ExamPaper\ExamPaperController;
 use App\Http\Controllers\Admin\ExamPaper\UpdateExamPaperController;
 use App\Http\Controllers\Admin\Feature\FeatureController;
@@ -35,6 +36,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
 
+    Route::get('dashboard', [DashboardController::class, 'index']);
     Route::apiResource('schools', schoolController::class)->names('school');
     Route::apiResource('grades', gradeController::class)->names('grade');
     Route::apiResource('subjects', SubjectController::class)->names('subject');
@@ -43,7 +45,6 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('teams', TeamController::class)->names('team');
     Route::apiResource('blogs', BlogController::class)->names('blog');
     Route::apiResource('student_registrations', StudentRegistrationsController::class)->names('student_registrations');
-    Route::apiResource('trusteds', trustedController::class)->names('trusted');
     Route::apiResource('success-stories', successStoriesController::class)->names('success_stories');
     Route::apiResource('users', UserController::class)->names('user');
     // Route::get('examss', [DataEntryController::class, 'index']);

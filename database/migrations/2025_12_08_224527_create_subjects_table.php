@@ -17,7 +17,6 @@ return new class extends Migration
             $table->unsignedBigInteger('grade_id');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
-
             $table->foreign('grade_id')->references('id')->on('grades')->onDelete('cascade');
         });
     }
