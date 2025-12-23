@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Admin\trusted;
 
-use App\Repositories\trusted\trustedRepositoryInterface;
 use App\Http\Controllers\BaseController\BaseController;
 use App\Http\Requests\Admin\trusted\trustedStoreRequest;
 use App\Http\Requests\Admin\trusted\trustedUpdateRequest;
-use App\Http\Resources\Admin\trusted\trustedResource;
+use App\Http\Resources\trusted\trustedResource;
+use App\Repositories\trusted\trustedRepositoryInterface;
 
 class trustedController extends BaseController
 {
