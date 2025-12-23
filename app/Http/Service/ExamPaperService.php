@@ -11,8 +11,8 @@ class ExamPaperService
 {
     public function createExamPaperWithQuestions($data)
     {
-        // return $data;
         return DB::transaction(function () use ($data) {
+
             $paper = ExamPaper::create([
                 'subject_id'       => $data['subject_id'],
                 'grade_id'         => $data['grade_id'],
@@ -39,10 +39,18 @@ class ExamPaperService
         });
     }
 
-    private function insertQuestions($paperId, $questions, $parentId = null, $subjectId = null, $topicId = null)
-    {
+    private function insertQuestions(
+        $paperId,
+        $questions,
+        $parentId = null,
+        $subjectId = null,
+        $topicId = null
+    ) {
         foreach ($questions as $q) {
 
+            // =========================
+            // Create Question
+            // =========================
             $question = Question::create([
                 'exam_paper_id'      => $paperId,
                 'subject_id'         => $subjectId,
@@ -54,12 +62,15 @@ class ExamPaperService
                 'question_max_score' => $q['question_max_score'] ?? null,
                 'marking_scheme'     => $q['marking_scheme'] ?? [],
                 'has_options'        => !empty($q['options']),
-                'parent_id' => $parentId,
+                'parent_id'          => $parentId,
             ]);
 
-            // insert options
+            // =========================
+            // Insert Options
+            // =========================
             if (!empty($q['options'])) {
                 $opts = [];
+
                 foreach ($q['options'] as $o) {
                     $opts[] = [
                         'question_id' => $question->id,
@@ -67,10 +78,49 @@ class ExamPaperService
                         'is_correct'  => $o['is_correct'],
                     ];
                 }
+
                 QuestionOption::insert($opts);
             }
 
-            // recursive for sub-questions
+            // =========================
+            // Insert Images
+            // =========================
+            if (!empty($q['images'])) {
+                $images = [];
+
+                foreach ($q['images'] as $img) {
+                    $images[] = [
+                        'question_id' => $question->id,
+                        'path'        => $img['path'],
+                        'created_at'  => now(),
+                        'updated_at'  => now(),
+                    ];
+                }
+
+                DB::table('question_images')->insert($images);
+            }
+
+            // =========================
+            // Insert Audios
+            // =========================
+            if (!empty($q['audios'])) {
+                $audios = [];
+
+                foreach ($q['audios'] as $audio) {
+                    $audios[] = [
+                        'question_id' => $question->id,
+                        'path'        => $audio['path'],
+                        'created_at'  => now(),
+                        'updated_at'  => now(),
+                    ];
+                }
+
+                DB::table('question_audios')->insert($audios);
+            }
+
+            // =========================
+            // Recursive Sub Questions
+            // =========================
             if (!empty($q['sub_questions'])) {
                 $this->insertQuestions(
                     $paperId,
