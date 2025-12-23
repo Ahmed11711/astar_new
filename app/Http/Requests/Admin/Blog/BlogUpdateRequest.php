@@ -17,7 +17,7 @@ class BlogUpdateRequest extends BaseRequest
             'title' => 'sometimes|required|string|max:255',
             'slug' => 'sometimes|required|string|max:255|unique:blogs,slug,' . $this->route('blog') . ',id',
             'content' => 'sometimes|required|string',
-            'img' => 'nullable|sometimes|max:255|file|max:2048',
+            'img' => 'nullable|file',
             'author_id' => 'nullable|sometimes|integer',
             'is_published' => 'sometimes|required|integer',
         ];

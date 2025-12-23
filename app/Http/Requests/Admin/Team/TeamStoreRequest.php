@@ -16,7 +16,7 @@ class TeamStoreRequest extends BaseRequest
         return [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:255',
-            'img' => 'nullable|max:255|file|max:2048',
+            'img' => 'nullable|file',
             'is_active' => 'nullable|integer',
         ];
     }

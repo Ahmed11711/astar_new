@@ -16,7 +16,7 @@ class TeamUpdateRequest extends BaseRequest
         return [
             'name' => 'sometimes|required|string|max:255',
             'description' => 'nullable|sometimes|string|max:255',
-            'img' => 'nullable|sometimes|max:255|file|max:2048',
+            'img' => 'nullable|file',
             'is_active' => 'sometimes|required|integer',
         ];
     }
