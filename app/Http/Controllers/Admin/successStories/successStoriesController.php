@@ -17,7 +17,6 @@ class successStoriesController extends BaseController
         $this->initService(
             repository: $repository,
             collectionName: 'successStories',
-            fileFields: ['img']
         );
 
         $this->storeRequestClass = successStoriesStoreRequest::class;
