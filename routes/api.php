@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 
 
 
-Route::get('run-migrate', function () {
+Route::get('run-migratessgit', function () {
     //
     Artisan::call('migrate:refresh', ['--force' => true]);
     Artisan::call('db:seed', [
