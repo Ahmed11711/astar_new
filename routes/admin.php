@@ -67,9 +67,6 @@ Route::prefix('v1')->group(function () {
 
         Route::post('exams', [UpdateExamPaperController::class, 'store']);
         Route::get('exams/{id}', [UpdateExamPaperController::class, 'show']);
-        Route::get('test', function () {
-            return 55;
-            Route::apiResource('social_media', SocialMediaController::class)->names('social_media');
-});
+        Route::apiResource('social_media', SocialMediaController::class)->names('social_media');
     });
 });
