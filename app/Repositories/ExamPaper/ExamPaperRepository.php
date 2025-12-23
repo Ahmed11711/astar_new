@@ -8,21 +8,21 @@ use App\Models\ExamPaper;
 
 class ExamPaperRepository extends BaseRepository implements ExamPaperRepositoryInterface
 {
- public function __construct(ExamPaper $model)
- {
-  parent::__construct($model);
- }
+    public function __construct(ExamPaper $model)
+    {
+        parent::__construct($model);
+    }
 
- public function allData($id)
- {
-  $data = $this->model
-   ->with(['questions.option', 'subject', 'grade', 'paper'])
-   ->find($id);
+    public function allData($id)
+    {
+        $data = $this->model
+            ->with(['questions.options', 'subject', 'grade', 'paper'])
+            ->find($id);
 
-  if (!$data) {
-   return null;
-  }
+        if (!$data) {
+            return null;
+        }
 
-  return $data;
- }
+        return $data;
+    }
 }
