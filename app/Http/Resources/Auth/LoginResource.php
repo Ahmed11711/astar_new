@@ -30,7 +30,7 @@ class LoginResource extends JsonResource
                 'starts_at'     => $this->latestStudentPackage->starts_at,
                 'ends_at'       => $this->latestStudentPackage->ends_at,
                 'status'        => $this->latestStudentPackage->status,
-                'transaction_id' => $this->latestStudentPackage->transaction_id,
+                'type'          => $this->latestStudentPackage->type,
             ] : null,
             'tokens' => [
                 'access'  => $this->access_token ?? null,
