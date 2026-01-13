@@ -122,6 +122,9 @@ class DashboardController extends Controller
             $subjectTotalQuestions = $topics->sum('total_questions');
             $subjectAnsweredQuestions = $topics->sum('answered_questions');
 
+            // days analysis for the subject
+
+
             return [
                 'subject_name' => $subject->name,
                 'subject_id' => $subject->id,
@@ -132,7 +135,64 @@ class DashboardController extends Controller
                 'subject_student_marks' => $subjectStudentMarks,
             ];
         });
+        $subjectsWeeklyScores = $subjects->map(function ($subject) use ($result, $period) {
 
-        return response()->json($result);
+            $subjectData = $result->firstWhere('subject_id', $subject->id);
+
+            $dailyScores = [];
+
+            foreach ($period as $date) {
+                $day = $date->format('Y-m-d');
+
+                $dayStudentMarks = 0;
+                $dayTotalMarks   = 0;
+
+                foreach ($subjectData['topics'] as $topic) {
+                    foreach ($topic['subtopics'] as $subtopic) {
+
+                        $daily = collect($subtopic['daily'])
+                            ->firstWhere('day', $day);
+
+                        if (!$daily || $daily['answered'] == 0) {
+                            continue;
+                        }
+
+                        $answeredToday = $daily['answered'];
+
+                        $avgStudentMarkPerQuestion = $subtopic['answered_questions'] > 0
+                            ? $subtopic['student_marks'] / $subtopic['answered_questions']
+                            : 0;
+
+                        $avgTotalMarkPerQuestion = $subtopic['total_questions'] > 0
+                            ? $subtopic['total_marks'] / $subtopic['total_questions']
+                            : 0;
+
+                        $dayStudentMarks += $avgStudentMarkPerQuestion * $answeredToday;
+                        $dayTotalMarks   += $avgTotalMarkPerQuestion * $answeredToday;
+                    }
+                }
+
+                $scorePercentage = $dayTotalMarks > 0
+                    ? round(($dayStudentMarks / $dayTotalMarks) * 100, 2)
+                    : 0;
+
+                $dailyScores[] = [
+                    'day' => $day,
+                    'score_percentage' => $scorePercentage,
+                ];
+            }
+
+            return [
+                'subject_id' => $subject->id,
+                'subject_name' => $subject->name,
+                'daily_scores' => $dailyScores,
+            ];
+        });
+
+
+        return response()->json([
+            'subjects_data' => $result,
+            'subjects_weekly_scores' => $subjectsWeeklyScores,
+        ]);
     }
 }
