@@ -49,6 +49,12 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasOne(StudentPackage::class, 'student_id', 'id');
     }
 
+    public function latestStudentPackage()
+    {
+        return $this->hasOne(StudentPackage::class, 'student_id', 'id')->latestOfMany();
+    }
+
+
 
     public function grades()
     {
