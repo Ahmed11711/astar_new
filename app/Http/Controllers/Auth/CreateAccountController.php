@@ -5,21 +5,39 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\CreateAccountRequest;
 use App\Http\Service\Auth\CreateAccountService;
-use App\Models\StudentAssignment;
-use App\Models\User;
-use App\Models\UserGrade;
+use App\Http\Service\Payment\KashierPaymentService;
 use App\Traits\ApiResponseTrait;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 
 class CreateAccountController extends Controller
 {
     use ApiResponseTrait;
-    public function createAccount(CreateAccountRequest $request)
-    {
-        $user = app(CreateAccountService::class)
-            ->execute($request->validated());
 
-        return $this->successResponse($user, 'Account created successfully');
+    public function createAccount(
+        CreateAccountRequest $request,
+        CreateAccountService $service,
+        KashierPaymentService $payment
+    ) {
+        $result = $service->execute($request->validated());
+
+        $user = $result['user']; //
+        $studentPackage = $result['studentPackage'];
+        if ($studentPackage && $studentPackage->price > 0) {
+            $paymentUrl = $payment->createSession(
+                $studentPackage->price,
+                $user->email,
+                $studentPackage->transaction_id
+            );
+
+            return $this->successResponse([
+                'payment_required' => true,
+                'payment_url' => $paymentUrl,
+                // 'transaction_id' => $studentPackage->transaction_id,
+            ], 'Payment required');
+        }
+
+        return $this->successResponse([
+            'payment_required' => false,
+            'user' => $user,
+        ], 'Account created successfully');
     }
 }
