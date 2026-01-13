@@ -32,6 +32,9 @@ class PakageController extends Controller
         }
 
         $userPackageId = StudentPackage::where('student_id', $userId)
+            ->where('active', true)
+            // ->where('ends_at', '>', now())
+            ->where('status', 'paid')
             ->latest()
             ->value('package_id');
 
