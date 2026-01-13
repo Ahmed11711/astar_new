@@ -88,6 +88,7 @@ class KashierPaymentController extends Controller
             if ($studentPackage) {
                 $studentPackage->status = 'paid';
                 $studentPackage->payment_response = $data;
+                $studentPackage->active = true;
                 $studentPackage->save();
             } else {
                 Log::warning('Student Package Not Found for Transaction ID:', ['transaction_id' => $transactionId]);
