@@ -24,7 +24,6 @@ class LoginResource extends JsonResource
                 'school'            => $this->school ?? null,
             ],
             'last_student_package' => $this->latestStudentPackage ? [
-                'id'            => $this->latestStudentPackage->id,
                 'package_id'    => $this->latestStudentPackage->package_id,
                 'price'         => $this->latestStudentPackage->price,
                 'starts_at'     => $this->latestStudentPackage->starts_at,
