@@ -28,6 +28,9 @@ return new class extends Migration
                 ->nullable()
                 ->unique()
                 ->after('price');
+            $table->json('payment_response')
+                ->nullable()
+                ->after('transaction_id');
         });
     }
 

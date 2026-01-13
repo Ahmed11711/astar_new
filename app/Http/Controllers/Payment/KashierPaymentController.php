@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Payment;
 
 use App\Http\Controllers\Controller;
+use App\Models\StudentPackage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Http;
 
 class KashierPaymentController extends Controller
 {
@@ -93,7 +94,18 @@ class KashierPaymentController extends Controller
     public function success(Request $request)
     {
         $data = $request->all();
-        Log::info('Kashier Payment Success Redirect:', $data);
+        $transactionId = $data['merchantOrderId'] ?? null;
+
+        if ($transactionId) {
+            $studentPackage = StudentPackage::where('transaction_id', $transactionId)->first();
+            if ($studentPackage) {
+                $studentPackage->status = 'paid';
+                $studentPackage->payment_response = $data;
+                $studentPackage->save();
+            } else {
+                Log::warning('Student Package Not Found for Transaction ID:', ['transaction_id' => $transactionId]);
+            }
+        }
 
         return response()->json([
             'message' => 'Payment Success (Redirect)',
