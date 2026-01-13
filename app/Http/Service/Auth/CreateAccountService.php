@@ -11,6 +11,7 @@ use App\Models\UserGrade;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class CreateAccountService
 {
@@ -21,7 +22,7 @@ class CreateAccountService
         return DB::transaction(fn() => $this->createUserWithRelations($data));
     }
 
-    protected function createUserWithRelations(array $data): User
+    protected function createUserWithRelations(array $data)
     {
         $user = User::create([
             'username'     => $data['username'],
@@ -35,17 +36,19 @@ class CreateAccountService
             'password'     => Hash::make($data['password']),
         ]);
 
-        if ($user->role !== 'student') {
-            return $user;
+        $studentPackage = null;
+
+        if ($user->role === 'student') {
+            $this->assignStudentAssignment($user, $data);
+            $this->assignGrade($user, $data);
+            $this->assignSubjects($user, $data);
+            $studentPackage = $this->assignPackage($user, $data);
         }
 
-        $this->assignStudentAssignment($user, $data);
-        $this->assignGrade($user, $data);
-        $this->assignPackage($user, $data);
-        $this->assignSubjects($user, $data);
+        return $user; // 🔹 User فقط
 
-        return $user;
     }
+
 
     protected function assignStudentAssignment(User $user, array $data): void
     {
@@ -67,20 +70,32 @@ class CreateAccountService
             'grade_id' => $data['grade_id'],
         ]);
     }
-
-    protected function assignPackage(User $user, array $data): void
+    protected function assignPackage(User $user, array $data)
     {
-        if (empty($data['package_id'])) return;
+        if (empty($data['package_id'])) {
+            return;
+        }
 
-        $this->packageDuration ??= Packages::where('id', $data['package_id'])
-            ->value('duration_days');
+        $package = Packages::select('id', 'price', 'duration_days')
+            ->find($data['package_id']);
 
-        StudentPackage::create([
+        if (!$package) {
+            return;
+        }
+        $transactionId = 'TXN-' . Str::uuid();
+
+
+        return StudentPackage::create([
             'student_id' => $user->id,
-            'package_id' => $data['package_id'],
+            'package_id' => $package->id,
+            'price'      => $package->price ?? 0,
             'starts_at'  => now(),
-            'ends_at'    => now()->addDays($this->packageDuration ?? 30),
+            'ends_at'    => now()->addDays($package->duration_days ?? 30),
             'active'     => true,
+            'status'     => 'pending',
+            'type'       => $package->price > 0 ? 'not_free' : 'free',
+            'transaction_id' => $transactionId,
+
         ]);
     }
 

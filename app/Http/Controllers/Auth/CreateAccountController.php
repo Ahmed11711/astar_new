@@ -17,10 +17,10 @@ class CreateAccountController extends Controller
         CreateAccountService $service,
         KashierPaymentService $payment
     ) {
-        $result = $service->execute($request->validated());
+        $user = $service->execute($request->validated());
 
-        $user = $result['user']; //
-        $studentPackage = $result['studentPackage'];
+        $studentPackage = $user->studentPackage;
+
         if ($studentPackage && $studentPackage->price > 0) {
             $paymentUrl = $payment->createSession(
                 $studentPackage->price,
@@ -31,7 +31,7 @@ class CreateAccountController extends Controller
             return $this->successResponse([
                 'payment_required' => true,
                 'payment_url' => $paymentUrl,
-                // 'transaction_id' => $studentPackage->transaction_id,
+                'transaction_id' => $studentPackage->transaction_id,
             ], 'Payment required');
         }
 

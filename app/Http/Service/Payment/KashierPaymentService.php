@@ -17,25 +17,27 @@ class KashierPaymentService
      * @return string|null
      */
     public function createSession(
-        float $amount,
+        string $amount,
         string $customerEmail,
         string $transactionId
     ): ?string {
+
         try {
             $response = Http::withHeaders([
-                'Authorization' => config('kashier.secret_key'),
-                'api-key'       => config('kashier.api_key'),
+                'Authorization' => 'df974d751303a6d76a5637d19ca9a0f7$2c9243f4284be65f2055d390c1185f2fac0619b8c7a4ffee04af37e48051409836beda2dd93ebb72988ef55ad0d8e4ea',
+                'api-key'       => '9f78bd9d-fd4e-45fd-a7a6-93e3998b8712',
                 'Content-Type'  => 'application/json',
             ])->post('https://test-api.kashier.io/v3/payment/sessions', [
                 'expireAt' => now()->addMinutes(30)->toISOString(),
-                'amount'   => number_format($amount, 2, '.', ''),
+                'maxFailureAttempts' => 3,
+                'amount' => $amount,
                 'currency' => 'EGP',
-                'order'    => $transactionId,
-                'merchantId' => config('kashier.merchant_id'),
+                'order' => $transactionId,
+                'merchantId' => 'MID-41016-213',
                 'merchantRedirect' => route('kashier.success'),
-                'failureRedirect'  => route('kashier.failure'),
-                'serverWebhook'    => route('kashier.webhook'),
-                'allowedMethods'   => 'card,wallet',
+                'failureRedirect' => true,
+                'serverWebhook' => route('kashier.webhook'),
+                'allowedMethods' => 'card,wallet',
                 'interactionSource' => 'ECOMMERCE',
                 'enable3DS' => true,
 
