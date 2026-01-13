@@ -6,13 +6,20 @@ use App\Models\ExamPaper;
 use App\Models\Question;
 use App\Models\QuestionOption;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class ExamPaperService
 {
+    private $questionsMap = []; 
+
     public function createExamPaperWithQuestions($data)
     {
         return DB::transaction(function () use ($data) {
 
+            // =========================
+            // Create Exam Paper
+            // =========================
             $paper = ExamPaper::create([
                 'subject_id'       => $data['subject_id'],
                 'grade_id'         => $data['grade_id'],
@@ -27,108 +34,113 @@ class ExamPaperService
                 'meta'             => $data['meta'] ?? [],
             ]);
 
-            $this->insertQuestions(
-                $paper->id,
-                $data['questions'],
-                null,
-                $paper->subject_id,
-                $data['topic'] ?? null
-            );
+            // =========================
+            // Insert Questions + Media
+            // =========================
+            $this->insertQuestions($paper->id, $data['questions'], null, $paper->subject_id, $data['topic'] ?? null);
 
             return $paper->load('questions');
         });
     }
 
-    private function insertQuestions(
-        $paperId,
-        $questions,
-        $parentId = null,
-        $subjectId = null,
-        $topicId = null
-    ) {
+    private function insertQuestions($paperId, $questions, $parentId = null, $subjectId = null, $topicId = null)
+    {
         foreach ($questions as $q) {
 
+
+            if (!empty($q['parent_question_number']) && isset($this->questionsMap[$q['parent_question_number']])) {
+                $parentId = $this->questionsMap[$q['parent_question_number']];
+            } else {
+                $parentId = null;
+            }
+
             // =========================
-            // Create Question
+            //  Create Question
             // =========================
             $question = Question::create([
                 'exam_paper_id'      => $paperId,
                 'subject_id'         => $subjectId,
-                'topic_id'           => $q['topic_id'],
-                'subtopics_id'       => $q['subtopics_id'],
+                'topic_id'           => $q['topic_id'] ?? null,
+                'subtopics_id'       => $q['subtopics_id'] ?? null,
                 'question_type'      => $q['question_type'],
                 'question_string'    => $q['question_string'] ?? null,
                 'question_number'    => $q['question_number'],
                 'question_max_score' => $q['question_max_score'] ?? null,
-                'marking_scheme'     => $q['marking_scheme'] ?? [],
+'marking_scheme' => array_key_exists('marking_scheme', $q)
+    ? $q['marking_scheme']
+    : [],
                 'has_options'        => !empty($q['options']),
                 'parent_id'          => $parentId,
             ]);
+
+            $this->questionsMap[$q['question_number']] = $question->id;
 
             // =========================
             // Insert Options
             // =========================
             if (!empty($q['options'])) {
-                $opts = [];
-
-                foreach ($q['options'] as $o) {
-                    $opts[] = [
-                        'question_id' => $question->id,
-                        'text'        => $o['text'],
-                        'is_correct'  => $o['is_correct'],
-                    ];
-                }
-
+                $opts = array_map(fn($o) => [
+                    'question_id' => $question->id,
+                    'text'        => $o['text'],
+                    'is_correct'  => $o['is_correct'],
+                ], $q['options']);
                 QuestionOption::insert($opts);
             }
 
             // =========================
-            // Insert Images
+            // Insert Images (FormData Upload)
             // =========================
-            if (!empty($q['images'])) {
-                $images = [];
 
-                foreach ($q['images'] as $img) {
-                    $images[] = [
-                        'question_id' => $question->id,
-                        'path'        => $img['path'],
-                        'created_at'  => now(),
-                        'updated_at'  => now(),
-                    ];
-                }
 
-                DB::table('question_images')->insert($images);
-            }
+if (!empty($q['new_images'])) {
+    foreach ($q['new_images'] as $file) {
+
+        $path = $file->store('questions', 'public'); 
+        // $path = questions/filename.png
+
+        $fullPath = url('storage/app/public/' . $path);
+
+        DB::table('question_images')->insert([
+            'question_id' => $question->id,
+            'path'        => $fullPath,
+            'created_at'  => now(),
+            'updated_at'  => now(),
+        ]);
+
+        Log::info("Uploaded image for question {$question->id}: $fullPath");
+    }
+}
+
 
             // =========================
-            // Insert Audios
+            // Insert Audios (FormData Upload)
             // =========================
-            if (!empty($q['audios'])) {
-                $audios = [];
+if (!empty($q['new_audios'])) {
+    foreach ($q['new_audios'] as $file) {
 
-                foreach ($q['audios'] as $audio) {
-                    $audios[] = [
-                        'question_id' => $question->id,
-                        'path'        => $audio['path'],
-                        'created_at'  => now(),
-                        'updated_at'  => now(),
-                    ];
-                }
+        $path = $file->store('questions', 'public');
+        // questions/filename.mp3
 
-                DB::table('question_audios')->insert($audios);
-            }
+        $fullPath = url('storage/app/public/' . $path);
+
+        DB::table('question_audios')->insert([
+            'question_id' => $question->id,
+            'path'        => $fullPath, // ✅ المسار الكامل
+            'created_at'  => now(),
+            'updated_at'  => now(),
+        ]);
+
+        Log::info("Uploaded audio for question {$question->id}: $fullPath");
+    }
+}
+
+
 
             // =========================
             // Recursive Sub Questions
             // =========================
             if (!empty($q['sub_questions'])) {
-                $this->insertQuestions(
-                    $paperId,
-                    $q['sub_questions'],
-                    $question->id,
-                    $subjectId,
-                    $topicId
-                );
+                $this->insertQuestions($paperId, $q['sub_questions'], $question->id, $subjectId, $topicId);
             }
         }
     }

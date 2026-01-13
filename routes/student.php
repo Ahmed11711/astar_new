@@ -5,11 +5,13 @@ use App\Http\Controllers\Student\Ai\AiChateController;
 use App\Http\Controllers\Student\AnswerController;
 use App\Http\Controllers\Student\AttmpateWithAnswerController;
 use App\Http\Controllers\Student\Dashboard\DashboardController;
+use App\Http\Controllers\Student\MySubject\MySubjectController;
 use App\Http\Controllers\Student\Package\PakageController;
 use App\Http\Controllers\Student\PastPapersController;
 use App\Http\Controllers\Student\TopicWise\TopicWiseController;
 use App\Http\Middleware\RoleToken;
 use Illuminate\Support\Facades\Route;
+
 
 
 
@@ -37,7 +39,8 @@ Route::prefix('v1/student')->group(function () {
         Route::post('answers', [AnswerController::class, 'saveAnswersOptimized']);
 
         Route::post('topicwise', [TopicWiseController::class, 'index']);
-
+        // My Subject
+        Route::get('my-subjects', [MySubjectController::class, 'index']);
 
         // topic- wise
 

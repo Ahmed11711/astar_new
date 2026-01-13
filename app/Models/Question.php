@@ -52,4 +52,14 @@ class Question extends Model
         return $this->hasOne(answer::class, 'question_id')
             ->latest('created_at'); // آخر إجابة
     }
+    public function getImagesPathAttribute()
+{
+    return DB::table('question_images')
+        ->where('question_id', $this->id)
+        ->get()
+        ->map(function ($img) {
+            return asset('storage/'.$img->path);
+        });
+}
+
 }
