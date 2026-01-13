@@ -78,19 +78,6 @@ class KashierPaymentController extends Controller
         return response()->json(['status' => 'ok'], 200);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
     public function success(Request $request)
     {
         $data = $request->all();
@@ -116,7 +103,9 @@ class KashierPaymentController extends Controller
     {
         $data = $request->all();
         Log::info('Kashier Payment Failure Redirect:', $data);
-
+        return redirect()->away(
+            'https://astar.click/auth/login'
+        );
         return response()->json([
             'message' => 'Payment Failed (Redirect)',
             'data' => $data

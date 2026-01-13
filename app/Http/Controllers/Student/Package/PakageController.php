@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Student\Package;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Student\Package\PackageUpgradeRequest;
 use App\Http\Resources\Student\PackageResource;
+use App\Http\Service\Payment\KashierPaymentService;
 use App\Models\Packages;
 use App\Models\StudentAssignment;
 use App\Models\StudentPackage;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class PakageController extends Controller
 {
@@ -48,22 +50,57 @@ class PakageController extends Controller
         ]);
     }
 
-    public function upgrade(PackageUpgradeRequest $request)
-    {
-        $userId = $request->user_id;
+    public function upgrade(
+        PackageUpgradeRequest $request,
+        KashierPaymentService $payment
+    ) {
         $data = $request->validated();
+        $userId = $data['user_id'];
 
-        $data['student_id'] = $userId;
-        $data['starts_at'] = now();
+        $package = Packages::findOrFail($data['package_id']);
 
-        $studentPackage = StudentPackage::create($data);
+        if ($package->price <= 0) {
+            $hasUsedFree = StudentPackage::where('student_id', $userId)
+                ->where('type', 'free')
+                ->exists();
 
-        return $this->successResponse($studentPackage);
+            if ($hasUsedFree) {
+                return $this->errorResponse(
+                    'You have already used the free package.',
+                    403
+                );
+            }
+        }
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Package upgraded successfully',
-            'data' => $studentPackage
+        StudentPackage::where('student_id', $userId)
+            ->where('active', true)
+            ->update(['active' => false]);
+
+        $studentPackage = StudentPackage::create([
+            'student_id'     => $userId,
+            'package_id'     => $package->id,
+            'price'          => $package->price,
+            'starts_at'      => now(),
+            'ends_at'        => now()->addDays($package->duration_days ?? 30),
+            'status'         => 'pending',
+            'active'         => false,
+            'type'           => $package->price > 0 ? 'not_free' : 'free',
+            'transaction_id' => 'TXN-' . Str::uuid(),
         ]);
+
+        if ($package->price <= 0) {
+            return $this->successResponse([
+                'payment_required' => false,
+                'student_package'  => $studentPackage,
+            ], 'Free package activated successfully');
+        }
+
+        $paymentUrl = $payment->createSession(
+            $studentPackage->price,
+            $request->user()->email ?? null,
+            $studentPackage->transaction_id
+        );
+
+        return redirect()->away($paymentUrl);
     }
 }
