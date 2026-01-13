@@ -24,12 +24,14 @@ class RoleToken
             $userId  = $claims->get('user_id');
             $role    = $claims->get('role');
             $name    = $claims->get('name');
+            $email   = $claims->get('email');
 
             // الأساسيات
             $request->merge([
                 'user_id'   => $userId,
                 'user_role' => $role,
                 'user_name' => $name,
+                'user_email' => $email,
             ]);
 
 

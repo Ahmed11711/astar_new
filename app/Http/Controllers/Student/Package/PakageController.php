@@ -55,7 +55,8 @@ class PakageController extends Controller
         KashierPaymentService $payment
     ) {
         $data = $request->validated();
-        $userId = $data['user_id'];
+        $userId = $request->user_id;
+        $email = $request->user_email ?? 'test@gmail.com';
 
         $package = Packages::findOrFail($data['package_id']);
 
@@ -97,10 +98,12 @@ class PakageController extends Controller
 
         $paymentUrl = $payment->createSession(
             $studentPackage->price,
-            $request->user()->email ?? null,
+            $email,
             $studentPackage->transaction_id
         );
 
-        return redirect()->away($paymentUrl);
+        return $this->successResponse([
+            'payment_url'      => $paymentUrl,
+        ], 'Payment session created successfully');
     }
 }
