@@ -44,6 +44,12 @@ class User extends Authenticatable implements JWTSubject
         ];
     }
 
+    public function studentPackage()
+    {
+        return $this->hasOne(StudentPackage::class, 'student_id', 'id');
+    }
+
+
     public function grades()
     {
         return $this->belongsToMany(grade::class, 'user_grades', 'user_id', 'grade_id');
