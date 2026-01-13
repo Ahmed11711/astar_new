@@ -21,6 +21,7 @@ class PastPapersController extends Controller
             ->where('grade_id', $gradeId)
             ->whereIn('subject_id', $subjectIds)
             ->with([
+                'paper:id,name',
                 'subject:id,name',
                 'studentAttempt' => function ($query) use ($userId) {
                     $query->where('user_id', $userId);
