@@ -34,7 +34,7 @@ class TopicWiseController extends Controller
         }
 
         if (isset($data['subtopic_id'])) {
-            $query->where('subtopic_id', $data['subtopic_id']);
+            $query->where('subtopics_id', $data['subtopic_id']);
         }
 
         if (isset($data['count'])) {
