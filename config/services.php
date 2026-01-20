@@ -35,7 +35,7 @@ return [
         ],
     ],
     'callback' => [
-        'url' => env('CALLBACK_URL'),
+        'url' => env('CALLBACK_URL', 'https://crepuscular-maidenish-jett.ngrok-free.dev/'),
     ],
 
 
