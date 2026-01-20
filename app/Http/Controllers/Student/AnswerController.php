@@ -28,63 +28,62 @@ class AnswerController extends Controller
         $answersData  = $request->input('answers', []);
 
         // 🔹 Files (drawing answers)
-        $answersFiles = $request->files->get('answers', []);
+  $answersData  = $request->input('answers', []);
+$answersFiles = $request->files->get('answers', []);
 
-        $upsertData = collect($answersData)->map(function ($a, $index) use (
-            $attempt,
-            $userId,
-            $answersFiles
-        ) {
+// ✅ فولدرات ثابتة مسبقاً
+$folders = [
+    'drawing_answer' => public_path('storage/answers/drawings'),
+    'audio_answer'   => public_path('storage/answers/audio'),
+];
 
-            // response من الـ input
-            $response = $a['response'] ?? [];
-
-            // ✅ لو في صورة جاية فعلاً
-if (
-    isset($answersFiles[$index]['response']['drawing_answer'])
-    && $answersFiles[$index]['response']['drawing_answer']->isValid()
-) {
-    $file = $answersFiles[$index]['response']['drawing_answer'];
-
-    $fileName = uniqid('draw_') . '.' . $file->getClientOriginalExtension();
-
-    $destinationPath = public_path('storage/answers/drawings');
-
-    if (! file_exists($destinationPath)) {
-        mkdir($destinationPath, 0755, true);
-    }
-
-    $file->move($destinationPath, $fileName);
-
-    // ✅ مسار كامل
-    $response['drawing_answer'] =
-        url('public/storage/answers/drawings/' . $fileName);
+foreach ($folders as $f) {
+    if (!file_exists($f)) mkdir($f, 0755, true);
 }
 
+$upsertData = [];
+foreach ($answersData as $index => $a) {
+    $response = $a['response'] ?? [];
 
-            return [
-                'attempt_id'     => $attempt->id,
-                'user_id'        => $userId,
-                'question_id'    => $a['question_id'],
-                'question_index' => $a['question_index'],
-                'response'       => json_encode($response, JSON_UNESCAPED_UNICODE),
-                'is_flagged'     => $a['is_flagged'] ?? false,
-                'created_at'     => now(),
-                'updated_at'     => now(),
-            ];
-        })->toArray();
+    // ✅ معالجة الملفات بسرعة
+    foreach (['drawing_answer', 'audio_answer'] as $key) {
+        if (isset($answersFiles[$index]['response'][$key])
+            && $answersFiles[$index]['response'][$key]->isValid()
+        ) {
+            $file = $answersFiles[$index]['response'][$key];
+            $ext = $file->getClientOriginalExtension();
+            $prefix = $key === 'drawing_answer' ? 'draw_' : 'audio_';
+            $fileName = uniqid($prefix) . '.' . $ext;
+            $file->move($folders[$key], $fileName);
 
-        DB::transaction(function () use ($upsertData, $attempt, $request) {
-            answer::upsert(
-                $upsertData,
-                ['attempt_id', 'question_id', 'question_index', 'user_id'],
-                ['response', 'is_flagged', 'updated_at']
-            );
+            $response[$key] = url("public/storage/answers/{$key}/{$fileName}");
+        }
+    }
 
-            $attempt->update([
-                'is_saved' => $request->is_saved
-            ]);
-        });
+    $upsertData[] = [
+        'attempt_id'     => $request->attempt_id,
+        'user_id'        => $request->user_id,
+        'question_id'    => $a['question_id'],
+        'question_index' => $a['question_index'],
+        'response'       => json_encode($response, JSON_UNESCAPED_UNICODE),
+        'is_flagged'     => $a['is_flagged'] ?? false,
+        'created_at'     => now(),
+        'updated_at'     => now(),
+    ];
+}
+
+// ✅ transaction سريع بدون انتظار الملفات
+DB::transaction(function() use ($upsertData, $request) {
+    answer::upsert(
+        $upsertData,
+        ['attempt_id', 'question_id', 'question_index', 'user_id'],
+        ['response', 'is_flagged', 'updated_at']
+    );
+
+    StudentAttamp::where('id', $request->attempt_id)
+        ->update(['is_saved' => $request->is_saved]);
+});
+
 
         return response()->json([
             'detail' => 'All answers saved successfully.'

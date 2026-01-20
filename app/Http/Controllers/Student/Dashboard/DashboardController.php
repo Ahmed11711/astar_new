@@ -5,192 +5,215 @@ namespace App\Http\Controllers\Student\Dashboard;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 
 class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        $userId = $request->user_id;
+        $userId     = $request->user_id;
         $subjectIds = $request->student_subject_ids;
 
-        $from = $request->from ?? now()->subWeek()->startOfDay();
-        $to   = $request->to ?? now()->endOfDay();
-        $period = CarbonPeriod::create($from->format('Y-m-d'), $to->format('Y-m-d'));
+        $from = $request->from
+            ? Carbon::parse($request->from)->startOfDay()
+            : now()->subWeek()->startOfDay();
 
+        $to = $request->to
+            ? Carbon::parse($request->to)->endOfDay()
+            : now()->endOfDay();
+
+        $period = CarbonPeriod::create($from, $to);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Query 1 — Subjects
+        |--------------------------------------------------------------------------
+        */
         $subjects = DB::table('subjects')
             ->whereIn('id', $subjectIds)
-            ->get();
+            ->select('id', 'name')
+            ->get()
+            ->keyBy('id');
 
-        $topicsData = DB::table('topics')
-            ->leftJoin('questions as topic_questions', 'topic_questions.topic_id', '=', 'topics.id')
-            ->leftJoin('subtopics', 'subtopics.topic_id', '=', 'topics.id')
-            ->leftJoin('questions as sub_questions', 'sub_questions.subtopics_id', '=', 'subtopics.id')
-            ->leftJoin('answers as topic_answers', function ($join) use ($userId) {
-                $join->on('topic_answers.question_id', '=', 'topic_questions.id')
-                    ->where('topic_answers.user_id', $userId);
-            })
-            ->leftJoin('answers as sub_answers', function ($join) use ($userId) {
-                $join->on('sub_answers.question_id', '=', 'sub_questions.id')
-                    ->where('sub_answers.user_id', $userId);
-            })
-            ->whereIn('topics.subject_id', $subjectIds)
+        /*
+        |--------------------------------------------------------------------------
+        | Query 2 — Questions (NO JOIN)
+        |--------------------------------------------------------------------------
+        */
+        $questions = DB::table('questions')
+            ->whereIn('subject_id', $subjectIds)
             ->select(
-                'topics.id as topic_id',
-                'topics.name as topic_name',
-                'topics.subject_id',
-                'subtopics.id as subtopic_id',
-                'subtopics.name as subtopic_name',
-                DB::raw('COUNT(DISTINCT topic_questions.id) + COUNT(DISTINCT sub_questions.id) as total_questions'),
-                DB::raw('COUNT(DISTINCT topic_answers.id) + COUNT(DISTINCT sub_answers.id) as answered_questions'),
-                DB::raw('SUM(COALESCE(topic_questions.question_max_score,0)) + SUM(COALESCE(sub_questions.question_max_score,0)) as total_marks'),
-                DB::raw('SUM(COALESCE(topic_answers.mark_score,0)) + SUM(COALESCE(sub_answers.mark_score,0)) as student_marks')
+                'id',
+                'subject_id',
+                'topic_id',
+                'subtopics_id',
+                'question_max_score'
             )
-            ->groupBy('topics.id', 'topics.name', 'topics.subject_id', 'subtopics.id', 'subtopics.name')
             ->get();
 
+        $questionsBySubtopic = $questions->groupBy('subtopics_id');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Query 3 — Student Answers (GROUPED)
+        |--------------------------------------------------------------------------
+        */
+        $answers = DB::table('answers')
+            ->where('user_id', $userId)
+            ->whereBetween('created_at', [$from, $to])
+            ->select(
+                'question_id',
+                DB::raw('SUM(mark_score) as student_score')
+            )
+            ->groupBy('question_id')
+            ->get()
+            ->keyBy('question_id');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Query 4 — Daily Answers (Charts)
+        |--------------------------------------------------------------------------
+        */
         $dailyAnswers = DB::table('answers')
-            ->join('questions', 'questions.id', '=', 'answers.question_id')
-            ->join('subtopics', 'subtopics.id', '=', 'questions.subtopics_id')
-            ->where('answers.user_id', $userId)
-            ->whereBetween('answers.created_at', [$from, $to])
+            ->where('user_id', $userId)
+            ->whereBetween('created_at', [$from, $to])
             ->select(
-                'subtopics.id as subtopic_id',
-                DB::raw('DATE(answers.created_at) as day'),
-                DB::raw('COUNT(*) as answered_count')
+                DB::raw('DATE(created_at) as day'),
+                'question_id',
+                DB::raw('COUNT(*) as answered')
             )
-            ->groupBy('subtopics.id', DB::raw('DATE(answers.created_at)'))
-            ->orderBy('day')
+            ->groupBy('day', 'question_id')
             ->get();
 
-        $result = $subjects->map(function ($subject) use ($topicsData, $dailyAnswers, $period) {
+        /*
+        |--------------------------------------------------------------------------
+        | Topics & Subtopics meta
+        |--------------------------------------------------------------------------
+        */
+        $topics = DB::table('topics')
+            ->whereIn('subject_id', $subjectIds)
+            ->select('id', 'subject_id', 'name')
+            ->get();
 
-            $subjectTopics = $topicsData->where('subject_id', $subject->id)
-                ->groupBy('topic_id');
+        $subtopics = DB::table('subtopics')
+            ->select('id', 'topic_id', 'name')
+            ->get()
+            ->groupBy('topic_id');
 
-            $topics = $subjectTopics->map(function ($topicGroup) use ($dailyAnswers, $period) {
+        /*
+        |--------------------------------------------------------------------------
+        | Build Response
+        |--------------------------------------------------------------------------
+        */
+        $subjectsData = $subjects->map(function ($subject) use (
+            $topics,
+            $subtopics,
+            $questionsBySubtopic,
+            $answers,
+            $dailyAnswers,
+            $period
+        ) {
 
-                $topic = $topicGroup->first();
+            $subjectTopics = $topics->where('subject_id', $subject->id);
 
-                $subtopics = $topicGroup->filter(fn($t) => $t->subtopic_id !== null)->map(function ($sub) use ($dailyAnswers, $period) {
+            $topicsData = $subjectTopics->map(function ($topic) use (
+                $subtopics,
+                $questionsBySubtopic,
+                $answers,
+                $dailyAnswers,
+                $period
+            ) {
 
-                    $cumulativeAnswered = 0;
-                    $dailyData = [];
+                $topicTotalQuestions = 0;
+                $topicAnswered       = 0;
+                $topicTotalMarks     = 0;
+                $topicStudentMarks   = 0;
 
-                    foreach ($period as $date) {
-                        $day = $date->format('Y-m-d');
-                        $answeredToday = $dailyAnswers
-                            ->where('subtopic_id', $sub->subtopic_id)
-                            ->where('day', $day)
-                            ->sum('answered_count');
+                $subtopicsData = collect($subtopics[$topic->id] ?? [])
+                    ->map(function ($sub) use (
+                        $questionsBySubtopic,
+                        $answers,
+                        $dailyAnswers,
+                        $period,
+                        &$topicTotalQuestions,
+                        &$topicAnswered,
+                        &$topicTotalMarks,
+                        &$topicStudentMarks
+                    ) {
 
-                        $cumulativeAnswered += $answeredToday;
-                        $remaining = max($sub->total_questions - $cumulativeAnswered, 0);
+                        $questions = $questionsBySubtopic[$sub->id] ?? collect();
 
-                        $dailyData[] = [
-                            'day' => $day,
-                            'answered' => (int)$answeredToday,
-                            'remaining' => (int)$remaining,
+                        $totalQuestions = $questions->count();
+                        $totalMarks     = (int) $questions->sum('question_max_score');
+
+                        $answeredQuestions = $questions
+                            ->filter(fn($q) => isset($answers[$q->id]))
+                            ->count();
+
+                        $studentMarks = (int) $questions
+                            ->sum(fn($q) => $answers[$q->id]->student_score ?? 0);
+
+                        $topicTotalQuestions += $totalQuestions;
+                        $topicAnswered       += $answeredQuestions;
+                        $topicTotalMarks     += $totalMarks;
+                        $topicStudentMarks   += $studentMarks;
+
+                        /* Daily */
+                        $cumulative = 0;
+                        $daily = [];
+
+                        foreach ($period as $date) {
+                            $day = $date->format('Y-m-d');
+
+                            $answeredToday = $dailyAnswers
+                                ->where('day', $day)
+                                ->whereIn('question_id', $questions->pluck('id'))
+                                ->count();
+
+                            $cumulative += $answeredToday;
+
+                            $daily[] = [
+                                'day'       => $day,
+                                'answered'  => $answeredToday,
+                                'remaining' => max($totalQuestions - $cumulative, 0),
+                            ];
+                        }
+
+                        return [
+                            'subtopic_name'       => $sub->name,
+                            'total_questions'    => $totalQuestions,
+                            'answered_questions' => $answeredQuestions,
+                            'total_marks'        => $totalMarks,
+                            'student_marks'      => $studentMarks,
+                            'daily'              => $daily,
                         ];
-                    }
-
-                    return [
-                        'subtopic_name' => $sub->subtopic_name,
-                        'total_marks' => (int)$sub->total_marks,
-                        'student_marks' => (int)$sub->student_marks,
-                        'answered_questions' => (int)$sub->answered_questions,
-                        'total_questions' => (int)$sub->total_questions,
-                        'daily' => $dailyData,
-                    ];
-                })->values();
-
-                $topicTotalMarks = (int)$topic->total_marks + $subtopics->sum('total_marks');
-                $topicStudentMarks = (int)$topic->student_marks + $subtopics->sum('student_marks');
+                    })
+                    ->values();
 
                 return [
-                    'topic_name' => $topic->topic_name,
-                    'total_marks' => $topicTotalMarks,
-                    'student_marks' => $topicStudentMarks,
-                    'answered_questions' => (int)$topic->answered_questions,
-                    'total_questions' => (int)$topic->total_questions,
-                    'subtopics' => $subtopics,
+                    'topic_name'         => $topic->name,
+                    'total_questions'    => $topicTotalQuestions,
+                    'answered_questions' => $topicAnswered,
+                    'total_marks'        => $topicTotalMarks,
+                    'student_marks'      => $topicStudentMarks,
+                    'subtopics'          => $subtopicsData,
                 ];
             })->values();
 
-            $subjectTotalMarks = $topics->sum('total_marks');
-            $subjectStudentMarks = $topics->sum('student_marks');
-            $subjectTotalQuestions = $topics->sum('total_questions');
-            $subjectAnsweredQuestions = $topics->sum('answered_questions');
-
             return [
-                'subject_name' => $subject->name,
-                'subject_id' => $subject->id,
-                'topics' => $topics,
-                'subject_total_questions' => $subjectTotalQuestions,
-                'subject_answered_questions' => $subjectAnsweredQuestions,
-                'subject_total_marks' => $subjectTotalMarks,
-                'subject_student_marks' => $subjectStudentMarks,
-
+                'subject_id'               => $subject->id,
+                'subject_name'             => $subject->name,
+                'topics'                   => $topicsData,
+                'subject_total_questions'  => $topicsData->sum('total_questions'),
+                'subject_answered_questions'=> $topicsData->sum('answered_questions'),
+                'subject_total_marks'      => $topicsData->sum('total_marks'),
+                'subject_student_marks'    => $topicsData->sum('student_marks'),
             ];
-        });
-
-        $subjectsWeeklyScores = $subjects->map(function ($subject) use ($result, $period) {
-
-            $subjectData = $result->firstWhere('subject_id', $subject->id);
-
-            $dailyScores = [];
-
-            foreach ($period as $date) {
-                $day = $date->format('Y-m-d');
-
-                $dayStudentMarks = 0;
-                $dayTotalMarks   = 0;
-
-                foreach ($subjectData['topics'] as $topic) {
-                    foreach ($topic['subtopics'] as $subtopic) {
-
-                        $daily = collect($subtopic['daily'])
-                            ->firstWhere('day', $day);
-
-                        if (!$daily || $daily['answered'] == 0) {
-                            continue;
-                        }
-
-                        $answeredToday = $daily['answered'];
-
-                        $avgStudentMarkPerQuestion = $subtopic['answered_questions'] > 0
-                            ? $subtopic['student_marks'] / $subtopic['answered_questions']
-                            : 0;
-
-                        $avgTotalMarkPerQuestion = $subtopic['total_questions'] > 0
-                            ? $subtopic['total_marks'] / $subtopic['total_questions']
-                            : 0;
-
-                        $dayStudentMarks += $avgStudentMarkPerQuestion * $answeredToday;
-                        $dayTotalMarks   += $avgTotalMarkPerQuestion * $answeredToday;
-                    }
-                }
-
-                $scorePercentage = $dayTotalMarks > 0
-                    ? round(($dayStudentMarks / $dayTotalMarks) * 100, 2)
-                    : 0;
-
-                $dailyScores[] = [
-                    'day' => $day,
-                    'score_percentage' => $scorePercentage,
-                ];
-            }
-
-            return [
-                'subject_id' => $subject->id,
-                'subject_name' => $subject->name,
-                'daily_scores' => $dailyScores,
-            ];
-        });
+        })->values();
 
         return response()->json([
-            'subjects_data' => $result,
-            'subjects_weekly_scores' => $subjectsWeeklyScores,
+            'subjects_data' => $subjectsData
         ]);
     }
 }

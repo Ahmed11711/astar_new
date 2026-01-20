@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
+use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
 
 
 
@@ -64,6 +66,18 @@ Route::get('/generate-jwt-secret', function () {
     ]);
 });
 
+Route::post('ai', function (Request $request) {
+
+    Log::info('AI Request Data', [
+        'data' => $request->all(),
+        'ip' => $request->ip(),
+        'headers' => $request->headers->all(),
+    ]);
+
+    return response()->json([
+        'status' => 'ok'
+    ]);
+});
 // Route::get('run-migrate-refresh', function () {
 //  // Artisan::call('migrate:refresh', [
 //  //  '--force' => true,
@@ -79,3 +93,4 @@ Route::get('/generate-jwt-secret', function () {
 // });
 require __DIR__ . '/admin.php';
 require __DIR__ . '/student.php';
+require __DIR__ . '/teacher.php';

@@ -11,10 +11,11 @@ use Illuminate\Support\Facades\Log;
 
 class ExamPaperService
 {
-    private $questionsMap = []; 
+    private $questionsMap = [];
 
     public function createExamPaperWithQuestions($data)
     {
+
         return DB::transaction(function () use ($data) {
 
             // =========================
@@ -32,6 +33,12 @@ class ExamPaperService
                 'total_marks'      => $data['total_marks'] ?? null,
                 'duration_minutes' => $data['duration_minutes'] ?? null,
                 'meta'             => $data['meta'] ?? [],
+                'type'          => $data['created_by']['type'] ?? null,
+                'created_by'    => $data['created_by']['id'] ?? null,
+                'dateline'      => $data['dateline'] ?? null,
+
+
+
             ]);
 
             // =========================
@@ -66,9 +73,9 @@ class ExamPaperService
                 'question_string'    => $q['question_string'] ?? null,
                 'question_number'    => $q['question_number'],
                 'question_max_score' => $q['question_max_score'] ?? null,
-'marking_scheme' => array_key_exists('marking_scheme', $q)
-    ? $q['marking_scheme']
-    : [],
+                'marking_scheme' => array_key_exists('marking_scheme', $q)
+                    ? $q['marking_scheme']
+                    : [],
                 'has_options'        => !empty($q['options']),
                 'parent_id'          => $parentId,
             ]);
@@ -92,47 +99,47 @@ class ExamPaperService
             // =========================
 
 
-if (!empty($q['new_images'])) {
-    foreach ($q['new_images'] as $file) {
+            if (!empty($q['new_images'])) {
+                foreach ($q['new_images'] as $file) {
 
-        $path = $file->store('questions', 'public'); 
-        // $path = questions/filename.png
+                    $path = $file->store('questions', 'public');
+                    // $path = questions/filename.png
 
-        $fullPath = url('storage/app/public/' . $path);
+                    $fullPath = url('storage/app/public/' . $path);
 
-        DB::table('question_images')->insert([
-            'question_id' => $question->id,
-            'path'        => $fullPath,
-            'created_at'  => now(),
-            'updated_at'  => now(),
-        ]);
+                    DB::table('question_images')->insert([
+                        'question_id' => $question->id,
+                        'path'        => $fullPath,
+                        'created_at'  => now(),
+                        'updated_at'  => now(),
+                    ]);
 
-        Log::info("Uploaded image for question {$question->id}: $fullPath");
-    }
-}
+                    Log::info("Uploaded image for question {$question->id}: $fullPath");
+                }
+            }
 
 
             // =========================
             // Insert Audios (FormData Upload)
             // =========================
-if (!empty($q['new_audios'])) {
-    foreach ($q['new_audios'] as $file) {
+            if (!empty($q['new_audios'])) {
+                foreach ($q['new_audios'] as $file) {
 
-        $path = $file->store('questions', 'public');
-        // questions/filename.mp3
+                    $path = $file->store('questions', 'public');
+                    // questions/filename.mp3
 
-        $fullPath = url('storage/app/public/' . $path);
+                    $fullPath = url('storage/app/public/' . $path);
 
-        DB::table('question_audios')->insert([
-            'question_id' => $question->id,
-            'path'        => $fullPath, // ✅ المسار الكامل
-            'created_at'  => now(),
-            'updated_at'  => now(),
-        ]);
+                    DB::table('question_audios')->insert([
+                        'question_id' => $question->id,
+                        'path'        => $fullPath, // ✅ المسار الكامل
+                        'created_at'  => now(),
+                        'updated_at'  => now(),
+                    ]);
 
-        Log::info("Uploaded audio for question {$question->id}: $fullPath");
-    }
-}
+                    Log::info("Uploaded audio for question {$question->id}: $fullPath");
+                }
+            }
 
 
 
