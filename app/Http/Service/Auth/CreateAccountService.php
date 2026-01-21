@@ -37,16 +37,17 @@ class CreateAccountService
         ]);
 
         $studentPackage = null;
+        $this->assignStudentAssignment($user, $data);
+        $this->assignGrade($user, $data);
+        $this->assignSubjects($user, $data);
 
         if ($user->role === 'student') {
-            $this->assignStudentAssignment($user, $data);
-            $this->assignGrade($user, $data);
-            $this->assignSubjects($user, $data);
+
             $studentPackage = $this->assignPackage($user, $data);
         }
 
-        return $user; // 🔹 User فقط
 
+        return $user;
     }
 
 
