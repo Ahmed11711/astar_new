@@ -23,6 +23,7 @@ Route::prefix('v1/teacher')->group(function () {
         Route::get('my-student/exame/{student}', [MyStudentController::class, 'showStudentexam'])
             ->whereNumber('student');
         Route::get('showStudentExams/{studentId}', [MyStudentController::class, 'showStudentExams']);
+        Route::post('getOneMyQuiez', [MyStudentController::class, 'getOneMyQuiez']);
 
 
         Route::get('assign-student', [AssignStudentsController::class, 'index']);
