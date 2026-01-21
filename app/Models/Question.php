@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Question extends Model
 {
@@ -53,13 +54,12 @@ class Question extends Model
             ->latest('created_at'); // آخر إجابة
     }
     public function getImagesPathAttribute()
-{
-    return DB::table('question_images')
-        ->where('question_id', $this->id)
-        ->get()
-        ->map(function ($img) {
-            return asset('storage/'.$img->path);
-        });
-}
-
+    {
+        return DB::table('question_images')
+            ->where('question_id', $this->id)
+            ->get()
+            ->map(function ($img) {
+                return asset('storage/' . $img->path);
+            });
+    }
 }

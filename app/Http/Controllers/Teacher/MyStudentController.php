@@ -137,78 +137,110 @@ class MyStudentController extends Controller
         return new teachestudentexams($student);
     }
 
-    public function getOneMyQuiez(StudentQuizeRequest $request)
-    {
-        $examId    = $request->exam_id;
-        $studentId = $request->student_id;
-        $teacherId = $request->user_id;
 
-        // 1️⃣ Exam Paper (teacher ownership)
-        $exam = ExamPaper::query()
-            ->where('id', $examId)
-            ->where('created_by', $teacherId)
-            ->with([
-                // 2️⃣ Questions
-                'questions' => function ($q) use ($studentId) {
-                    $q->select(
-                        'id',
-                        'exam_paper_id',
-                        'question_string',
-                        'question_number',
-                        'question_max_score',
-                        'marking_scheme',
-                        'has_options'
-                    )
-                        ->with([
-                            // 4️⃣ Answers (via attempt)
-                            'answers' => function ($q) use ($studentId) {
-                                $q->where('user_id', $studentId)
-                                    ->select(
-                                        'id',
-                                        'question_id',
-                                        'attempt_id',
-                                        'response',
-                                        // 'score'
-                                    )
-                                    ->with([
-                                        // 3️⃣ Attempt
-                                        'attempt:id,user_id,exam_id,score,time_taken'
-                                    ]);
-                            }
-                        ]);
-                }
-            ])
-            ->firstOrFail();
 
-        return response()->json([
-            'exam_id'   => $exam->id,
-            'exam_name' => $exam->title,
+    // from user
 
-            'questions' => $exam->questions->map(function ($question) {
 
-                $answer = $question->answers->first();
+    public function getOneQuiez(StudentQuizeRequest $request)
+    {;
+        $id = $request->exam_id;
+        $userId = $request->student_id;
 
-                return [
-                    'question_id'         => $question->id,
-                    'question_text'       => $question->question_string,
-                    'question_number'     => $question->question_number,
-                    'question_max_score'  => $question->question_max_score,
-                    'marking_scheme'      => $question->marking_scheme,
-                    'has_options'         => $question->has_options,
+        $examPaper = ExamPaper::with([
+            'questions.options',
+            'questions.audios',
+            'questions.images',
+            'studentAttempt' => function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            },
+            'questions.lastAnswer' => function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            },
+        ])->find($id);
 
-                    'my_answer' => $answer ? [
-                        'answer_id' => $answer->id,
-                        'response'  => $answer->response,
-                        'score'     => $answer->score,
-                    ] : null,
 
-                    'attempt' => $answer && $answer->attempt ? [
-                        'attempt_id' => $answer->attempt->id,
-                        'score'      => $answer->attempt->score,
-                        'time_taken' => $answer->attempt->time_taken,
-                    ] : null,
-                ];
-            }),
-        ]);
+        return $examPaper;
     }
+
+
+
+
+
+
+
+    // public function getOneMyQuiez(StudentQuizeRequest $request)
+    // {
+    //     $examId    = $request->exam_id;
+    //     $studentId = $request->student_id;
+    //     $teacherId = $request->user_id;
+
+    //     // 1️⃣ Exam Paper (teacher ownership)
+    //     $exam = ExamPaper::query()
+    //         ->where('id', $examId)
+    //         ->where('created_by', $teacherId)
+    //         ->with([
+    //             // 2️⃣ Questions
+    //             'questions' => function ($q) use ($studentId) {
+    //                 $q->select(
+    //                     'id',
+    //                     'exam_paper_id',
+    //                     'question_string',
+    //                     'question_number',
+    //                     'question_max_score',
+    //                     'marking_scheme',
+    //                     'has_options'
+    //                 )
+    //                     ->with([
+    //                         // 4️⃣ Answers (via attempt)
+    //                         'answers' => function ($q) use ($studentId) {
+    //                             $q->where('user_id', $studentId)
+    //                                 ->select(
+    //                                     'id',
+    //                                     'question_id',
+    //                                     'attempt_id',
+    //                                     'response',
+    //                                     // 'score'
+    //                                 )
+    //                                 ->with([
+    //                                     // 3️⃣ Attempt
+    //                                     'attempt:id,user_id,exam_id,score,time_taken'
+    //                                 ]);
+    //                         }
+    //                     ]);
+    //             }
+    //         ])
+    //         ->firstOrFail();
+
+    //     return response()->json([
+    //         'exam_id'   => $exam->id,
+    //         'exam_name' => $exam->title,
+
+    //         'questions' => $exam->questions->map(function ($question) {
+
+    //             $answer = $question->answers->first();
+
+    //             return [
+    //                 'question_id'         => $question->id,
+    //                 'question_text'       => $question->question_string,
+    //                 'question_number'     => $question->question_number,
+    //                 'question_max_score'  => $question->question_max_score,
+    //                 'marking_scheme'      => $question->marking_scheme,
+    //                 'has_options'         => $question->has_options,
+
+    //                 'my_answer' => $answer ? [
+    //                     'answer_id' => $answer->id,
+    //                     'response'  => $answer->response,
+    //                     'score'     => $answer->score,
+    //                 ] : null,
+
+    //                 'attempt' => $answer && $answer->attempt ? [
+    //                     'attempt_id' => $answer->attempt->id,
+    //                     'score'      => $answer->attempt->score,
+    //                     'time_taken' => $answer->attempt->time_taken,
+    //                 ] : null,
+    //             ];
+    //         }),
+    //     ]);
+    // }
 }
