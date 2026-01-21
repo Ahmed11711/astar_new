@@ -51,30 +51,23 @@ class MyStudentController extends Controller
                 'subjects' => function ($q) use ($teacherId, $id) {
                     $q->select('subjects.id', 'subjects.name')
                         ->with([
-                            // Exam Papers الخاصة بالمدرس والمادة
+                            // ✅ Exam papers لكل subject للمدرس
                             'examPapers' => function ($q) use ($teacherId, $id) {
                                 $q->where('created_by', $teacherId)
                                     ->select('id', 'subject_id', 'title')
                                     ->with([
-                                        // Attempts الخاصة بالطالب
+                                        // Attempts بتاعة الطالب
                                         'studentAttempts' => function ($q) use ($id) {
                                             $q->where('user_id', $id)
                                                 ->select('id', 'exam_id', 'user_id', 'score');
                                         }
                                     ]);
-                            }
-                        ]);
-                },
+                            },
 
-                'subjects.topics:id,name,subject_id',
-                'subjects.topics.questions' => function ($q) use ($id) {
-                    $q->select('id', 'topic_id')
-                        ->with([
-                            'answers' => function ($q) use ($id) {
-                                $q->where('user_id', $id)
-                                    ->select('id', 'question_id', 'attempt_id', 'user_id')
-                                    ->with('attempt:id,score');
-                            }
+                            // Topics + questions + answers
+                            'topics.questions.answers.attempt' => function ($q) use ($id) {
+                                $q->where('user_id', $id);
+                            },
                         ]);
                 }
             ])
@@ -82,6 +75,7 @@ class MyStudentController extends Controller
 
         return new teachestudentdashboard($student);
     }
+
 
 
     public function showStudentexam(Request $request, $id) {}

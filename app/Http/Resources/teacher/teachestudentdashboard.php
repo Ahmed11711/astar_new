@@ -21,8 +21,11 @@ class teachestudentdashboard extends JsonResource
 
             'subjects' => $this->subjects->map(function ($subject) {
 
-                // 1️⃣ جمع بيانات المواضيع
+                /* =========================
+                 * 1️⃣ Topics Stats
+                 * ========================= */
                 $topics = $subject->topics->map(function ($topic) {
+
                     $questions = $topic->questions;
 
                     $answeredQuestions = $questions->filter(
@@ -30,29 +33,44 @@ class teachestudentdashboard extends JsonResource
                     );
 
                     $scores = $answeredQuestions
-                        ->pluck('answers')     // جمع كل الإجابات
+                        ->pluck('answers')
                         ->flatten()
-                        ->pluck('attempt.score') // درجات كل محاولة
-                        ->filter(); // safety
+                        ->pluck('attempt.score')
+                        ->filter();
 
                     return [
-                        'id'                => $topic->id,
-                        'name'              => $topic->name,
-                        'questions_count'   => $questions->count(),
-                        'answered_questions' => $answeredQuestions->count(),
-                        'total_score'       => $scores->sum(),
-                        'average_score'     => $scores->count() ? round($scores->avg(), 2) : 0,
+                        'id'                  => $topic->id,
+                        'name'                => $topic->name,
+                        'questions_count'     => $questions->count(),
+                        'answered_questions'  => $answeredQuestions->count(),
+                        'total_score'         => $scores->sum(),
+                        'average_score'       => $scores->count() ? round($scores->avg(), 2) : 0,
                     ];
                 });
 
-                // 2️⃣ حساب score كامل للـ subject
                 $subjectScore = $topics->pluck('total_score')->sum();
 
+                /* =========================
+                 * 2️⃣ Exam Papers الخاصة بالمدرس
+                 * ========================= */
+                $examPapers = $subject->examPapers->map(function ($exam) {
+
+                    $attempts = $exam->studentAttempts;
+
+                    return [
+                        'id'          => $exam->id,
+                        'title'       => $exam->title,
+                        'trials'      => $attempts->count(),
+                        'total_score' => $attempts->sum('score'),
+                    ];
+                });
+
                 return [
-                    'id'     => $subject->id,
-                    'name'   => $subject->name,
-                    'score'  => $subjectScore, // المجموع لكل الـ topics
-                    'topics' => $topics,
+                    'id'          => $subject->id,
+                    'name'        => $subject->name,
+                    'score'       => $subjectScore,
+                    'topics'      => $topics,
+                    'exam_papers' => $examPapers,
                 ];
             }),
         ];
