@@ -26,7 +26,7 @@ return new class extends Migration
             $table->integer('total_marks')->nullable();
             $table->integer('duration_minutes')->nullable();
             $table->integer('by_created')->nullable();
-            $table->date('dateline')->nullable()->after('by_created');
+            $table->date('deadline')->nullable()->after('by_created');
             $table->json('meta')->nullable(); // creationMethod, duration, meta.subject, meta.grade, ...
             $table->timestamps();
 

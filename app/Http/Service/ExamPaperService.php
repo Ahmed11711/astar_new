@@ -35,7 +35,7 @@ class ExamPaperService
                 'meta'             => $data['meta'] ?? [],
                 'type'          => $data['created_by']['type'] ?? null,
                 'created_by'    => $data['created_by']['id'] ?? null,
-                'dateline'      => $data['dateline'] ?? null,
+                'deadline'      => $data['deadline'] ?? null,
 
 
 

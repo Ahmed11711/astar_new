@@ -29,6 +29,7 @@ use App\Http\Middleware\CheckJwtTokenByAdmin;
 use App\Http\Middleware\RoleToken;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\bugs\bugsController;
 use App\Http\Controllers\Admin\SocialMedia\SocialMediaController;
 
 
@@ -56,6 +57,8 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('packages', PackagesController::class)->names('packages');
     Route::apiResource('social_media', SocialMediaController::class)->names('social_media');
     Route::apiResource('trusteds', trustedController::class)->names('trusted');
+    Route::apiResource('bugs', bugsController::class)->names('bugs');
+
 
 
 

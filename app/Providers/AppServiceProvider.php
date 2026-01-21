@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Repositories\bugs\bugsRepositoryInterface;
+use App\Repositories\bugs\bugsRepository;
+
 use App\Repositories\trusted\trustedRepositoryInterface;
 use App\Repositories\trusted\trustedRepository;
 
@@ -86,6 +89,7 @@ class AppServiceProvider extends ServiceProvider
     $this->app->bind(AttmpateRepositoryInterface::class, AttmpateRepository::class);
         $this->app->bind(SocialMediaRepositoryInterface::class, SocialMediaRepository::class);
         $this->app->bind(trustedRepositoryInterface::class, trustedRepository::class);
+        $this->app->bind(bugsRepositoryInterface::class, bugsRepository::class);
 }
 
   /**

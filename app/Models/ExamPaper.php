@@ -42,4 +42,8 @@ class ExamPaper extends Model
     {
         return $this->hasMany(StudentAttamp::class, 'exam_id');
     }
+    public function studentAttempts()
+    {
+        return $this->hasMany(StudentAttamp::class, 'exam_id');
+    }
 }
