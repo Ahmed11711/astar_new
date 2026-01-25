@@ -29,6 +29,7 @@ use App\Http\Middleware\CheckJwtTokenByAdmin;
 use App\Http\Middleware\RoleToken;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\policy\policyController;
 use App\Http\Controllers\Admin\bugs\bugsController;
 use App\Http\Controllers\Admin\SocialMedia\SocialMediaController;
 
@@ -74,5 +75,6 @@ Route::prefix('v1')->group(function () {
 
         Route::post('exams', [UpdateExamPaperController::class, 'store']);
         Route::get('exams/{id}', [UpdateExamPaperController::class, 'show']);
-    });
+        Route::apiResource('policies', policyController::class)->names('policy');
+});
 });
