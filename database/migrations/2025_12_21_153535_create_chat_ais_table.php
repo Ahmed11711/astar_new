@@ -22,6 +22,8 @@ return new class extends Migration
             $table->longText('content');
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->enum('rating', ['like', 'dislike'])->nullable();
+            $table->foreign('parent_id')->references('id')->on('chat_ais')->cascadeOnDelete();
+            $table->text('feedback')->nullable();
 
             $table->timestamps();
         });

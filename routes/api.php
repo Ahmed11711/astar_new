@@ -14,22 +14,9 @@ use Illuminate\Http\Request;
 
 
 
-Route::get('run-migratessgit', function () {
-    Artisan::call('migrate:fresh', ['--seed' => true, '--force' => true]);
-
-    return response()->json([
-        'code' => Artisan::output()
-    ]);
-});
 
 
-Route::get('delete-student-attempts', function () {
-    DB::table('student_attempts')->truncate();
 
-    return response()->json([
-        'message' => 'All student attempts deleted successfully.'
-    ]);
-});
 
 Route::prefix('v1/')->group(function () {
 
@@ -47,25 +34,6 @@ Route::prefix('v1/')->group(function () {
 });
 
 
-Route::get('run-migrate', function () {
-    //
-    Artisan::call('migrate', ['--force' => true]);
-
-    return response()->json([
-        'code' => Artisan::output()
-    ]);
-});
-Route::get('/generate-jwt-secret', function () {
-    // Artisan::call('jwt:secret');
-    Artisan::call('jwt:secret', ['--force' => true]);
-
-
-    return response()->json([
-        'status' => 'success',
-        'output' => Artisan::output(),
-    ]);
-});
-
 Route::post('ai', function (Request $request) {
 
     Log::info('AI Request Data', [
@@ -78,19 +46,7 @@ Route::post('ai', function (Request $request) {
         'status' => 'ok'
     ]);
 });
-// Route::get('run-migrate-refresh', function () {
-//  // Artisan::call('migrate:refresh', [
-//  //  '--force' => true,
-//  // ]);
 
-//  Artisan::call('db:seed', [
-//   '--force' => true,
-//  ]);
-
-//  return response()->json([
-//   'output' => Artisan::output(),
-//  ]);
-// });
 require __DIR__ . '/admin.php';
 require __DIR__ . '/student.php';
 require __DIR__ . '/teacher.php';

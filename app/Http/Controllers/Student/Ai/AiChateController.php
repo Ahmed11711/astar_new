@@ -37,7 +37,6 @@ class AiChateController extends Controller
         $data = $request->validated();
         $userId = $request->user_id;
 
-        // صح، ضيف user_id للمصفوفة
         $data['user_id'] = $userId;
 
         $chat = chatAi::create($data);
