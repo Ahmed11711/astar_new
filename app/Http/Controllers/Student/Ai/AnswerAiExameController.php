@@ -71,7 +71,7 @@ class AnswerAiExameController extends Controller
                     ->where('id', $attemptId)
                     ->where('user_id', $data['user_id'])
                     ->update([
-                        'ai_checked' => true,
+                        // 'ai_checked' => true,
                         'score' => $data['score'],
                         'updated_at' => now(),
                     ]);
