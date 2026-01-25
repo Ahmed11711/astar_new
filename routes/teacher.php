@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Student\Ai\AnswerAiExameController;
 use App\Http\Controllers\Teacher\AssignStudents\AssignStudentsController;
 use App\Http\Controllers\Teacher\bugs\bugsController;
 use App\Http\Controllers\Teacher\Dashboard\DashboardTeacherController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\Teacher\MyStudentController;
 use App\Http\Controllers\Teacher\StudentChatAi\StudentChateAiController;
 use App\Http\Middleware\RoleToken;
 use Illuminate\Support\Facades\Route;
+
 
 
 
@@ -36,9 +38,14 @@ Route::prefix('v1/teacher')->group(function () {
         Route::post('my-bugs', [bugsController::class, 'store']);
         Route::get('dashboard', [DashboardTeacherController::class, 'index']);
 
+
+        // ... other teacher routes for Ai ...
         // get chat ai for teacher
         Route::post('student-all-chat-ai', [StudentChateAiController::class, 'index']);
         Route::post('student-one-chat-ai', [StudentChateAiController::class, 'show']);
         Route::post('student-update-one-chat-ai', [StudentChateAiController::class, 'update']);
+
+        // update anser with feedback
+        Route::post('ai', [AnswerAiExameController::class, 'handleAi']);
     });
 });

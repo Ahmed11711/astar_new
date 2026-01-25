@@ -35,7 +35,7 @@ Route::prefix('v1/')->group(function () {
     });
 });
 
-Route::post('ai', [AnswerAiExameController::class, 'handle']);
+Route::post('ai', [AnswerAiExameController::class, 'handleAi']);
 // Route::post('ai', function (Request $request) {
 
 //     Log::info('AI Request Data', [

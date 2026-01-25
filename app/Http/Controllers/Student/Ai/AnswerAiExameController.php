@@ -9,49 +9,117 @@ use Illuminate\Support\Facades\DB;
 
 class AnswerAiExameController extends Controller
 {
-    public function handle(Request $request)
+    public function handelAiFeadback(Request $request)
     {
         $data = $request->json()->all();
 
         Log::info('AI Payload', $data);
 
-        // Validate payload structure
         if (
-            !isset($data['job_id']) ||
-            !isset($data['status']) ||
-            !isset($data['results']) ||
+            empty($data['job_id']) ||
+            empty($data['results']) ||
             !is_array($data['results'])
         ) {
+            return response()->json(['message' => 'Invalid AI payload'], 422);
+        }
+
+        DB::transaction(function () use ($data) {
+
+            $attempts = []; // attempt_id => ['user_id' => ?, 'score' => ?]
+
+            foreach ($data['results'] as $result) {
+
+                if (empty($result['answer_id'])) {
+                    continue;
+                }
+
+                $answer = DB::table('answers')
+                    ->select('id', 'attempt_id', 'user_id')
+                    ->where('id', $result['answer_id'])
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$answer) {
+                    Log::warning('Answer not found', [
+                        'answer_id' => $result['answer_id']
+                    ]);
+                    continue;
+                }
+
+                $score = $result['grading_score'] ?? 0;
+
+                // تحديث جدول الأجوبة
+                DB::table('answers')
+                    ->where('id', $answer->id)
+                    ->update([
+                        'mark_score'  => $score,
+                        'is_correct'  => $result['is_correct'] ?? false,
+                        'ai_feedback' => $result['feedback_message'] ?? null,
+                        'updated_at'  => now(),
+                    ]);
+
+                // حفظ attempt info لتحديثه بعدين
+                $attempts[$answer->attempt_id] = [
+                    'user_id' => $answer->user_id,
+                    'score'   => $score,
+                ];
+            }
+
+            // تحديث student_attempts
+            foreach ($attempts as $attemptId => $data) {
+                DB::table('student_attempts')
+                    ->where('id', $attemptId)
+                    ->where('user_id', $data['user_id'])
+                    ->update([
+                        'ai_checked' => true,
+                        'score' => $data['score'],
+                        'updated_at' => now(),
+                    ]);
+            }
+        });
+
+        return response()->json([
+            'message' => 'AI grading processed successfully',
+            'job_id'  => $data['job_id']
+        ]);
+    }
+
+
+
+    public function handelTeacherFeedback(Request $request)
+    {
+        $data = $request->json()->all();
+
+        Log::info('Teacher Feedback Payload', $data);
+
+        // Validate payload structure
+        if (
+            !isset($data['answers']) ||
+            !is_array($data['answers'])
+        ) {
             return response()->json([
-                'message' => 'Invalid AI payload'
+                'message' => 'Invalid Teacher Feedback payload'
             ], 422);
         }
 
-        $jobId   = $data['job_id'];
-        $status  = $data['status'];
-        $results = $data['results'];
+        $answers = $data['answers'];
 
-        foreach ($results as $result) {
+        foreach ($answers as $answer) {
 
-            if (!isset($result['answer_id'])) {
+            if (!isset($answer['answer_id'])) {
                 continue;
             }
 
             DB::table('answers')
-                ->where('id', $result['answer_id'])
+                ->where('id', $answer['answer_id'])
                 ->update([
-                    'mark_score'        => $result['grading_score'] ?? 0,
-                    'is_correct'   => $result['is_correct'] ?? false,
-                    'ai_feedback'  => $result['feedback_message'] ?? null,
-                    // 'ai_job_id'    => $jobId,
-                    // 'ai_status'    => $status,
-                    'updated_at'   => now(),
+                    'teacher_feedback' => $answer['teacher_feedback'] ?? null,
+                    'updated_at'       => now(),
                 ]);
         }
 
         return response()->json([
-            'message' => 'Answers updated successfully',
-            'job_id'  => $jobId
+            'message' => 'Teacher feedback updated successfully',
         ], 200);
     }
 }
