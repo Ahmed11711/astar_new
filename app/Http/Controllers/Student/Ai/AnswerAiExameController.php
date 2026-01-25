@@ -25,7 +25,7 @@ class AnswerAiExameController extends Controller
 
         DB::transaction(function () use ($data) {
 
-            $attempts = []; // attempt_id => ['user_id' => ?, 'score' => ?]
+            $attempts = []; // attempt_id => ['user_id' => ?, 'total_score' => ?]
 
             foreach ($data['results'] as $result) {
 
@@ -58,21 +58,24 @@ class AnswerAiExameController extends Controller
                         'updated_at'  => now(),
                     ]);
 
-                // حفظ attempt info لتحديثه بعدين
-                $attempts[$answer->attempt_id] = [
-                    'user_id' => $answer->user_id,
-                    'score'   => $score,
-                ];
+                // تجميع الدرجات لكل attempt
+                if (!isset($attempts[$answer->attempt_id])) {
+                    $attempts[$answer->attempt_id] = [
+                        'user_id'     => $answer->user_id,
+                        'total_score' => 0,
+                    ];
+                }
+
+                $attempts[$answer->attempt_id]['total_score'] += $score;
             }
 
-            // تحديث student_attempts
             foreach ($attempts as $attemptId => $data) {
                 DB::table('student_attempts')
                     ->where('id', $attemptId)
                     ->where('user_id', $data['user_id'])
                     ->update([
                         // 'ai_checked' => true,
-                        'score' => $data['score'],
+                        'score'      => $data['total_score'],
                         'updated_at' => now(),
                     ]);
             }
@@ -83,6 +86,7 @@ class AnswerAiExameController extends Controller
             'job_id'  => $data['job_id']
         ]);
     }
+
 
 
 
