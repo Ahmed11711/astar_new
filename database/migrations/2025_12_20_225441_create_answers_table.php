@@ -17,7 +17,11 @@ return new class extends Migration
             $table->boolean('is_flagged')->default(false);
             $table->integer('question_index')->nullable();
             $table->decimal('awarded_marks', 5, 2)->nullable();
+            $table->text('ai_feedback')->nullable();
+            $table->text('teacher_feedback')->nullable();
+
             $table->timestamps();
+
 
             $table->index(['attempt_id', 'question_id']);
             $table->index('question_index');
