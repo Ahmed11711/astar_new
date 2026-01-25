@@ -58,7 +58,6 @@ class AnswerAiExameController extends Controller
                         'updated_at'  => now(),
                     ]);
 
-                // تجميع الدرجات لكل attempt
                 if (!isset($attempts[$answer->attempt_id])) {
                     $attempts[$answer->attempt_id] = [
                         'user_id'     => $answer->user_id,
@@ -66,16 +65,15 @@ class AnswerAiExameController extends Controller
                     ];
                 }
 
-                $attempts[$answer->attempt_id]['total_score'] += 1;
+                $attempts[$answer->attempt_id]['total_score'] += $score;
             }
 
-            // تحديث student_attempts بالمجموع
             foreach ($attempts as $attemptId => $data) {
                 DB::table('student_attempts')
                     ->where('id', $attemptId)
                     ->where('user_id', $data['user_id'])
                     ->update([
-                        'score'      => $data['total_score'], // مجموع كل الدرجات
+                        'score'      => $data['total_score'],
                         'updated_at' => now(),
                     ]);
             }
