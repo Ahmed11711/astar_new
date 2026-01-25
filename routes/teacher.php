@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\Teacher\AssignStudents\AssignStudentsController;
 use App\Http\Controllers\Teacher\bugs\bugsController;
+use App\Http\Controllers\Teacher\Dashboard\DashboardTeacherController;
 use App\Http\Controllers\Teacher\MyExame\MyExameTeacherController;
 use App\Http\Controllers\Teacher\MyStudentController;
 use App\Http\Middleware\RoleToken;
 use Illuminate\Support\Facades\Route;
+
 
 
 
@@ -34,5 +36,6 @@ Route::prefix('v1/teacher')->group(function () {
         Route::post('remove-assign-student', [AssignStudentsController::class, 'removeassignStudent']);
         Route::get('my-bugs', [bugsController::class, 'index']);
         Route::post('my-bugs', [bugsController::class, 'store']);
+        Route::get('dashboard', [DashboardTeacherController::class, 'index']);
     });
 });
