@@ -52,7 +52,7 @@ class AnswerAiExameController extends Controller
                 DB::table('answers')
                     ->where('id', $answer->id)
                     ->update([
-                        'mark_score'  => $score,
+                        'mark_score'  => 1,
                         'is_correct'  => $result['is_correct'] ?? false,
                         'ai_feedback' => $result['feedback_message'] ?? null,
                         'updated_at'  => now(),
