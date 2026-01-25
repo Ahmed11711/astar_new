@@ -48,11 +48,11 @@ class AnswerAiExameController extends Controller
 
                 $score = $result['grading_score'] ?? 0;
 
-                // تحديث جدول الأجوبة
+
                 DB::table('answers')
                     ->where('id', $answer->id)
                     ->update([
-                        'mark_score'  => 1,
+                        'mark_score'  => $score,
                         'is_correct'  => $result['is_correct'] ?? false,
                         'ai_feedback' => $result['feedback_message'] ?? null,
                         'updated_at'  => now(),
@@ -66,16 +66,16 @@ class AnswerAiExameController extends Controller
                     ];
                 }
 
-                $attempts[$answer->attempt_id]['total_score'] += $score;
+                $attempts[$answer->attempt_id]['total_score'] += 1;
             }
 
+            // تحديث student_attempts بالمجموع
             foreach ($attempts as $attemptId => $data) {
                 DB::table('student_attempts')
                     ->where('id', $attemptId)
                     ->where('user_id', $data['user_id'])
                     ->update([
-                        // 'ai_checked' => true,
-                        'score'      => $data['total_score'],
+                        'score'      => $data['total_score'], // مجموع كل الدرجات
                         'updated_at' => now(),
                     ]);
             }
@@ -86,6 +86,7 @@ class AnswerAiExameController extends Controller
             'job_id'  => $data['job_id']
         ]);
     }
+
 
 
 
