@@ -43,8 +43,8 @@ class AnswerAiExameController extends Controller
                     'score'        => $result['grading_score'] ?? 0,
                     'is_correct'   => $result['is_correct'] ?? false,
                     'ai_feedback'  => $result['feedback_message'] ?? null,
-                    'ai_job_id'    => $jobId,
-                    'ai_status'    => $status,
+                    // 'ai_job_id'    => $jobId,
+                    // 'ai_status'    => $status,
                     'updated_at'   => now(),
                 ]);
         }
