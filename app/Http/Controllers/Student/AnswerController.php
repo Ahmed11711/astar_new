@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Student\Answer\SaveAnswerRequest;
-use App\Models\Answer;
+use App\Models\answer;
 use App\Models\StudentAttamp;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -94,7 +94,7 @@ class AnswerController extends Controller
         DB::transaction(function () use ($upsertData, $attemptId, $userId, &$answerIds) {
 
             // 🔹 Save answers
-            Answer::upsert(
+            answer::upsert(
                 $upsertData,
                 ['attempt_id', 'question_id', 'question_index', 'user_id'],
                 ['response', 'is_flagged', 'updated_at']
@@ -105,7 +105,7 @@ class AnswerController extends Controller
                 ->update(['is_saved' => true]);
 
             // 🔹 Collect all answer IDs
-            $answerIds = Answer::where('attempt_id', $attemptId)
+            $answerIds = answer::where('attempt_id', $attemptId)
                 ->where('user_id', $userId)
                 ->pluck('id')
                 ->toArray();
