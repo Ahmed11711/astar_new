@@ -49,7 +49,7 @@ class AnswerController extends Controller
                 ) {
                     $file = $answersFiles[$index]['response'][$key];
                     $ext = $file->getClientOriginalExtension();
-                    $prefix = $key === 'drawing_answer' ? 'draw_' : 'audio_';
+                    $prefix = $key === 'drawings' ? 'draw_' : 'audio_';
                     $fileName = uniqid($prefix) . '.' . $ext;
                     $file->move($folders[$key], $fileName);
 
