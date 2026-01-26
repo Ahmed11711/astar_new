@@ -6,9 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Student\Answer\SaveAnswerRequest;
 use App\Models\answer;
 use App\Models\StudentAttamp;
-use Illuminate\Container\Attributes\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class AnswerController extends Controller
 {
@@ -115,7 +115,7 @@ class AnswerController extends Controller
 
         // check is saved
         if (! $is_saved) {
-            Log::info("is_saved", ['true']);
+            Log::alert("is_saved", ['answer_ids' => $answerIds]);
             // 🔹 Send to AI service
             Http::withHeaders([
                 'Content-Type' => 'application/json',
