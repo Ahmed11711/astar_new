@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Student\Answer\SaveAnswerRequest;
 use App\Models\answer;
 use App\Models\StudentAttamp;
+use Illuminate\Container\Attributes\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
@@ -15,6 +16,7 @@ class AnswerController extends Controller
     {
         $userId = $request->user_id;
         $attemptId = $request->attempt_id;
+        $is_saved = $request->is_saved;
 
         // 🔹 Check attempt ownership
         $attempt = StudentAttamp::where('id', $attemptId)
@@ -111,13 +113,17 @@ class AnswerController extends Controller
                 ->toArray();
         });
 
-        // 🔹 Send to AI service
-        Http::withHeaders([
-            'Content-Type' => 'application/json',
-        ])
-            ->post('https://ai.astar.click/get_marks', [
-                'answer_ids' => $answerIds,
-            ]);
+        // check is saved
+        if (! $is_saved) {
+            Log::info("is_saved", ['true']);
+            // 🔹 Send to AI service
+            Http::withHeaders([
+                'Content-Type' => 'application/json',
+            ])
+                ->post('https://ai.astar.click/get_marks', [
+                    'answer_ids' => $answerIds,
+                ]);
+        }
 
         return response()->json([
             'message'    => 'All answers saved successfully.',
