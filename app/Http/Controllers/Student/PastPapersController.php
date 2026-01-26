@@ -56,7 +56,7 @@ class PastPapersController extends Controller
     public function showByAttempt(Request $request, $attemptId)
     {
 
-        return $userId = $request->user_id;
+        $userId = $request->user_id;
 
 
         // Load Attempt + ExamPaper + Questions + Options/Media + Student Answers
