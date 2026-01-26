@@ -14,6 +14,7 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $userId     = $request->user_id;
+        Log::info("DashboardController index called for user_id: $userId");
         $subjectIds = $request->student_subject_ids;
 
         $from = $request->from
@@ -37,7 +38,6 @@ class DashboardController extends Controller
             ->get()
             ->keyBy('id');
 
-        Log::alert("subjects", [$subjects]);
 
         /*
         |--------------------------------------------------------------------------
@@ -54,7 +54,6 @@ class DashboardController extends Controller
                 'question_max_score'
             )
             ->get();
-        Log::alert("questions", [$questions]);
 
 
 
@@ -76,7 +75,6 @@ class DashboardController extends Controller
             ->get()
             ->keyBy('question_id');
 
-        Log::alert("answers", [$answers]);
 
 
         /*
@@ -94,7 +92,6 @@ class DashboardController extends Controller
             )
             ->groupBy('day', 'question_id')
             ->get();
-        Log::alert("dailyAnswers", [$dailyAnswers]);
 
         /*
         |--------------------------------------------------------------------------
@@ -110,9 +107,6 @@ class DashboardController extends Controller
             ->select('id', 'topic_id', 'name')
             ->get()
             ->groupBy('topic_id');
-
-        Log::alert("topics", [$topics]);
-        Log::alert("subtopics", [$subtopics]);
 
         /*
         |--------------------------------------------------------------------------
