@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Student\Answer\SaveAnswerRequest;
 use App\Models\answer;
 use App\Models\StudentAttamp;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
@@ -49,11 +50,12 @@ class AnswerController extends Controller
                 ) {
                     $file = $answersFiles[$index]['response'][$key];
                     $ext = $file->getClientOriginalExtension();
-                    $prefix = $key === 'drawings' ? 'draw_' : 'audio_';
+                    $prefix = $key === 'drawing_answer' ? 'draw_' : 'audio_';
                     $fileName = uniqid($prefix) . '.' . $ext;
                     $file->move($folders[$key], $fileName);
 
                     $response[$key] = url("public/storage/answers/{$key}/{$fileName}");
+                    Log::alert("sssssss", [$response[$key]]);
                 }
             }
 
