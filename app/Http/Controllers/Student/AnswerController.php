@@ -114,7 +114,7 @@ class AnswerController extends Controller
         });
 
         // check is saved
-        if (! $is_saved) {
+        if ($is_saved) {
             Log::alert("is_saved", ['answer_ids' => $answerIds]);
             // 🔹 Send to AI service
             Http::withHeaders([
