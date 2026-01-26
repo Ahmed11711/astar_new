@@ -14,6 +14,7 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $userId     = $request->user_id;
+        Log::info("DashboardController index called for user_id: $userId");
         $subjectIds = $request->student_subject_ids;
 
         $from = $request->from
