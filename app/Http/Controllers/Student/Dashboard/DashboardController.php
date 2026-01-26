@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
+use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
 {
@@ -36,6 +37,8 @@ class DashboardController extends Controller
             ->get()
             ->keyBy('id');
 
+        Log::alert("subjects", [$subjects]);
+
         /*
         |--------------------------------------------------------------------------
         | Query 2 — Questions (NO JOIN)
@@ -51,6 +54,9 @@ class DashboardController extends Controller
                 'question_max_score'
             )
             ->get();
+        Log::alert("questions", [$questions]);
+
+
 
         $questionsBySubtopic = $questions->groupBy('subtopics_id');
 
@@ -70,6 +76,9 @@ class DashboardController extends Controller
             ->get()
             ->keyBy('question_id');
 
+        Log::alert("answers", [$answers]);
+
+
         /*
         |--------------------------------------------------------------------------
         | Query 4 — Daily Answers (Charts)
@@ -85,6 +94,7 @@ class DashboardController extends Controller
             )
             ->groupBy('day', 'question_id')
             ->get();
+        Log::alert("dailyAnswers", [$dailyAnswers]);
 
         /*
         |--------------------------------------------------------------------------
@@ -100,6 +110,9 @@ class DashboardController extends Controller
             ->select('id', 'topic_id', 'name')
             ->get()
             ->groupBy('topic_id');
+
+        Log::alert("topics", [$topics]);
+        Log::alert("subtopics", [$subtopics]);
 
         /*
         |--------------------------------------------------------------------------
@@ -206,7 +219,7 @@ class DashboardController extends Controller
                 'subject_name'             => $subject->name,
                 'topics'                   => $topicsData,
                 'subject_total_questions'  => $topicsData->sum('total_questions'),
-                'subject_answered_questions'=> $topicsData->sum('answered_questions'),
+                'subject_answered_questions' => $topicsData->sum('answered_questions'),
                 'subject_total_marks'      => $topicsData->sum('total_marks'),
                 'subject_student_marks'    => $topicsData->sum('student_marks'),
             ];

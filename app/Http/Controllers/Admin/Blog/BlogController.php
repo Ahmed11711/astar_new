@@ -23,6 +23,5 @@ class BlogController extends BaseController
         $this->storeRequestClass = BlogStoreRequest::class;
         $this->updateRequestClass = BlogUpdateRequest::class;
         $this->resourceClass = BlogResource::class;
-        //
     }
 }
