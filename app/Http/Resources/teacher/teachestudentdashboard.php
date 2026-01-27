@@ -22,7 +22,7 @@ class teachestudentdashboard extends JsonResource
             'subjects' => $this->subjects->map(function ($subject) {
 
                 /* =========================
-                 * 1️⃣ Topics Stats
+                 * 1️⃣ Topics Stats  
                  * ========================= */
                 $topics = $subject->topics->map(function ($topic) {
 
@@ -35,6 +35,7 @@ class teachestudentdashboard extends JsonResource
                     $scores = $answeredQuestions
                         ->pluck('answers')
                         ->flatten()
+                        ->where('user_id', $this->id)
                         ->pluck('attempt.score')
                         ->filter();
 
