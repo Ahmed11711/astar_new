@@ -20,38 +20,40 @@ class PakageController extends Controller
     {
         $userId = $request->user_id;
 
-        $myAssignment = StudentAssignment::where('student_id', $userId)
-            ->latest()
-            ->first();
-
-        if (!$myAssignment) {
-            return response()->json([
-                'packages' => [],
-                'myPackage' => null
-            ]);
-        }
-
-        $userPackageId = StudentPackage::where('student_id', $userId)
-            ->where('active', true)
-            // ->where('ends_at', '>', now())
-            ->where('status', 'paid')
+        // 1️⃣ الباقة الحالية
+        $userPackageId = StudentPackage::where([
+            'student_id' => $userId,
+            'active'     => true,
+            'status'     => 'paid',
+        ])
             ->latest()
             ->value('package_id');
 
-        $packages = Packages::where('assignable_id', $myAssignment->assigned_id)
-            ->where('assign_type', $myAssignment->assigned_type)
+        // 2️⃣ Assignment أو System
+        $assignment = StudentAssignment::where('student_id', $userId)
+            ->latest()
+            ->first();
+
+        $packages = Packages::query()
             ->with('featuresPackage')
-            ->get()
-            ->map(function ($package) use ($userPackageId) {
-                $package->is_user_package = $package->id == $userPackageId;
-                return $package;
-            });
+            ->when(
+                $assignment,
+                fn($q) => $q->where([
+                    'assignable_id' => $assignment->assigned_id,
+                    'assign_type'   => $assignment->assigned_type,
+                ]),
+                fn($q) => $q->whereNull('assignable_id')
+                    ->where('assign_type', 'system')
+            )
+            ->get();
 
         return response()->json([
-            'packages' => PackageResource::collection($packages),
-            'myPackage' => $userPackageId
+            'packages'  => PackageResource::collection($packages)
+                ->additional(['userPackageId' => $userPackageId]),
+            'myPackage' => $userPackageId,
         ]);
     }
+
 
     public function upgrade(
         PackageUpgradeRequest $request,
