@@ -56,16 +56,10 @@ class AnswerController extends Controller
 
         $upsertData = [];
 
-        // ✅ NEW: track affected questions only (minimal addition)
-        $affectedQuestions = [];
+        // ✅ FIX CORE: operation-level timestamp (single source of truth)
+        $operationTime = now();
 
         foreach ($answersData as $index => $answer) {
-
-            // ✅ track submitted questions
-            $affectedQuestions[] = [
-                'question_id'    => $answer['question_id'],
-                'question_index' => $answer['question_index'],
-            ];
 
             $response = $answer['response'] ?? [];
 
@@ -95,8 +89,8 @@ class AnswerController extends Controller
                 'question_index' => $answer['question_index'],
                 'response'       => json_encode($response, JSON_UNESCAPED_UNICODE),
                 'is_flagged'     => $answer['is_flagged'] ?? false,
-                'created_at'     => now(),
-                'updated_at'     => now(),
+                'created_at'     => $operationTime,
+                'updated_at'     => $operationTime, // 👈 CRITICAL
             ];
         }
 
@@ -106,7 +100,7 @@ class AnswerController extends Controller
             $upsertData,
             $attemptId,
             $userId,
-            $affectedQuestions,
+            $operationTime,
             &$answerIds
         ) {
 
@@ -121,23 +115,17 @@ class AnswerController extends Controller
             StudentAttamp::where('id', $attemptId)
                 ->update(['is_saved' => true]);
 
-            // ✅ FIX: get ONLY affected answer IDs (not whole attempt)
+            // ✅ ONLY answers touched in THIS request
             $answerIds = answer::where('attempt_id', $attemptId)
                 ->where('user_id', $userId)
-                ->where(function ($q) use ($affectedQuestions) {
-                    foreach ($affectedQuestions as $question) {
-                        $q->orWhere(function ($q2) use ($question) {
-                            $q2->where('question_id', $question['question_id'])
-                                ->where('question_index', $question['question_index']);
-                        });
-                    }
-                })
+                ->where('updated_at', $operationTime)
                 ->pluck('id')
                 ->toArray();
         });
 
         // 🔹 Send to AI only when final save
-        if ($is_saved) {
+        if ($is_saved && ! empty($answerIds)) {
+
             Log::alert('is_saved', ['answer_ids' => $answerIds]);
 
             Http::withHeaders([
