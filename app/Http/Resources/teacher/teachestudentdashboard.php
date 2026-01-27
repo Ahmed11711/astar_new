@@ -43,7 +43,7 @@ class teachestudentdashboard extends JsonResource
                 $subjectScore = $topics->pluck('total_score')->sum();
 
                 /* =========================
-                 * 2️⃣ Exam Papers الخاصة بالمدرس
+                 
                  * ========================= */
                 $examPapers = $subject->examPapers->map(function ($exam) {
 
