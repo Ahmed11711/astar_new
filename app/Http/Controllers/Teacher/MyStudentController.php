@@ -23,7 +23,8 @@ class MyStudentController extends Controller
     public function myStudent(Request $request)
     {
 
-        $userId = $request->userId;
+        $userId = 123;
+
         Log::info('Teacher ID: ' . $userId);
         $limit = $request->query('limit', 10);
         $studentsQuery = User::query()
