@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Repositories\Report\ReportRepositoryInterface;
+use App\Repositories\Report\ReportRepository;
+
 use App\Repositories\policy\policyRepositoryInterface;
 use App\Repositories\policy\policyRepository;
 
@@ -94,6 +97,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(trustedRepositoryInterface::class, trustedRepository::class);
         $this->app->bind(bugsRepositoryInterface::class, bugsRepository::class);
         $this->app->bind(policyRepositoryInterface::class, policyRepository::class);
+        $this->app->bind(ReportRepositoryInterface::class, ReportRepository::class);
 }
 
   /**
