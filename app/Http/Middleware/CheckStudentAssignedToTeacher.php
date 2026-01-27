@@ -13,8 +13,10 @@ class CheckStudentAssignedToTeacher
     public function handle(Request $request, Closure $next): Response
     {
         $teacgherId = $request->get('user_id');
+        $role = $request->get('user_role');
         $studentId = $request->input('student_id');
-        Log::alert("Checking assignment: Teacher ID {$teacgherId}, Student ID {$studentId}");
+        Log::alert("Checking assignment: Teacher ID {$role}, Student ID {$role}");
+
         return $next($request);
     }
 }
