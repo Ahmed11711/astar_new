@@ -28,26 +28,37 @@ class teachestudentdashboard extends JsonResource
 
                     $questions = $topic->questions;
 
-                    $answeredQuestions = $questions->filter(
-                        fn($q) => $q->answers->isNotEmpty()
-                    );
-
-                    $scores = $answeredQuestions
+                    // ✅ إجابات الطالب فقط
+                    $studentAnswers = $questions
                         ->pluck('answers')
                         ->flatten()
-                        ->where('user_id', $this->id)
+                        ->where('user_id', $this->id);
+
+                    // ✅ IDs الأسئلة اللي الطالب جاوبها فعليًا
+                    $answeredQuestionIds = $studentAnswers
+                        ->pluck('question_id')
+                        ->unique();
+
+                    // ✅ عدد الأسئلة المتجاوبة للطالب فقط
+                    $answeredQuestionsCount = $answeredQuestionIds->count();
+
+                    // ✅ السكورات
+                    $scores = $studentAnswers
                         ->pluck('attempt.score')
                         ->filter();
 
                     return [
-                        'id'                  => $topic->id,
-                        'name'                => $topic->name,
-                        'questions_count'     => $questions->count(),
-                        'answered_questions'  => $answeredQuestions->count(),
-                        'total_score'         => $scores->sum(),
-                        'average_score'       => $scores->count() ? round($scores->avg(), 2) : 0,
+                        'id'                 => $topic->id,
+                        'name'               => $topic->name,
+                        'questions_count'    => $questions->count(),
+                        'answered_questions' => $answeredQuestionsCount,
+                        'total_score'        => $scores->sum(),
+                        'average_score'      => $scores->count()
+                            ? round($scores->avg(), 2)
+                            : 0,
                     ];
                 });
+
 
                 $subjectScore = $topics->pluck('total_score')->sum();
 
