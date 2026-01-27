@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Student\Ai;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Teacher\AnwserForUser\UpdateAnswerForUser;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AnswerAiExameController extends Controller
 {
@@ -86,40 +87,30 @@ class AnswerAiExameController extends Controller
 
 
 
-    public function handelTeacherFeedback(Request $request)
+    public function handelTeacherFeedback(UpdateAnswerForUser $request)
     {
-        $data = $request->json()->all();
+        $data = $request->validated();
+        $answerId = $data['answer_id'];
+        $teacher_feedback = $data['teacher_feedback'];
+        $mark_score = $data['mark_score'];
+        $is_correct = $data['is_correct'];
+
+
+
 
         Log::info('Teacher Feedback Payload', $data);
-
-        // Validate payload structure
-        if (
-            !isset($data['answers']) ||
-            !is_array($data['answers'])
-        ) {
-            return response()->json([
-                'message' => 'Invalid Teacher Feedback payload'
-            ], 422);
-        }
-
-        $answers = $data['answers'];
-
-        foreach ($answers as $answer) {
-
-            if (!isset($answer['answer_id'])) {
-                continue;
-            }
-
-            DB::table('answers')
-                ->where('id', $answer['answer_id'])
-                ->update([
-                    'teacher_feedback' => $answer['teacher_feedback'] ?? null,
-                    'updated_at'       => now(),
-                ]);
-        }
-
+        DB::table('answers')
+            ->where('id', $answerId)
+            ->update([
+                'teacher_feedback' => $teacher_feedback ?? null,
+                'mark_score'       => $mark_score,
+                'is_correct'       => $is_correct,
+                'awarded_marks' => $mark_score,
+                'updated_at'       => now(),
+            ]);
         return response()->json([
             'message' => 'Teacher feedback updated successfully',
-        ], 200);
+
+        ]);
     }
 }

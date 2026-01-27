@@ -12,8 +12,8 @@ class UpdateAnswerForUser extends BaseRequest
         return [
             'answer_id'       => 'required|integer|exists:answers,id',
             'is_correct'      => 'required|boolean',
-            'mark_score'   => 'nullable|numeric|min:0',
-            'teacher_feedback' => 'nullable|string',
+            'mark_score'   => 'required|numeric|min:0',
+            'teacher_feedback' => 'required|string',
         ];
     }
 }
