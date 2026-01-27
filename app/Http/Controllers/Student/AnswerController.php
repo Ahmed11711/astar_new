@@ -14,9 +14,9 @@ class AnswerController extends Controller
 {
     public function saveAnswersOptimized(SaveAnswerRequest $request)
     {
-        $userId = $request->user_id;
+        $userId    = $request->user_id;
         $attemptId = $request->attempt_id;
-        $is_saved = $request->is_saved;
+        $is_saved  = $request->is_saved;
 
         // 🔹 Check attempt ownership
         $attempt = StudentAttamp::where('id', $attemptId)
@@ -56,7 +56,16 @@ class AnswerController extends Controller
 
         $upsertData = [];
 
+        // ✅ NEW: track affected questions only (minimal addition)
+        $affectedQuestions = [];
+
         foreach ($answersData as $index => $answer) {
+
+            // ✅ track submitted questions
+            $affectedQuestions[] = [
+                'question_id'    => $answer['question_id'],
+                'question_index' => $answer['question_index'],
+            ];
 
             $response = $answer['response'] ?? [];
 
@@ -93,7 +102,13 @@ class AnswerController extends Controller
 
         $answerIds = [];
 
-        DB::transaction(function () use ($upsertData, $attemptId, $userId, &$answerIds) {
+        DB::transaction(function () use (
+            $upsertData,
+            $attemptId,
+            $userId,
+            $affectedQuestions,
+            &$answerIds
+        ) {
 
             // 🔹 Save answers
             answer::upsert(
@@ -106,23 +121,30 @@ class AnswerController extends Controller
             StudentAttamp::where('id', $attemptId)
                 ->update(['is_saved' => true]);
 
-            // 🔹 Collect all answer IDs
+            // ✅ FIX: get ONLY affected answer IDs (not whole attempt)
             $answerIds = answer::where('attempt_id', $attemptId)
                 ->where('user_id', $userId)
+                ->where(function ($q) use ($affectedQuestions) {
+                    foreach ($affectedQuestions as $question) {
+                        $q->orWhere(function ($q2) use ($question) {
+                            $q2->where('question_id', $question['question_id'])
+                                ->where('question_index', $question['question_index']);
+                        });
+                    }
+                })
                 ->pluck('id')
                 ->toArray();
         });
 
-        // check is saved
+        // 🔹 Send to AI only when final save
         if ($is_saved) {
-            Log::alert("is_saved", ['answer_ids' => $answerIds]);
-            // 🔹 Send to AI service
+            Log::alert('is_saved', ['answer_ids' => $answerIds]);
+
             Http::withHeaders([
                 'Content-Type' => 'application/json',
-            ])
-                ->post('https://ai.astar.click/get_marks', [
-                    'answer_ids' => $answerIds,
-                ]);
+            ])->post('https://ai.astar.click/get_marks', [
+                'answer_ids' => $answerIds,
+            ]);
         }
 
         return response()->json([
