@@ -53,6 +53,7 @@ class AnswerAiExameController extends Controller
                     ->where('id', $answer->id)
                     ->update([
                         'mark_score'  => $score,
+                        'awarded_marks' => $score,
                         'is_correct'  => $result['is_correct'] ?? false,
                         'ai_feedback' => $result['feedback_message'] ?? null,
                         'updated_at'  => now(),

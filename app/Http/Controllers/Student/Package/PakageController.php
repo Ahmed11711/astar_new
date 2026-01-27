@@ -20,7 +20,6 @@ class PakageController extends Controller
     {
         $userId = $request->user_id;
 
-        // 1️⃣ الباقة الحالية
         $userPackageId = StudentPackage::where([
             'student_id' => $userId,
             'active'     => true,
@@ -29,7 +28,6 @@ class PakageController extends Controller
             ->latest()
             ->value('package_id');
 
-        // 2️⃣ Assignment أو System
         $assignment = StudentAssignment::where('student_id', $userId)
             ->latest()
             ->first();
