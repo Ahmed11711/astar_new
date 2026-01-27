@@ -95,23 +95,25 @@ class AnswerAiExameController extends Controller
         $mark_score = $data['mark_score'];
         $is_correct = $data['is_correct'];
 
-
-
-
-        Log::info('Teacher Feedback Payload', $data);
-        DB::table('answers')
+        $updated = DB::table('answers')
             ->where('id', $answerId)
             ->where('user_id', $data['student_id'])
             ->update([
                 'teacher_feedback' => $teacher_feedback ?? null,
                 'mark_score'       => $mark_score,
                 'is_correct'       => $is_correct,
-                'awarded_marks' => $mark_score,
+                'awarded_marks'    => $mark_score,
                 'updated_at'       => now(),
             ]);
-        return response()->json([
-            'message' => 'Teacher feedback updated successfully',
 
-        ]);
+        if ($updated) {
+            return response()->json([
+                'message' => 'Teacher feedback updated successfully',
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Answer not found for this student',
+            ], 404);
+        }
     }
 }
