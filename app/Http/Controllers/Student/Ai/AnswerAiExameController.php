@@ -101,6 +101,7 @@ class AnswerAiExameController extends Controller
         Log::info('Teacher Feedback Payload', $data);
         DB::table('answers')
             ->where('id', $answerId)
+            ->where('user_id', $data['student_id'])
             ->update([
                 'teacher_feedback' => $teacher_feedback ?? null,
                 'mark_score'       => $mark_score,

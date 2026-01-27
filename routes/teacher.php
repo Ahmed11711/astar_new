@@ -7,8 +7,10 @@ use App\Http\Controllers\Teacher\Dashboard\DashboardTeacherController;
 use App\Http\Controllers\Teacher\MyExame\MyExameTeacherController;
 use App\Http\Controllers\Teacher\MyStudentController;
 use App\Http\Controllers\Teacher\StudentChatAi\StudentChateAiController;
+use App\Http\Middleware\CheckStudentAssignedToTeacher;
 use App\Http\Middleware\RoleToken;
 use Illuminate\Support\Facades\Route;
+
 
 
 
@@ -47,6 +49,6 @@ Route::prefix('v1/teacher')->group(function () {
 
         // update anser with feedback
         Route::post('ai', [AnswerAiExameController::class, 'handleAi']);
-        Route::post('teacher-feedback', [AnswerAiExameController::class, 'handelTeacherFeedback']);
+        Route::post('teacher-feedback', [AnswerAiExameController::class, 'handelTeacherFeedback'])->middleware(CheckStudentAssignedToTeacher::class);
     });
 });

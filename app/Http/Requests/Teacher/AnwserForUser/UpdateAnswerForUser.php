@@ -14,6 +14,7 @@ class UpdateAnswerForUser extends BaseRequest
             'is_correct'      => 'required|boolean',
             'mark_score'   => 'required|numeric|min:0',
             'teacher_feedback' => 'required|string',
+            'student_id'      => 'sometimes|integer|exists:users,id',
         ];
     }
 }
