@@ -44,67 +44,33 @@ class MyStudentController extends Controller
     //      → questions
     //        → answers
     //          → student_attempts
+
     public function showStudent(Request $request, $id)
     {
         $teacherId = $request->user_id;
         Log::info("Teacher IaaaaD: " . $teacherId . ", Scccsssssscctudent ID: " . $id);
-
-        $student = User::query()
-            ->select('id', 'username', 'email')
-            ->with([
+        $student = User::query()->select('id', 'username', 'email')->with(
+            [
                 'grades:id,name',
-
                 'subjects' => function ($q) use ($teacherId, $id) {
-                    $q->select('subjects.id', 'subjects.name')
-                        ->with([
-                            'topics' => function ($q) use ($id) {
-                                $q->select('topics.id', 'topics.name', 'topics.subject_id')
-
-                                    // إجمالي الأسئلة
-                                    ->withCount('questions')
-
-                                    // عدد الأسئلة اللي الطالب جاوبها
-                                    ->withCount([
-                                        'questions as answered_questions' => function ($q) use ($id) {
-                                            $q->whereHas('answers', function ($q) use ($id) {
-                                                $q->where('user_id', $id);
-                                            });
-                                        }
-                                    ])
-
-                                    // مجموع السكورات
-                                    ->withSum([
-                                        'questions as total_score' => function ($q) use ($id) {
-                                            $q->whereHas('answers', function ($q) use ($id) {
-                                                $q->where('user_id', $id);
-                                            });
-                                        }
-                                    ], 'answers.attempt.score');
-                            },
-
+                    $q->select('subjects.id', 'subjects.name')->with(
+                        [
                             'examPapers' => function ($q) use ($teacherId, $id) {
-                                $q->where('created_by', $teacherId)
-                                    ->select('id', 'subject_id', 'title')
-                                    ->withCount([
-                                        'studentAttempts as trials' => function ($q) use ($id) {
-                                            $q->where('user_id', $id);
-                                        }
-                                    ])
-                                    ->withSum([
-                                        'studentAttempts as total_score' => function ($q) use ($id) {
-                                            $q->where('user_id', $id);
-                                        }
-                                    ], 'score');
-                            }
-                        ]);
+                                $q->where('created_by', $teacherId)->select('id', 'subject_id', 'title')
+                                    ->with(['studentAttempts' => function ($q) use ($id) {
+                                        $q->where('user_id', $id)->select('id', 'exam_id', 'user_id', 'score');
+                                    }]);
+                            },
+                            'topics.questions.answers.attempt' => function ($q) use ($id) {
+                                $q->where('user_id', $id);
+                            },
+                        ]
+                    );
                 }
-            ])
-            ->findOrFail($id);
-
-
+            ]
+        )->findOrFail($id);
         return new teachestudentdashboard($student);
     }
-
 
 
     public function showStudentexam(Request $request, $id) {}
