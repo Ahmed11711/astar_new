@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Student\Ai;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Teacher\AnwserForUser\UpdateAnswerForUser;
+use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class AnswerAiExameController extends Controller
 {
+    use ApiResponseTrait;
     public function handelAiFeadback(Request $request)
     {
         $data = $request->json()->all();
@@ -107,13 +109,9 @@ class AnswerAiExameController extends Controller
             ]);
 
         if ($updated) {
-            return response()->json([
-                'message' => 'Teacher feedback updated successfully',
-            ]);
+            return $this->successResponse([], 'Teacher feedback updated successfully');
         } else {
-            return response()->json([
-                'message' => 'Answer not found for this student',
-            ], 404);
+            return $this->errorResponse('Answer not found for this student', 404);
         }
     }
 }
