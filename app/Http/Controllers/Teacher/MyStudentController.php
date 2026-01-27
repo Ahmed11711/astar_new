@@ -24,8 +24,9 @@ class MyStudentController extends Controller
     {
 
         $userId = $request->user_id;
+        $role = $request->user_role;
 
-        Log::info('Teacher ID: ' . $request);
+        Log::info('Teacher ID: ', ['user_id' => $userId, 'role' => $role]);
         $limit = $request->query('limit', 10);
         $studentsQuery = User::query()
             ->select('users.id', 'users.username', 'users.email')
