@@ -15,6 +15,7 @@ use App\Models\User;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class MyStudentController extends Controller
 {
@@ -23,6 +24,7 @@ class MyStudentController extends Controller
     {
 
         $userId = $request->userId;
+        Log::info('Teacher ID: ' . $userId);
         $limit = $request->query('limit', 10);
         $studentsQuery = User::query()
             ->select('users.id', 'users.username', 'users.email')
