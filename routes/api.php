@@ -36,19 +36,7 @@ Route::prefix('v1/')->group(function () {
 });
 
 Route::post('ai', [AnswerAiExameController::class, 'handelAiFeadback']);
-//
-// Route::post('ai', function (Request $request) {
 
-//     Log::info('AI Request Data', [
-//         'data' => $request->all(),
-//         'ip' => $request->ip(),
-//         'headers' => $request->headers->all(),
-//     ]);
-
-//     return response()->json([
-//         'status' => 'ok'
-//     ]);
-// });
 
 require __DIR__ . '/admin.php';
 require __DIR__ . '/student.php';
