@@ -20,6 +20,7 @@ return new class extends Migration
             $table->text('ai_feedback')->nullable();
             $table->text('teacher_feedback')->nullable();
 
+
             $table->timestamps();
 
 

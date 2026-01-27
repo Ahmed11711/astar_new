@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('answers', function (Blueprint $table) {
             $table->unsignedBigInteger('user_id')->index()->after('attempt_id');
+            $table->text('user_feedback')->nullable()->after('teacher_feedback');
         });
     }
 
