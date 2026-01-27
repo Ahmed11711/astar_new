@@ -72,6 +72,7 @@ class ExamPaperRequest extends BaseRequest
             'created_by.id'   => 'nullable|integer',
             'deadline' => 'nullable|date',
             'is_text_only' => 'nullable|boolean',
+            'exam_type' => 'nullable|string',
 
             'questions'                 => 'required|array',
             'questions.*.question_type' => 'required|string',
