@@ -46,7 +46,7 @@ class MyStudentController extends Controller
     //          → student_attempts
     public function showStudent(Request $request, $id)
     {
-        $teacherId = $request->userId;
+        $teacherId = $request->user_id;
         Log::info("Teacher IaaaaD: " . $teacherId . ", Scccsssssscctudent ID: " . $id);
 
         $student = User::query()
