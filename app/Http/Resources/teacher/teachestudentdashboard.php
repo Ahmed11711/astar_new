@@ -62,6 +62,7 @@ class teachestudentdashboard extends JsonResource
 
 
 
+
                 $subjectScore = $topics->pluck('total_score')->sum();
 
                 /* =========================
