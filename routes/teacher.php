@@ -47,5 +47,6 @@ Route::prefix('v1/teacher')->group(function () {
 
         // update anser with feedback
         Route::post('ai', [AnswerAiExameController::class, 'handleAi']);
+        Route::post('teacher-feedback', [AnswerAiExameController::class, 'handelTeacherFeedback']);
     });
 });
