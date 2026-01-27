@@ -21,7 +21,8 @@ class MyStudentController extends Controller
     use ApiResponseTrait;
     public function myStudent(Request $request)
     {
-        $userId = 2;
+
+        $userId = $request->userId;
         $limit = $request->query('limit', 10);
         $studentsQuery = User::query()
             ->select('users.id', 'users.username', 'users.email')
