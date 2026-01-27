@@ -34,7 +34,7 @@ class MyExameTeacherController extends Controller
 
         // 2️⃣ جلب بيانات الـ subjects المرتبطة بنفس الـ join
         $subjects = StudentAttamp::whereIn('exam_id', $papers->pluck('paper_id'))
-            ->select('exam_id', 'subject_id', 'score', 'time_remaining') // أو أي أعمدة عايزها
+            ->select('score', 'time_remaining') // أو أي أعمدة عايزها
             ->get();
 
         // 3️⃣ دمجهم في JSON واحد
