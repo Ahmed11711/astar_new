@@ -13,7 +13,6 @@ class AnswerAiExameController extends Controller
     {
         $data = $request->json()->all();
 
-        Log::info('AI Payload', $data);
 
         if (
             empty($data['job_id']) ||
@@ -25,8 +24,7 @@ class AnswerAiExameController extends Controller
 
         DB::transaction(function () use ($data) {
 
-            $attempts = []; // attempt_id => ['user_id' => ?, 'total_score' => ?]
-
+            $attempts = [];
             foreach ($data['results'] as $result) {
 
                 if (empty($result['answer_id'])) {
@@ -40,9 +38,7 @@ class AnswerAiExameController extends Controller
                     ->first();
 
                 if (!$answer) {
-                    Log::warning('Answer not found', [
-                        'answer_id' => $result['answer_id']
-                    ]);
+
                     continue;
                 }
 

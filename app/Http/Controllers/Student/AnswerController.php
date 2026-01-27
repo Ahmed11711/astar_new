@@ -126,7 +126,6 @@ class AnswerController extends Controller
         // 🔹 Send to AI only when final save
         if ($is_saved && ! empty($answerIds)) {
 
-            Log::alert('is_saved', ['answer_ids' => $answerIds]);
 
             Http::withHeaders([
                 'Content-Type' => 'application/json',
