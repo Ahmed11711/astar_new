@@ -15,10 +15,11 @@ class CheckFeatureLimit
         $feature = UserPackageFeature::query()
             ->where('user_id', $userId)
             ->whereHas('feature', function ($q) use ($featureKey) {
-                $q->where('feature_key', $featureKey);
+                $q->where('key', $featureKey);
             })
             ->lockForUpdate()
             ->first();
+
 
         if (!$feature || $feature->remaining_count <= 0) {
             return response()->json([

@@ -10,14 +10,20 @@ class UserPackageFeature extends Model
     {
         return $this->belongsTo(User::class);
     }
-
-    public function package()
+    public function packageFeature()
     {
-        return $this->belongsTo(Packages::class);
+        return $this->belongsTo(FeaturePackage::class, 'package_feature_id');
     }
 
     public function feature()
     {
-        return $this->belongsTo(FeaturePackage::class, 'package_feature_id');
+        return $this->hasOneThrough(
+            Feature::class,
+            FeaturePackage::class,
+            'id',               // FK in FeaturePackage
+            'id',               // PK in Feature
+            'package_feature_id', // localKey in UserPackageFeature
+            'feature_id'        // localKey in FeaturePackage
+        );
     }
 }
