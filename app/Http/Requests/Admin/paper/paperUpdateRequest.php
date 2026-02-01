@@ -6,16 +6,18 @@ use App\Http\Requests\BaseRequest\BaseRequest;
 
 class paperUpdateRequest extends BaseRequest
 {
- public function authorize(): bool
- {
-  return true;
- }
+    public function authorize(): bool
+    {
+        return true;
+    }
 
- public function rules(): array
- {
-  return [
-   'name' => 'nullable|string',
-   'type' => 'nullable|string',
-  ];
- }
+    public function rules(): array
+    {
+        return [
+            'name' => 'nullable|string',
+            'type' => 'nullable|string',
+            'grade_id' => 'nullable|integer|exists:grades,id',
+            'subject_id' => 'nullable|integer|exists:subjects,id',
+        ];
+    }
 }
