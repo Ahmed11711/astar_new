@@ -19,6 +19,7 @@ return new class extends Migration
 
             $table->string('value')->nullable();
             $table->string('lable')->nullable();
+            $table->string('key_feature')->nullable();
 
             $table->timestamps();
 
