@@ -48,7 +48,6 @@ class MyStudentController extends Controller
     public function showStudent(Request $request, $id)
     {
         $teacherId = $request->user_id;
-        Log::info("Teacher IaaaaD: " . $teacherId . ", Scccsssssscctudent ID: " . $id);
         $student = User::query()->select('id', 'username', 'email')->with(
             [
                 'grades:id,name',
