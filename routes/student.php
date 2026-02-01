@@ -35,8 +35,8 @@ Route::prefix('v1/student')->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index']);
         Route::get('dashboard-chart', [DashboardController::class, 'topicProgressPerDay']);
 
-        Route::get('past-papers', [PastPapersController::class, 'index'])->middleware(CheckFeatureLimit::class . ':attampted');
-        Route::get('past-paper/{examPaper}', [PastPapersController::class, 'show']);
+        Route::get('past-papers', [PastPapersController::class, 'index']);
+        Route::get('past-paper/{examPaper}', [PastPapersController::class, 'show'])->middleware(CheckFeatureLimit::class . ':attampted');
         Route::get('past-paper/attempt/{attemptId}', [PastPapersController::class, 'showByAttempt']);
 
         Route::post('attamepate', [AttmpateWithAnswerController::class, 'createAttamepate']);
