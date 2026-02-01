@@ -6,15 +6,37 @@ use App\Models\User;
 
 class UserRoleService
 {
- public function getTeachersAndSchools(?int $id = null)
- {
-  $query = User::whereIn('role', ['teacher', 'school'])
-   ->select('id', 'username', 'email', 'role');
+    public function getTeachersAndSchools()
+    {
+        /** =========================
+         *  1️⃣ المدرسين الأفراد
+         * ========================= */
+        $individualTeachers = User::query()
+            ->where('role', 'teacher')
+            ->where('student_type', 'individual')
+            ->select('id', 'username', 'email')
+            ->get();
 
-  if ($id) {
-   return $query->where('id', $id)->first();
-  }
+        /** =========================
+         *  2️⃣ المدارس + المدرسين
+         * ========================= */
+        $schools = User::query()
+            ->where('role', 'school')
+            ->select('id', 'username', 'email')
+            ->with([
+                'teachers:id,username,email'
+            ])
+            ->get()
+            ->map(function ($school) {
+                return [
+                    'school'   => $school->only(['id', 'username', 'email']),
+                    'teachers' => $school->teachers,
+                ];
+            });
 
-  return $query->get()->groupBy('role');
- }
+        return [
+            'teachers' => $individualTeachers,
+            'schools'  => $schools,
+        ];
+    }
 }

@@ -34,10 +34,7 @@ class FrontAuthController extends Controller
             return $this->successResponse($result, 'User retrieved successfully');
         }
 
-        return $this->successResponse([
-            'teachers' => $result->get('teacher', []),
-            'schools'  => $result->get('school', []),
-        ], 'Teachers and Schools retrieved successfully');
+        return $this->successResponse($result, 'Teachers and Schools retrieved successfully');
     }
 
 
