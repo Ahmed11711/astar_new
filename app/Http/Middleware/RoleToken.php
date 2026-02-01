@@ -36,11 +36,12 @@ class RoleToken
 
 
             if ($role === 'student') {
-                $user = User::with('subjects:id')->findOrFail($userId);
+                $user = User::with(['studentAssignments', 'subjects:id'])->findOrFail($userId);
 
                 $request->merge([
                     'student_grade_id'    => $user->grades->first()?->id,
                     'student_subject_ids' => $user->subjects->pluck('id')->all(),
+                    'student_assignment_id' => $user->studentAssignments?->assigned_id,
                 ]);
             }
 

@@ -7,6 +7,7 @@ use App\Models\ExamPaper;
 use App\Models\paper;
 use App\Models\StudentAttamp;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class PastPapersController extends Controller
 {
@@ -15,11 +16,17 @@ class PastPapersController extends Controller
     {
         $userId = $request->user_id;
         $role   = $request->user_role;
-        $gradeId    = $request->student_grade_id;
+        $gradeId = $request->student_grade_id;
         $subjectIds = $request->student_subject_ids;
+        $student_assignment_id = $request->student_assignment_id;
+
         $papers = ExamPaper::query()
             ->where('grade_id', $gradeId)
             ->whereIn('subject_id', $subjectIds)
+            ->where(function ($query) use ($student_assignment_id) {
+                $query->whereNull('created_by')
+                    ->orWhere('created_by', $student_assignment_id);
+            })
             ->with([
                 'paper:id,name',
                 'subject:id,name',
@@ -28,6 +35,7 @@ class PastPapersController extends Controller
                 }
             ])
             ->get();
+
 
         return response()->json([
             'success' => true,
