@@ -10,8 +10,10 @@ use App\Http\Controllers\Student\MySubject\MySubjectController;
 use App\Http\Controllers\Student\Package\PakageController;
 use App\Http\Controllers\Student\PastPapersController;
 use App\Http\Controllers\Student\TopicWise\TopicWiseController;
+use App\Http\Middleware\CheckFeatureLimit;
 use App\Http\Middleware\RoleToken;
 use Illuminate\Support\Facades\Route;
+
 
 
 
@@ -33,7 +35,7 @@ Route::prefix('v1/student')->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index']);
         Route::get('dashboard-chart', [DashboardController::class, 'topicProgressPerDay']);
 
-        Route::get('past-papers', [PastPapersController::class, 'index']);
+        Route::get('past-papers', [PastPapersController::class, 'index'])->middleware(CheckFeatureLimit::class . ':Automatic correction');
         Route::get('past-paper/{examPaper}', [PastPapersController::class, 'show']);
         Route::get('past-paper/attempt/{attemptId}', [PastPapersController::class, 'showByAttempt']);
 
