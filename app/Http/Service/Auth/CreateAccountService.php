@@ -92,6 +92,7 @@ class CreateAccountService
         }
         $transactionId = 'TXN-' . Str::uuid();
 
+        // Create features for the user based on the package
         $this->featureService->createFeaturesForUser($user->id, $package);
 
         return StudentPackage::create([

@@ -20,8 +20,8 @@ class StudentPackageFeatureService
                     'user_id'             => $userId,
                     'package_id'          => $package->id,
                     'package_feature_id'  => $feature->id,
-                    'total_count'         => $feature->limit_count,
-                    'remaining_count'     => $feature->limit_count,
+                    'total_count'         => $feature->value,
+                    'remaining_count'     => $feature->value,
                 ]);
             }
         });
