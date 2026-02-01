@@ -9,7 +9,6 @@ class UserRoleService
     public function getTeachersAndSchools()
     {
         /** =========================
-         *  1️⃣ المدرسين الأفراد
          * ========================= */
         $individualTeachers = User::query()
             ->where('role', 'teacher')
@@ -18,7 +17,6 @@ class UserRoleService
             ->get();
 
         /** =========================
-         *  2️⃣ المدارس + المدرسين
          * ========================= */
         $schools = User::query()
             ->where('role', 'school')

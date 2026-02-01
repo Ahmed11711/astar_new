@@ -2,6 +2,7 @@
 
 namespace App\Http\Service\Auth;
 
+use App\Http\Service\Student\StudentPackageFeatureService;
 use App\Models\Packages;
 use App\Models\StudentAssignment;
 use App\Models\StudentPackage;
@@ -15,6 +16,12 @@ use Illuminate\Support\Str;
 
 class CreateAccountService
 {
+    protected $featureService;
+
+    public function __construct(StudentPackageFeatureService $featureService)
+    {
+        $this->featureService = $featureService;
+    }
     protected ?int $packageDuration = null;
 
     public function execute(array $data): User
@@ -85,6 +92,7 @@ class CreateAccountService
         }
         $transactionId = 'TXN-' . Str::uuid();
 
+        $this->featureService->createFeaturesForUser($user->id, $package);
 
         return StudentPackage::create([
             'student_id' => $user->id,

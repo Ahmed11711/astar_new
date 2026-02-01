@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Student\Package\PackageUpgradeRequest;
 use App\Http\Resources\Student\PackageResource;
 use App\Http\Service\Payment\KashierPaymentService;
+use App\Http\Service\Student\StudentPackageFeatureService;
 use App\Models\Packages;
 use App\Models\StudentAssignment;
 use App\Models\StudentPackage;
@@ -16,6 +17,13 @@ use Illuminate\Support\Str;
 class PakageController extends Controller
 {
     use ApiResponseTrait;
+
+    protected $featureService;
+
+    public function __construct(StudentPackageFeatureService $featureService)
+    {
+        $this->featureService = $featureService;
+    }
     public function getPackageByAccount(Request $request)
     {
         $userId = $request->user_id;
