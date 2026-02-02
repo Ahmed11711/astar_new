@@ -57,13 +57,13 @@ Route::prefix('v1/teacher')->group(function () {
         Route::post('ai', [AnswerAiExameController::class, 'handleAi']);
         Route::post('teacher-feedback', [AnswerAiExameController::class, 'handelTeacherFeedback'])->middleware(CheckStudentAssignedToTeacher::class);
     });
+});
 
-    Route::prefix('v1/school')->group(function () {
-        Route::group([
-            'middleware' => RoleToken::class,
-            'roles' => ['school'],
-        ], function () {
-            Route::get('all-my-teacher', [AllTeacherController::class, 'allTeachers']);
-        });
+Route::prefix('v1/school')->group(function () {
+    Route::group([
+        'middleware' => RoleToken::class,
+        'roles' => ['school'],
+    ], function () {
+        Route::get('all-my-teacher', [AllTeacherController::class, 'allTeachers']);
     });
 });
