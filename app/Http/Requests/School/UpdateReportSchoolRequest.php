@@ -11,7 +11,7 @@ class UpdateReportSchoolRequest extends BaseRequest
     {
         return [
             'status' => 'required|in:pending,reviewed,resolved',
-            'response' => 'nullable|string',
+            'response' => 'required|string|max:255',
         ];
     }
 }
