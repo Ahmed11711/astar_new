@@ -65,5 +65,6 @@ Route::prefix('v1/school')->group(function () {
         'roles' => ['school'],
     ], function () {
         Route::get('all-my-teacher', [AllTeacherController::class, 'allTeachers']);
+        Route::get('dashboard-teacher', [AllTeacherController::class, 'Dashboard']);
     });
 });

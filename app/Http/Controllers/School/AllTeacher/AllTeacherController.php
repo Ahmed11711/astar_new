@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers\School\AllTeacher;
 
+use \App\Models\StudentAssignment;
 use App\Http\Controllers\Controller;
 use App\Http\Service\School\myTeacherService;
+use App\Models\ExamPaper;
+use App\Models\StudentSubject;
 use App\Models\User;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
@@ -37,9 +40,36 @@ class AllTeacherController extends Controller
     }
 
 
-    // public function AllSubjectsForTeacher(Request $request, $teacherId)
-    // {
-    //     $teacherIds = $this->myTeacherService->getMyTeachers($request->user_id);
-    //     $AllSubjects=
-    // }
+    public function dashboard(Request $request)
+    {
+        $schoolId = $request->user_id;
+
+        $teacherIds = $this->myTeacherService->getMyTeachers($schoolId);
+
+        $data = [
+            'total_teachers' => count($teacherIds),
+
+            'total_students' => StudentAssignment::whereIn(
+                'assigned_id',
+                $teacherIds
+            )
+                ->distinct('student_id')
+                ->count('student_id'),
+
+
+            'total_subjects' =>  StudentSubject::whereIn(
+                'student_id',
+                $teacherIds
+            )->count(),
+
+            'total_exams' => ExamPaper::whereIn(
+                'created_by',
+                $teacherIds
+            )->count(),
+
+
+        ];
+
+        return $this->successResponse($data);
+    }
 }
