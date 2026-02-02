@@ -36,10 +36,11 @@ class MyStudentController extends Controller
             ]);
 
         if ($role === 'school') {
+            Log::alert('allStudeForTeacher', ['5555555555555555']);
 
             $teacherIds = $this->myTeacherService->getMyTeachers($userId);
             $allStudeForTeacher = StudentAssignment::whereIn('assigned_id', $teacherIds)->pluck('student_id')->toArray();
-            Log::info('allStudeForTeacher', ['students' => $allStudeForTeacher]);
+            Log::alert('allStudeForTeacher', ['students' => $allStudeForTeacher]);
 
 
             $studentsQuery->whereIn('student_assignments.student_id', $allStudeForTeacher);
