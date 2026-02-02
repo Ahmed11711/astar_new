@@ -66,5 +66,7 @@ Route::prefix('v1/school')->group(function () {
     ], function () {
         Route::get('all-my-teacher', [AllTeacherController::class, 'allTeachers']);
         Route::get('dashboard-teacher', [AllTeacherController::class, 'Dashboard']);
+        Route::get('reports-of-teacher', [AllTeacherController::class, 'reportsOfTeacher']);
+        Route::put('reports-of-teacher/{id}', [AllTeacherController::class, 'updateReportOfTeacher'])->whereNumber('id');
     });
 });
