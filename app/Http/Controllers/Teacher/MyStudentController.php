@@ -24,10 +24,10 @@ class MyStudentController extends Controller
     public function __construct(public myTeacherService $myTeacherService) {}
     public function myStudent(Request $request)
     {
-        Log::alert('allStudeForTeacher', ['5555555555555dddddddddddddd55dddd5']);
 
         $userId = $request->user_id;
         $role   = $request->role;
+        Log::alert('role', ['role' => $role]);
         $limit  = $request->query('limit', 10);
 
         $studentsQuery = User::query()
