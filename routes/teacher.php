@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\School\AllTeacher\AllTeacherController;
+use App\Http\Controllers\School\AllTeacher\ReportOfTeacherController;
 use App\Http\Controllers\Student\Ai\AnswerAiExameController;
 use App\Http\Controllers\Teacher\AssignStudents\AssignStudentsController;
 use App\Http\Controllers\Teacher\bugs\bugsController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\Teacher\StudentChatAi\StudentChateAiController;
 use App\Http\Middleware\CheckStudentAssignedToTeacher;
 use App\Http\Middleware\RoleToken;
 use Illuminate\Support\Facades\Route;
+
 
 
 
@@ -66,7 +68,7 @@ Route::prefix('v1/school')->group(function () {
     ], function () {
         Route::get('all-my-teacher', [AllTeacherController::class, 'allTeachers']);
         Route::get('dashboard-teacher', [AllTeacherController::class, 'Dashboard']);
-        Route::get('reports-of-teacher', [AllTeacherController::class, 'reportsOfTeacher']);
-        Route::put('reports-of-teacher/{id}', [AllTeacherController::class, 'updateReportOfTeacher'])->whereNumber('id');
+        Route::get('reports-of-teacher', [ReportOfTeacherController::class, 'index']);
+        Route::put('reports-of-teacher/{id}', [ReportOfTeacherController::class, 'update'])->whereNumber('id');
     });
 });
