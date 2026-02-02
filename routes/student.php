@@ -33,7 +33,7 @@ Route::prefix('v1/student')->group(function () {
         Route::get("my-package", [PakageController::class, 'getPackageByAccount']);
         Route::post("upgrade-my-package", [PakageController::class, 'upgrade']);
         Route::get('dashboard', [DashboardController::class, 'index']);
-        Route::get('paper-scores', [DashboardController::class, 'PaperScores']);
+        Route::get('dashboard-paper-scores', [DashboardController::class, 'PaperScores']);
         Route::get('dashboard-chart', [DashboardController::class, 'topicProgressPerDay']);
 
         Route::get('past-papers', [PastPapersController::class, 'index']);
