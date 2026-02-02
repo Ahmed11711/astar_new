@@ -26,7 +26,7 @@ class MyStudentController extends Controller
     {
 
         $userId = $request->user_id;
-        $role   = $request->role;
+        $role   = $request->user_role;
         Log::alert('role', ['role' => $role]);
         $limit  = $request->query('limit', 10);
 
