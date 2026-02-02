@@ -39,6 +39,7 @@ class MyStudentController extends Controller
 
             $teacherIds = $this->myTeacherService->getMyTeachers($userId);
             $allStudeForTeacher = StudentAssignment::whereIn('assigned_id', $teacherIds)->pluck('student_id')->toArray();
+            Log::info('allStudeForTeacher', ['students' => $allStudeForTeacher]);
 
 
             $studentsQuery->whereIn('student_assignments.student_id', $allStudeForTeacher);
