@@ -10,6 +10,7 @@ use App\Models\StudentSubject;
 use App\Models\User;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AllTeacherController extends Controller
 {
@@ -44,22 +45,19 @@ class AllTeacherController extends Controller
     {
         $schoolId = $request->user_id;
 
-        // IDs المدرسين
         $teacherIds = $this->myTeacherService->getMyTeachers($schoolId);
 
-        // IDs الطلاب (مرة واحدة – مهم للسرعة)
         $studentIds = StudentAssignment::whereIn('assigned_id', $teacherIds)
             ->distinct()
             ->pluck('student_id');
 
-        // المواد + عدد الطلاب لكل مادة
-        $subjectsWithStudentsCount = \DB::table('student_subject')
+        $subjectsWithStudentsCount = DB::table('student_subject')
             ->join('subjects', 'subjects.id', '=', 'student_subject.subject_id')
             ->whereIn('student_subject.student_id', $studentIds)
             ->select(
                 'subjects.id',
                 'subjects.name',
-                \DB::raw('COUNT(DISTINCT student_subject.student_id) as students_count')
+                DB::raw('COUNT(DISTINCT student_subject.student_id) as students_count')
             )
             ->groupBy('subjects.id', 'subjects.name')
             ->get();
