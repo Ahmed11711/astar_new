@@ -228,12 +228,12 @@ class DashboardController extends Controller
         $student_attempts = DB::table('student_attempts')
             ->where('student_attempts.user_id', $userId)
             ->join('papers', 'student_attempts.paper_id', '=', 'papers.id')
-            ->join('exam_paper', 'student_attempts.exam_id', '=', 'exam_paper.id')
+            ->join('exam_papers', 'student_attempts.exam_id', '=', 'exam_papers.id')
             ->select(
                 'student_attempts.paper_id',
                 'papers.name as paper_name',
                 'student_attempts.exam_id',
-                'exam_paper.title as exam_name',
+                'exam_papers.title as exam_name',
                 'student_attempts.score',
                 'student_attempts.max_score',
                 'student_attempts.grading_source',
