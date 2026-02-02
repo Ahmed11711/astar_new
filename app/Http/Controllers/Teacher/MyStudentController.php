@@ -38,8 +38,10 @@ class MyStudentController extends Controller
         if ($role === 'school') {
 
             $teacherIds = $this->myTeacherService->getMyTeachers($userId);
+            $allStudeForTeacher = StudentAssignment::whereIn('assigned_id', $teacherIds)->pluck('student_id')->toArray();
 
-            $studentsQuery->whereIn('student_assignments.assigned_id', $teacherIds);
+
+            $studentsQuery->whereIn('student_assignments.student_id', $allStudeForTeacher);
         } else {
 
             $studentsQuery->where('student_assignments.assigned_id', $userId);

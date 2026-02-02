@@ -27,6 +27,7 @@ class bugsController extends Controller
         $bug = bugs::create([
             'user_id'  => $userId,
             'question' => $request->question,
+
         ]);
         return $this->successResponse($bug, "");
     }
