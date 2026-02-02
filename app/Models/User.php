@@ -70,6 +70,12 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'remember_token',
     ];
+    // User.php
+    public function createdExams()
+    {
+        return $this->hasMany(ExamPaper::class, 'created_by');
+    }
+
 
     /**
      * Get the attributes that should be cast.
