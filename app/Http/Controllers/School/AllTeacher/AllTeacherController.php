@@ -44,30 +44,36 @@ class AllTeacherController extends Controller
     {
         $schoolId = $request->user_id;
 
+        // IDs المدرسين
         $teacherIds = $this->myTeacherService->getMyTeachers($schoolId);
+
+        // IDs الطلاب (مرة واحدة – مهم للسرعة)
+        $studentIds = StudentAssignment::whereIn('assigned_id', $teacherIds)
+            ->distinct()
+            ->pluck('student_id');
+
+        // المواد + عدد الطلاب لكل مادة
+        $subjectsWithStudentsCount = \DB::table('student_subject')
+            ->join('subjects', 'subjects.id', '=', 'student_subject.subject_id')
+            ->whereIn('student_subject.student_id', $studentIds)
+            ->select(
+                'subjects.id',
+                'subjects.name',
+                \DB::raw('COUNT(DISTINCT student_subject.student_id) as students_count')
+            )
+            ->groupBy('subjects.id', 'subjects.name')
+            ->get();
 
         $data = [
             'total_teachers' => count($teacherIds),
 
-            'total_students' => StudentAssignment::whereIn(
-                'assigned_id',
-                $teacherIds
-            )
-                ->distinct('student_id')
-                ->count('student_id'),
+            'total_students' => $studentIds->count(),
 
+            'total_subjects' => $subjectsWithStudentsCount->count(),
 
-            'total_subjects' =>  StudentSubject::whereIn(
-                'student_id',
-                $teacherIds
-            )->count(),
+            'total_exams' => ExamPaper::whereIn('created_by', $teacherIds)->count(),
 
-            'total_exams' => ExamPaper::whereIn(
-                'created_by',
-                $teacherIds
-            )->count(),
-
-
+            'subjects' => $subjectsWithStudentsCount,
         ];
 
         return $this->successResponse($data);
