@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 class AllTeacherController extends Controller
 {
     public function __construct(public myTeacherService $myTeacherService) {}
+
     public function allTeachers(Request $request)
     {
         $limit = $request->query('limit', 10);

@@ -26,7 +26,8 @@ class RoleToken
             $name    = $claims->get('name');
             $email   = $claims->get('email');
 
-            // الأساسيات
+            Log::info("dd", [$role]);
+
             $request->merge([
                 'user_id'   => $userId,
                 'user_role' => $role,
