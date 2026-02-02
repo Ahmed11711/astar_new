@@ -5,10 +5,13 @@ namespace App\Http\Controllers\School\AllTeacher;
 use App\Http\Controllers\Controller;
 use App\Http\Service\School\myTeacherService;
 use App\Models\User;
+use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
 
 class AllTeacherController extends Controller
 {
+    use ApiResponseTrait;
+
     public function __construct(public myTeacherService $myTeacherService) {}
 
     public function allTeachers(Request $request)
@@ -29,9 +32,6 @@ class AllTeacherController extends Controller
             ->whereIn('users.id', $teacherIds)
             ->paginate($limit);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $teachers,
-        ]);
+        return $this->successResponsePaginate($teachers);
     }
 }
