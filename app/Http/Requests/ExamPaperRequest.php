@@ -71,7 +71,6 @@ class ExamPaperRequest extends BaseRequest
             'created_by.type' => 'nullable|string',
             'created_by.id'   => 'nullable|integer',
             'deadline' => 'nullable|date',
-            'is_text_only' => 'nullable|boolean',
             'exam_type' => 'nullable|string',
 
             'questions'                 => 'required|array',
@@ -82,6 +81,8 @@ class ExamPaperRequest extends BaseRequest
             'questions.*.parent_question_number' => 'nullable|string',
             'questions.*.topic_id' => 'required|integer|exists:topics,id',
             'questions.*.subtopics_id' => 'required|integer|exists:subtopics,id',
+            'questions.*.is_text_only' => 'nullable|boolean',
+
 
             'questions.*.options'                  => 'array',
             'questions.*.options.*.text'           => 'required_with:questions.*.options|string',

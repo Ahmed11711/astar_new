@@ -36,7 +36,6 @@ class ExamPaperService
                 'type'          => $data['created_by']['type'] ?? null,
                 'created_by'    => $data['created_by']['id'] ?? null,
                 'deadline'      => $data['deadline'] ?? null,
-                'is_text_only'  => $data['is_text_only'] ?? null,
                 'exam_type'     => $data['exam_type'] ?? null,
 
 
@@ -75,7 +74,10 @@ class ExamPaperService
                 'question_string'    => $q['question_string'] ?? null,
                 'question_number'    => $q['question_number'],
                 'question_max_score' => $q['question_max_score'] ?? null,
+                'is_text_only'  => $q['is_text_only'] ?? null,
+
                 'marking_scheme' => array_key_exists('marking_scheme', $q)
+
                     ? $q['marking_scheme']
                     : [],
                 'has_options'        => !empty($q['options']),
