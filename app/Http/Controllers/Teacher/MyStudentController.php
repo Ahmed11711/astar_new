@@ -8,6 +8,7 @@ use App\Http\Requests\Teacher\StudentQuizeRequest;
 use App\Http\Resources\StudentResource;
 use App\Http\Resources\teacher\teachestudentdashboard;
 use App\Http\Resources\teacher\teachestudentexams;
+use App\Http\Service\School\myTeacherService;
 use App\Models\ExamPaper;
 use App\Models\StudentAssignment;
 use App\Models\StudentAttamp;
@@ -20,30 +21,38 @@ use Illuminate\Support\Facades\Log;
 class MyStudentController extends Controller
 {
     use ApiResponseTrait;
+    public function __construct(public myTeacherService $myTeacherService) {}
     public function myStudent(Request $request)
     {
-
         $userId = $request->user_id;
+        $role   = $request->role;
+        $limit  = $request->query('limit', 10);
 
-        $limit = $request->query('limit', 10);
         $studentsQuery = User::query()
             ->select('users.id', 'users.username', 'users.email')
             ->join('student_assignments', 'student_assignments.student_id', '=', 'users.id')
-            ->where('student_assignments.assigned_id', $userId)
             ->with([
                 'grades:id,name',
-                // 'subjects:id,name',
             ]);
+
+        if ($role === 'school') {
+
+            $teacherIds = $this->myTeacherService->getMyTeachers($userId);
+
+            $studentsQuery->whereIn('student_assignments.assigned_id', $teacherIds);
+        } else {
+
+            $studentsQuery->where('student_assignments.assigned_id', $userId);
+        }
+
         $students = $studentsQuery->paginate($limit);
-        return $this->successResponsePaginate(StudentResource::collection($students));
+
+        return $this->successResponsePaginate(
+            StudentResource::collection($students)
+        );
     }
 
-    //         student
-    //  → subjects
-    //    → topics
-    //      → questions
-    //        → answers
-    //          → student_attempts
+
 
     public function showStudent(Request $request, $id)
     {
@@ -92,10 +101,10 @@ class MyStudentController extends Controller
 
     public function showStudentExams(Request $request, $studentId)
     {
-        $teacherId = $request->userId; // ID المدرس الحالي
+        $teacherId = $request->userId;
 
         // --------------------------
-        // جلب بيانات الطالب مع كل الـ relationships
+
         // --------------------------
         $student = User::query()
             ->select('id', 'username', 'email')
