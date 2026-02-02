@@ -98,6 +98,7 @@ class DashboardTeacherController extends Controller
             'subjects'             => $subjects,
             'number_of_exams_solved' => $totalAttempts,
             'total_users'          => $totalUsers,
+
         ]);
     }
 }
