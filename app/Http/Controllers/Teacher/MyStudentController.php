@@ -27,7 +27,6 @@ class MyStudentController extends Controller
 
         $userId = $request->user_id;
         $role   = $request->user_role;
-        Log::alert('role', ['role' => $role]);
         $limit  = $request->query('limit', 10);
 
         $studentsQuery = User::query()
@@ -38,16 +37,13 @@ class MyStudentController extends Controller
             ]);
 
         if ($role === 'school') {
-            Log::alert('allStudeForTeacher', ['5555555555555555']);
 
             $teacherIds = $this->myTeacherService->getMyTeachers($userId);
             $allStudeForTeacher = StudentAssignment::whereIn('assigned_id', $teacherIds)->pluck('student_id')->toArray();
-            Log::alert('allStudeForTeacher', ['students' => $allStudeForTeacher]);
 
 
             $studentsQuery->whereIn('student_assignments.student_id', $allStudeForTeacher);
         } else {
-            Log::alert('allStudeForTeacher', ['555555555555555dddd5']);
 
             $studentsQuery->where('student_assignments.assigned_id', $userId);
         }
