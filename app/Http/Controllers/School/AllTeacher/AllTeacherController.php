@@ -27,11 +27,19 @@ class AllTeacherController extends Controller
                 'subjects:id,name',
             ])
             ->withCount([
-                'createdExams as by_create'
+                'createdExams as by_create',
+                'students as students_count'
             ])
             ->whereIn('users.id', $teacherIds)
             ->paginate($limit);
 
         return $this->successResponsePaginate($teachers);
     }
+
+
+    // public function AllSubjectsForTeacher(Request $request, $teacherId)
+    // {
+    //     $teacherIds = $this->myTeacherService->getMyTeachers($request->user_id);
+    //     $AllSubjects=
+    // }
 }

@@ -94,6 +94,14 @@ class User extends Authenticatable implements JWTSubject
     // relation for get package schools
 
 
+    public function students()
+    {
+        return $this->hasMany(
+            StudentAssignment::class,
+            'assigned_id'
+        );
+    }
+
 
     public function scopeTeachersAndStudents($query)
     {
