@@ -5,12 +5,17 @@ use App\Http\Controllers\Api\HelperForFront\FrontAuthController;
 use App\Http\Controllers\Auth\CreateAccountController;
 use App\Http\Controllers\Student\Ai\AnswerAiExameController;
 use App\Http\Middleware\CheckJwtToken;
+use App\Mail\SentOtpMail;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Artisan;
 
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
+
+
 
 
 
@@ -36,6 +41,7 @@ Route::prefix('v1/')->group(function () {
 });
 
 Route::post('ai', [AnswerAiExameController::class, 'handelAiFeadback']);
+
 
 
 require __DIR__ . '/admin.php';
