@@ -37,7 +37,9 @@ Route::prefix('v1/')->group(function () {
         Route::post('create-account', [CreateAccountController::class, 'createAccount']);
         Route::post('login', [LoginController::class, 'login']);
         Route::get('me', [LoginController::class, 'me'])->middleware(CheckJwtToken::class);
-        Route::post('rest-password', [ForgetPasswordController::class, 'sendResetLink']);
+        Route::prefix('password/reset/')->group(function () {
+            Route::post('request', [ForgetPasswordController::class, 'sendResetLink']);
+        });
     });
 
     Route::prefix('global/')->group(function () {
