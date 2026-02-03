@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Student\TopicWise;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Student\TopicWise\createTopicWiseRequest;
 use App\Http\Requests\Student\TopicWise\TopicWiseRequest;
 use App\Models\Question;
 
@@ -47,5 +48,10 @@ class TopicWiseController extends Controller
             'count' => $questions->count(),
             'questions' => $questions
         ]);
+    }
+
+    public function store(createTopicWiseRequest $request)
+    {
+        $userId = $request->user_id;
     }
 }

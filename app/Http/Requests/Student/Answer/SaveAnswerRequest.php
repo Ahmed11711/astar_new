@@ -15,7 +15,7 @@ class SaveAnswerRequest extends BaseRequest
             'answers' => 'required|array|min:1',
             'answers.*.question_id'    => 'nullable|integer|exists:questions,id',
             'answers.*.question_index' => 'nullable|integer|min:0',
-            'answers.*.response'       => 'nullable|array', // JSON من الفرونت
+            'answers.*.response'       => 'nullable|array',
             'answers.*.is_flagged'     => 'boolean',
         ];
     }
