@@ -15,7 +15,7 @@ class HeroSectionStoreRequest extends BaseRequest
     {
         return [
             'title' => 'required|string|max:255',
-            'subtitle' => 'nullable|string',
+            'subtitle' => 'required|string',
             'background_image' => 'nullable|file',
         ];
     }
