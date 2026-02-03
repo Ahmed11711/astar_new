@@ -13,7 +13,7 @@ class RestPasswordRequest extends BaseRequest
         return [
             'token' => 'required',
             'email' => 'required|email',
-            'password' => 'required|min:6|confirmed',
+            'password' => 'required|min:6',
         ];
     }
 }
