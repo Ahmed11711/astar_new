@@ -24,7 +24,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1/student')->group(function () {
 
-    Route::get('otp', [otpcontroller::class, 'sendOtp']);
     Route::post('verfiy-email', [CheckAssignamentController::class, 'index']);
 
 

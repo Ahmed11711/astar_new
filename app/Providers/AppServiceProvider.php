@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Repositories\HeroSection\HeroSectionRepositoryInterface;
+use App\Repositories\HeroSection\HeroSectionRepository;
+
 use App\Repositories\Report\ReportRepositoryInterface;
 use App\Repositories\Report\ReportRepository;
 
@@ -98,6 +101,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(bugsRepositoryInterface::class, bugsRepository::class);
         $this->app->bind(policyRepositoryInterface::class, policyRepository::class);
         $this->app->bind(ReportRepositoryInterface::class, ReportRepository::class);
+        $this->app->bind(HeroSectionRepositoryInterface::class, HeroSectionRepository::class);
 }
 
   /**
