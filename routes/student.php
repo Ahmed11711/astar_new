@@ -4,6 +4,7 @@ use App\Http\Controllers\otpcontroller;
 use App\Http\Controllers\Student\Ai\AiChateController;
 use App\Http\Controllers\Student\AnswerController;
 use App\Http\Controllers\Student\AttmpateWithAnswerController;
+use App\Http\Controllers\Student\CheckAssignment\CheckAssignamentController;
 use App\Http\Controllers\Student\Dashboard\DashboardController;
 use App\Http\Controllers\Student\FeadbackAnswer\FeadBackAnswerController;
 use App\Http\Controllers\Student\MySubject\MySubjectController;
@@ -20,9 +21,12 @@ use Illuminate\Support\Facades\Route;
 
 
 
+
 Route::prefix('v1/student')->group(function () {
 
     Route::get('otp', [otpcontroller::class, 'sendOtp']);
+    Route::post('verfiy-email', [CheckAssignamentController::class, 'index']);
+
 
     Route::group([
         'middleware' => RoleToken::class,
