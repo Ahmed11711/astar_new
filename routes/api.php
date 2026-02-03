@@ -32,13 +32,12 @@ use Illuminate\Support\Str;
 Route::prefix('v1/')->group(function () {
 
 
-    Route::prefix('api/auth/password/')->group(function () {
-        Route::post('reset/request', [ForgetPasswordController::class, 'sendResetLink']);
-    });
+
     Route::prefix('auth/')->group(function () {
         Route::post('create-account', [CreateAccountController::class, 'createAccount']);
         Route::post('login', [LoginController::class, 'login']);
         Route::get('me', [LoginController::class, 'me'])->middleware(CheckJwtToken::class);
+        Route::post('rest-password', [ForgetPasswordController::class, 'sendResetLink']);
     });
 
     Route::prefix('global/')->group(function () {
