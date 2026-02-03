@@ -63,6 +63,8 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('bugs', bugsController::class)->names('bugs');
     Route::apiResource('policies', policyController::class);
     Route::apiResource('reports', ReportController::class)->names('report');
+    Route::apiResource('hero_sections', HeroSectionController::class)->names('hero_section');
+
 
 
 
@@ -81,6 +83,5 @@ Route::prefix('v1')->group(function () {
 
         Route::post('exams', [UpdateExamPaperController::class, 'store']);
         Route::get('exams/{id}', [UpdateExamPaperController::class, 'show']);
-        Route::apiResource('hero_sections', HeroSectionController::class)->names('hero_section');
-});
+    });
 });
