@@ -14,6 +14,7 @@ class AnswerController extends Controller
 {
     public function saveAnswersOptimized(SaveAnswerRequest $request)
     {
+        Log::alert('saveAnswersOptimized called', $request->all());
         $userId    = $request->user_id;
         $attemptId = $request->attempt_id;
         $is_saved  = $request->is_saved;
@@ -23,17 +24,19 @@ class AnswerController extends Controller
             ->where('user_id', $userId)
             ->first();
 
+
+
         if (! $attempt) {
             return response()->json([
                 'message' => 'Attempt not found or does not belong to this user'
             ], 404);
         }
 
-        // 🔹 Answers data & files
+        // Answers data & files
         $answersData  = $request->input('answers', []);
         $answersFiles = $request->files->get('answers', []);
 
-        // 🔹 File paths configuration
+        //  File paths configuration
         $paths = [
             'drawing_answer' => [
                 'folder' => public_path('storage/answers/drawings'),
@@ -47,7 +50,7 @@ class AnswerController extends Controller
             ],
         ];
 
-        // 🔹 Ensure folders exist
+        //  Ensure folders exist
         foreach ($paths as $config) {
             if (! file_exists($config['folder'])) {
                 mkdir($config['folder'], 0755, true);
@@ -56,7 +59,7 @@ class AnswerController extends Controller
 
         $upsertData = [];
 
-        // ✅ FIX CORE: operation-level timestamp (single source of truth)
+
         $operationTime = now();
 
         foreach ($answersData as $index => $answer) {
@@ -90,8 +93,9 @@ class AnswerController extends Controller
                 'response'       => json_encode($response, JSON_UNESCAPED_UNICODE),
                 'is_flagged'     => $answer['is_flagged'] ?? false,
                 'created_at'     => $operationTime,
-                'updated_at'     => $operationTime, // 👈 CRITICAL
+                'updated_at'     => $operationTime,
             ];
+            Log::info('Prepared answer data for upsert', $upsertData);
         }
 
         $answerIds = [];
