@@ -2,7 +2,7 @@
 
 namespace App\Http\Service\AnswerService;
 
-use App\Models\Answer;
+use App\Models\answer;
 use App\Models\StudentAttamp;
 use Illuminate\Support\Facades\DB;
 
@@ -110,7 +110,7 @@ class AnswerService
             }
 
             // 🔹 Batch upsert
-            Answer::upsert(
+            answer::upsert(
                 $upserts,
                 ['attempt_id', 'question_id', 'user_id'],
                 ['response', 'is_flagged', 'updated_at']
@@ -122,7 +122,7 @@ class AnswerService
         });
 
         // 🔹 Get inserted/updated answer IDs
-        $answerIds = Answer::whereIn('attempt_id', array_values($attemptMap))
+        $answerIds = answer::whereIn('attempt_id', array_values($attemptMap))
             ->where('updated_at', $now)
             ->pluck('id')
             ->toArray();
