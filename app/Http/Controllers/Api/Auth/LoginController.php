@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Auth\LoginResource;
 use App\Http\Resources\Auth\MeResource;
+use App\Models\UserOtp;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Exceptions\JWTException;
@@ -33,9 +34,19 @@ class LoginController extends Controller
             $user = auth()->user();
 
             // (optional) Attach the role to the token.
-            $token = JWTAuth::claims(['role' => $user->role])->fromUser($user);
-            $user->access_token = $token;
+            $token = null;
+
+            if ($this->checkOTP($user->email)) {
+                $token = JWTAuth::claims(['role' => $user->role])->fromUser($user);
+            }
+
+            $user->access_token  = $token;
             $user->refresh_token = null;
+
+            return response()->json([
+                'user'  => $user,
+                'token' => $token,
+            ]);
 
 
             // return response()->json(compact('token'));
@@ -53,5 +64,16 @@ class LoginController extends Controller
         $user = auth('api')->user();
 
         return new MeResource($user);
+    }
+
+    public function checkOTP($email)
+    {
+        $userOtp = UserOtp::where('email', $email)->latest()->first();
+        // i want to check if active column is true
+        if ($userOtp && $userOtp->active) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }
