@@ -10,7 +10,7 @@ class SaveAnswerRequest extends BaseRequest
     public function rules(): array
     {
         return [
-            'attempt_id' => 'required',
+            'attempt_id' => 'nullable|integer|exists:attempts,id',
             'is_saved' => 'required|boolean',
             'answers' => 'required|array|min:1',
             'answers.*.question_id'    => 'nullable|integer|exists:questions,id',

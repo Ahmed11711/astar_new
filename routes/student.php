@@ -47,6 +47,7 @@ Route::prefix('v1/student')->group(function () {
         Route::post('attamepate', [AttmpateWithAnswerController::class, 'createAttamepate']);
         Route::get('attamepate', [AttmpateWithAnswerController::class, 'index']);
         Route::post('answers', [AnswerController::class, 'saveAnswersOptimized']);
+        Route::post('asnwers-topicwise', [AnswerController::class, 'saveAnswersAutoAttempt']);
 
         Route::post('topicwise', [TopicWiseController::class, 'index']);
         // My Subject
