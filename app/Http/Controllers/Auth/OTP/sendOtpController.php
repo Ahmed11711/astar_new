@@ -18,10 +18,8 @@ class sendOtpController extends Controller
     public function sendOtp(SendOtpRequest $request)
     {
         $email = $request->input('email');
-
         $otp = $this->generateOtp(6);
         $this->storeOtp($email, $otp);
-
         Mail::to($email)->send(new SendEmailRegister($email, $otp));
         return $this->successResponse(null, 'OTP sent successfully.');
     }
@@ -41,6 +39,8 @@ class sendOtpController extends Controller
             ->first();
 
         if ($userOtp) {
+            $userOtp->active = true;
+            $userOtp->save();
             return  $this->successResponse(null, 'OTP is valid.');
         } else {
             return $this->errorResponse('OTP is invalid or expired.', 400);

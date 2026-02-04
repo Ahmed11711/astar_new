@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('email')->index();
             $table->string('otp_code');
             $table->timestamp('expires_at');
+            $table->boolean('active')->default(false);
             $table->timestamps();
         });
     }
