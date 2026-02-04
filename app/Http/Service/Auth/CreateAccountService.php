@@ -96,16 +96,15 @@ class CreateAccountService
         $this->featureService->createFeaturesForUser($user->id, $package);
 
         return StudentPackage::create([
-            'student_id' => $user->id,
-            'package_id' => $package->id,
-            'price'      => $package->price ?? 0,
-            'starts_at'  => now(),
-            'ends_at'    => now()->addDays($package->duration_days ?? 30),
-            'active'     => true,
-            'status'     => 'pending',
-            'type'       => $package->price > 0 ? 'not_free' : 'free',
+            'student_id'     => $user->id,
+            'package_id'     => $package->id,
+            'price'          => $package->price ?? 0,
+            'starts_at'      => now(),
+            'ends_at'        => now()->addDays($package->duration_days ?? 30),
+            'active'         => true,
+            'status'         => ($package->price ?? 0) == 0 ? 'paid' : 'pending',
+            'type'           => ($package->price ?? 0) > 0 ? 'not_free' : 'free',
             'transaction_id' => $transactionId,
-
         ]);
     }
 
