@@ -5,6 +5,8 @@ namespace App\Http\Service\AnswerService;
 use App\Models\answer;
 use App\Models\StudentAttamp;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 
 class AnswerService
 {
@@ -78,38 +80,74 @@ class AnswerService
     }
 
     /**
-     * 🔹 Core logic to upsert answers
+     * 🔹 Core logic to upsert answers, handle files, and mark attempts as saved
      */
     private function saveCore(array $payload, array $attemptMap): array
     {
-        $userId  = $payload['user_id'];
-        $answers = $payload['answers'];
-        $isSaved = $payload['is_saved'] ?? false;
+        $userId      = $payload['user_id'];
+        $answers     = $payload['answers'];
+        $isSaved     = $payload['is_saved'] ?? false;
+        $answersFiles = $payload['files'] ?? []; // لو جاي من Request
 
         $now = now();
         $upserts = [];
 
-        DB::transaction(function () use ($answers, $attemptMap, $userId, $now, $isSaved, &$upserts) {
+        // 📁 File paths config
+        $paths = [
+            'drawing_answer' => [
+                'folder' => public_path('storage/answers/drawings'),
+                'url'    => 'storage/answers/drawings',
+                'prefix' => 'draw_',
+            ],
+            'audio_answer' => [
+                'folder' => public_path('storage/answers/audio'),
+                'url'    => 'storage/answers/audio',
+                'prefix' => 'audio_',
+            ],
+        ];
+
+        // Ensure folders exist
+        foreach ($paths as $config) {
+            if (! file_exists($config['folder'])) {
+                mkdir($config['folder'], 0755, true);
+            }
+        }
+
+        DB::transaction(function () use ($answers, $attemptMap, $userId, $now, $paths, $answersFiles, $isSaved, &$upserts) {
 
             foreach ($answers as $answer) {
                 $questionId = $answer['question_id'];
                 $attemptId  = $attemptMap[$questionId] ?? null;
-
                 if (!$attemptId) continue; // Safety
+
+                $response = $answer['response'] ?? [];
+
+                // Handle files
+                if (isset($answersFiles[$questionId]['response'])) {
+                    foreach ($paths as $key => $config) {
+                        if (isset($answersFiles[$questionId]['response'][$key]) && $answersFiles[$questionId]['response'][$key]->isValid()) {
+                            $file = $answersFiles[$questionId]['response'][$key];
+                            $ext  = $file->getClientOriginalExtension();
+                            $fileName = uniqid($config['prefix']) . '.' . $ext;
+                            $file->move($config['folder'], $fileName);
+                            $response[$key] = url($config['url'] . '/' . $fileName);
+                        }
+                    }
+                }
 
                 $upserts[] = [
                     'attempt_id'     => $attemptId,
                     'user_id'        => $userId,
                     'question_id'    => $questionId,
                     'question_index' => $answer['question_index'] ?? 0,
-                    'response'       => json_encode($answer['response'] ?? []),
+                    'response'       => json_encode($response, JSON_UNESCAPED_UNICODE),
                     'is_flagged'     => $answer['is_flagged'] ?? false,
                     'created_at'     => $now,
                     'updated_at'     => $now,
                 ];
             }
 
-            // 🔹 Batch upsert
+            // 🔹 Batch upsert answers
             answer::upsert(
                 $upserts,
                 ['attempt_id', 'question_id', 'user_id'],
@@ -126,6 +164,14 @@ class AnswerService
             ->where('updated_at', $now)
             ->pluck('id')
             ->toArray();
+
+        // 🔹 Optional: send to AI if final save
+        if ($isSaved && !empty($answerIds)) {
+            Http::withHeaders(['Content-Type' => 'application/json'])
+                ->post('https://ai.astar.click/get_marks', [
+                    'answer_ids' => $answerIds,
+                ]);
+        }
 
         return [
             'attempt_ids' => array_values($attemptMap),
