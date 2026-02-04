@@ -157,6 +157,7 @@ class AnswerController extends Controller
         if ($request->is_saved) {
             // dispatch(new SendAnswersToAIJob($result['answer_ids']));
         }
+        return $result;
 
         return response()->json($result);
     }
@@ -168,7 +169,7 @@ class AnswerController extends Controller
         $validated = $request->validated();
 
         $validated['user_id'] = $request->user_id;
-        $result = $service->saveAutoAttempt($validated);
+        return $result = $service->saveAutoAttempt($validated);
 
         if ($request->is_saved) {
             // dispatch(new SendAnswersToAIJob($result['answer_ids']));
