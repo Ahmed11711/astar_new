@@ -65,9 +65,9 @@ class LoginController extends Controller
         $userOtp = UserOtp::where('email', $email)->latest()->first();
         // i want to check if active column is true
         if ($userOtp && $userOtp->active) {
-            return false;
-        } else {
             return true;
+        } else {
+            return false;
         }
     }
 }
