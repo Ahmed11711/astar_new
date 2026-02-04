@@ -19,6 +19,14 @@ class CheckAssignamentController extends Controller
             ->where('user_id', $validatedData['assignment_id'])
             ->first();
 
+        // if false return respponse error
+        if (!$studentResign) {
+            return $this->errorResponse(
+                'Student not registered for this assignment',
+                404
+            );
+        }
+
         return $this->successResponse([
             'is_registered' => $studentResign ? true : false,
         ], 'Check completed successfully');
