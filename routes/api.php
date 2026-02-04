@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\HelperForFront\FrontAuthController;
 use App\Http\Controllers\Auth\CreateAccountController;
 use App\Http\Controllers\Auth\ForgetPassword\ForgetPasswordController;
 use App\Http\Controllers\Auth\ForgetPassword\ResetPasswordController;
+use App\Http\Controllers\Auth\OTP\sendOtpController;
 use App\Http\Controllers\Student\Ai\AnswerAiExameController;
 use App\Http\Middleware\CheckJwtToken;
 use App\Http\Requests\Auth\RestPasswordRequest;
@@ -41,6 +42,8 @@ Route::prefix('v1/')->group(function () {
         Route::get('me', [LoginController::class, 'me'])->middleware(CheckJwtToken::class);
         Route::post('forget-password', [ForgetPasswordController::class, 'sendResetLink']);
         Route::post('reset-password', [ResetPasswordController::class, 'reset']);
+        Route::post('resend-otp', [sendOtpController::class, 'sendOtp']);
+        Route::post('check-otp', [sendOtpController::class, 'checkOtp']);
     });
 
     Route::prefix('global/')->group(function () {

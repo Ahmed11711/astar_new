@@ -146,134 +146,134 @@ class AnswerController extends Controller
         ]);
     }
 
-    public function saveAnswersOptimizeds(SaveAnswerRequest $request, AnswerService $service)
-    {
-        $validated = $request->validated();
-
-        $validated['user_id'] = $request->user_id;
-
-        $result = $service->saveWithAttempt($validated);
-
-        if ($request->is_saved) {
-            // dispatch(new SendAnswersToAIJob($result['answer_ids']));
-        }
-        return $result;
-
-        return response()->json($result);
-    }
-
-
-
-    public function saveAnswersAutoAttempt(SaveAnswerRequest $request, AnswerService $service)
-    {
-        $validated = $request->validated();
-
-        $validated['user_id'] = $request->user_id;
-        return $result = $service->saveAutoAttempt($validated);
-
-        if ($request->is_saved) {
-            // dispatch(new SendAnswersToAIJob($result['answer_ids']));
-        }
-
-        return response()->json($result);
-    }
-
-
-
-    // public function saveAnswersAutoAttempt(SaveAnswerRequest $request)
+    // public function saveAnswersOptimizeds(SaveAnswerRequest $request, AnswerService $service)
     // {
-    //     Log::alert('saveAnswersAutoAttempt called', $request->all());
+    //     $validated = $request->validated();
 
-    //     $userId   = $request->user_id;
-    //     $isSaved  = $request->is_saved;
-    //     $answers  = $request->input('answers', []);
+    //     $validated['user_id'] = $request->user_id;
 
-    //     if (empty($answers)) {
-    //         return response()->json([
-    //             'message' => 'No answers provided'
-    //         ], 422);
+    //     $result = $service->saveWithAttempt($validated);
+
+    //     if ($request->is_saved) {
+    //         // dispatch(new SendAnswersToAIJob($result['answer_ids']));
     //     }
+    //     return $result;
 
-
-    //     $questionIds = collect($answers)
-    //         ->pluck('question_id')
-    //         ->unique()
-    //         ->values();
-
-
-    //     $questions = DB::table('questions')
-    //         ->whereIn('id', $questionIds)
-    //         ->select('id', 'exam_paper_id')
-    //         ->get()
-    //         ->keyBy('id');
-
-    //     if ($questions->count() !== $questionIds->count()) {
-    //         return response()->json([
-    //             'message' => 'One or more questions not found'
-    //         ], 404);
-    //     }
-
-
-    //     $groupedAnswers = collect($answers)->groupBy(function ($answer) use ($questions) {
-    //         return $questions[$answer['question_id']]->exam_paper_id;
-    //     });
-
-    //     $result = [];
-    //     $allAnswerIds = [];
-
-
-    //     foreach ($groupedAnswers as $examPaperId => $answersGroup) {
-
-    //         $examPaper = DB::table('exam_papers')
-    //             ->where('id', $examPaperId)
-    //             ->select('id', 'paper_id')
-    //             ->first();
-
-    //         if (! $examPaper) {
-    //             continue;
-    //         }
-
-
-    //         $attempt = StudentAttamp::firstOrCreate(
-    //             [
-    //                 'user_id'       => $userId,
-    //                 'exam_id' => $examPaper->id,
-    //             ],
-    //             [
-    //                 'paper_id' => $examPaper->paper_id,
-    //                 'is_saved' => false,
-    //             ]
-    //         );
-
-
-    //         $newRequest = clone $request;
-
-    //         $newRequest->merge([
-    //             'attempt_id' => $attempt->id,
-    //             'answers'    => $answersGroup->values()->toArray(),
-    //             'is_saved'   => $isSaved,
-    //         ]);
-
-
-    //         $response = $this->saveAnswersOptimized($newRequest);
-
-    //         $data = $response->getData(true);
-
-    //         if (! empty($data['answer_ids'])) {
-    //             $allAnswerIds = array_merge($allAnswerIds, $data['answer_ids']);
-    //         }
-
-    //         $result[] = [
-    //             'exam_paper_id' => $examPaper->id,
-    //             'attempt_id'    => $attempt->id,
-    //             'answer_ids'    => $data['answer_ids'] ?? [],
-    //         ];
-    //     }
-
-    //     return response()->json([
-    //         'message'    => 'Answers saved successfully',
-    //         'attempts'   => $result,
-    //         'answer_ids' => $allAnswerIds,
-    //     ]);
+    //     return response()->json($result);
     // }
+
+
+
+    // public function saveAnswersAutoAttempt(SaveAnswerRequest $request, AnswerService $service)
+    // {
+    //     $validated = $request->validated();
+
+    //     $validated['user_id'] = $request->user_id;
+    //     return $result = $service->saveAutoAttempt($validated);
+
+    //     if ($request->is_saved) {
+    //         // dispatch(new SendAnswersToAIJob($result['answer_ids']));
+    //     }
+
+    //     return response()->json($result);
+    // }
+
+
+
+    public function saveAnswersAutoAttempt(SaveAnswerRequest $request)
+    {
+        Log::alert('saveAnswersAutoAttempt called', $request->all());
+
+        $userId   = $request->user_id;
+        $isSaved  = $request->is_saved;
+        $answers  = $request->input('answers', []);
+
+        if (empty($answers)) {
+            return response()->json([
+                'message' => 'No answers provided'
+            ], 422);
+        }
+
+
+        $questionIds = collect($answers)
+            ->pluck('question_id')
+            ->unique()
+            ->values();
+
+
+        $questions = DB::table('questions')
+            ->whereIn('id', $questionIds)
+            ->select('id', 'exam_paper_id')
+            ->get()
+            ->keyBy('id');
+
+        if ($questions->count() !== $questionIds->count()) {
+            return response()->json([
+                'message' => 'One or more questions not found'
+            ], 404);
+        }
+
+
+        $groupedAnswers = collect($answers)->groupBy(function ($answer) use ($questions) {
+            return $questions[$answer['question_id']]->exam_paper_id;
+        });
+
+        $result = [];
+        $allAnswerIds = [];
+
+
+        foreach ($groupedAnswers as $examPaperId => $answersGroup) {
+
+            $examPaper = DB::table('exam_papers')
+                ->where('id', $examPaperId)
+                ->select('id', 'paper_id')
+                ->first();
+
+            if (! $examPaper) {
+                continue;
+            }
+
+
+            $attempt = StudentAttamp::firstOrCreate(
+                [
+                    'user_id'       => $userId,
+                    'exam_id' => $examPaper->id,
+                ],
+                [
+                    'paper_id' => $examPaper->paper_id,
+                    'is_saved' => false,
+                ]
+            );
+
+
+            $newRequest = clone $request;
+
+            $newRequest->merge([
+                'attempt_id' => $attempt->id,
+                'answers'    => $answersGroup->values()->toArray(),
+                'is_saved'   => $isSaved,
+            ]);
+
+
+            $response = $this->saveAnswersOptimized($newRequest);
+
+            $data = $response->getData(true);
+
+            if (! empty($data['answer_ids'])) {
+                $allAnswerIds = array_merge($allAnswerIds, $data['answer_ids']);
+            }
+
+            $result[] = [
+                'exam_paper_id' => $examPaper->id,
+                'attempt_id'    => $attempt->id,
+                'answer_ids'    => $data['answer_ids'] ?? [],
+            ];
+        }
+
+        return response()->json([
+            'message'    => 'Answers saved successfully',
+            'attempts'   => $result,
+            'answer_ids' => $allAnswerIds,
+        ]);
+    }
 }
