@@ -150,7 +150,6 @@ class AnswerController extends Controller
     {
         $validated = $request->validated();
 
-        // ضيف user_id من الـ auth أو من request مباشرة
         $validated['user_id'] = $request->user_id;
 
         $result = $service->saveWithAttempt($validated);

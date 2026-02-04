@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 class AnswerService
 {
     /**
-     * Save answers when attempt_id موجود
+     * 🔹 Save answers when attempt_id موجود
      */
     public function saveWithAttempt(array $payload): array
     {
@@ -26,7 +26,7 @@ class AnswerService
     }
 
     /**
-     * Save answers when attempt_id مش موجود (Auto-create)
+     * 🔹 Save answers when attempt_id مش موجود (Auto-create)
      */
     public function saveAutoAttempt(array $payload): array
     {
@@ -35,7 +35,6 @@ class AnswerService
 
         $questionIds = collect($answers)->pluck('question_id')->unique();
 
-        // 🔹 جلب exam_paper_id لكل سؤال من DB
         $questions = DB::table('questions')
             ->whereIn('id', $questionIds)
             ->select('id', 'exam_paper_id')
@@ -44,7 +43,7 @@ class AnswerService
 
         $attemptMap = [];
 
-        // Group answers by exam_paper_id
+        // 🔹 Group answers by exam_paper_id
         $grouped = collect($answers)->groupBy(
             fn($a) => $questions[$a['question_id']]->exam_paper_id
         );
@@ -56,9 +55,8 @@ class AnswerService
                 ->select('id', 'paper_id')
                 ->first();
 
-            if (!$examPaper) continue;
+            if (!$examPaper) continue; // Safety check
 
-            // 🔹 إنشاء attempt إذا مش موجود
             $attempt = StudentAttamp::firstOrCreate(
                 [
                     'user_id' => $userId,
@@ -80,7 +78,7 @@ class AnswerService
     }
 
     /**
-     * Core logic to upsert answers
+     * 🔹 Core logic to upsert answers
      */
     private function saveCore(array $payload, array $attemptMap): array
     {
@@ -92,11 +90,12 @@ class AnswerService
         $upserts = [];
 
         DB::transaction(function () use ($answers, $attemptMap, $userId, $now, $isSaved, &$upserts) {
+
             foreach ($answers as $answer) {
                 $questionId = $answer['question_id'];
                 $attemptId  = $attemptMap[$questionId] ?? null;
 
-                if (!$attemptId) continue;
+                if (!$attemptId) continue; // Safety
 
                 $upserts[] = [
                     'attempt_id'     => $attemptId,
@@ -110,17 +109,19 @@ class AnswerService
                 ];
             }
 
+            // 🔹 Batch upsert
             Answer::upsert(
                 $upserts,
                 ['attempt_id', 'question_id', 'user_id'],
                 ['response', 'is_flagged', 'updated_at']
             );
 
+            // 🔹 Mark attempts as saved
             StudentAttamp::whereIn('id', array_values($attemptMap))
                 ->update(['is_saved' => $isSaved]);
         });
 
-
+        // 🔹 Get inserted/updated answer IDs
         $answerIds = Answer::whereIn('attempt_id', array_values($attemptMap))
             ->where('updated_at', $now)
             ->pluck('id')
