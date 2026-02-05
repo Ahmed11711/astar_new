@@ -39,6 +39,7 @@ class LoginController extends Controller
             if ($this->checkOTP($user->email)) {
                 $token = JWTAuth::claims(['role' => $user->role])->fromUser($user);
             }
+
             $user->access_token = $token;
             $user->refresh_token = null;
 

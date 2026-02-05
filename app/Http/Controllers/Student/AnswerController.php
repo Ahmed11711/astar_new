@@ -182,7 +182,7 @@ class AnswerController extends Controller
 
     public function saveAnswersAutoAttempt(SaveAnswerRequest $request)
     {
-        Log::alert('saveAnswersAutoAttempt called', $request->all());
+        // Log::alert('saveAnswersAutoAttempt called', $request->all());
 
         $userId   = $request->user_id;
         $isSaved  = $request->is_saved;
@@ -257,23 +257,22 @@ class AnswerController extends Controller
 
             $response = $this->saveAnswersOptimized($newRequest);
 
-            $data = $response->getData(true);
+            return  $data = $response->getData(true);
 
-            if (! empty($data['answer_ids'])) {
-                $allAnswerIds = array_merge($allAnswerIds, $data['answer_ids']);
-            }
+            // if (! empty($data['answer_ids'])) {
+            //     $allAnswerIds = array_merge($allAnswerIds, $data['answer_ids']);
+            // }
 
-            $result[] = [
-                'exam_paper_id' => $examPaper->id,
-                'attempt_id'    => $attempt->id,
-                'answer_ids'    => $data['answer_ids'] ?? [],
-            ];
+            // $result[] = [
+            //     'exam_paper_id' => $examPaper->id,
+            //     'attempt_id'    => $attempt->id,
+            //     'answer_ids'    => $data['answer_ids'] ?? [],
+            // ];
         }
 
-        return response()->json([
-            'message'    => 'Answers saved successfully',
-            'attempts'   => $result,
-            'answer_ids' => $allAnswerIds,
-        ]);
+        // return response()->json([
+        //     'message'    => 'All answers saved successfully.',
+        //     'answer_ids' => $data,
+        // ]);
     }
 }
