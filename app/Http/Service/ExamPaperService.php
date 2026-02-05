@@ -37,7 +37,7 @@ class ExamPaperService
                 'created_by'    => $data['created_by']['id'] ?? null,
                 'deadline'      => $data['deadline'] ?? null,
                 // 'exam_type'     => $data['exam_type'] ?? null,
-                'exam_type'  => isset($data['created_by']['id']) ? 'quiz' : ($data['exam_type'] ?? null),
+                'exam_type' => !empty($data['created_by']['id']) ? 'quiz' : null,
 
 
 
