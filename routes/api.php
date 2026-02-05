@@ -33,9 +33,6 @@ use Illuminate\Support\Str;
 
 
 Route::prefix('v1/')->group(function () {
-
-
-
     Route::prefix('auth/')->group(function () {
         Route::post('create-account', [CreateAccountController::class, 'createAccount']);
         Route::post('login', [LoginController::class, 'login']);
@@ -45,13 +42,11 @@ Route::prefix('v1/')->group(function () {
         Route::post('resend-otp', [sendOtpController::class, 'sendOtp']);
         Route::post('check-otp', [sendOtpController::class, 'checkOtp']);
     });
-
     Route::prefix('global/')->group(function () {
         Route::get('grades', [FrontAuthController::class, 'getGrades']);
         Route::get('all-school-teacher', [FrontAuthController::class, 'allTeacherAndSchool']);
         Route::get('packages', [FrontAuthController::class, 'getPackageByAccount']);
     });
-
     Route::prefix('front/')->group(function () {
         Route::get('hero-sections', [HeroSectionController::class, 'index']);
     });

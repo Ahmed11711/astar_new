@@ -25,13 +25,10 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1/student')->group(function () {
 
     Route::post('verfiy-email', [CheckAssignamentController::class, 'index']);
-
-
     Route::group([
         'middleware' => RoleToken::class,
         'roles' => ['student'],
     ], function () {
-
         Route::apiResource('chat-ai', AiChateController::class);
         Route::get("my-package", [PakageController::class, 'getPackageByAccount']);
         Route::post("upgrade-my-package", [PakageController::class, 'upgrade']);
