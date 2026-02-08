@@ -9,16 +9,7 @@ use App\Http\Controllers\Auth\ForgetPassword\ResetPasswordController;
 use App\Http\Controllers\Auth\OTP\sendOtpController;
 use App\Http\Controllers\Student\Ai\AnswerAiExameController;
 use App\Http\Middleware\CheckJwtToken;
-use App\Http\Middleware\CompressResponse;
-use App\Http\Requests\Auth\RestPasswordRequest;
-use App\Mail\SentOtpMail;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
 
 
 
@@ -44,7 +35,7 @@ Route::prefix('v1/')->group(function () {
         Route::post('resend-otp', [sendOtpController::class, 'sendOtp']);
         Route::post('check-otp', [sendOtpController::class, 'checkOtp']);
     });
-    Route::prefix('global/')->middleware([CompressResponse::class])->group(function () {
+    Route::prefix('global/')->group(function () {
         Route::get('grades', [FrontAuthController::class, 'getGrades']);
         Route::get('all-school-teacher', [FrontAuthController::class, 'allTeacherAndSchool']);
         Route::get('packages', [FrontAuthController::class, 'getPackageByAccount']);
