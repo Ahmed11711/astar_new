@@ -3,6 +3,7 @@
 use App\Http\Controllers\School\AllTeacher\AllTeacherController;
 use App\Http\Controllers\School\AllTeacher\ReportOfTeacherController;
 use App\Http\Controllers\Student\Ai\AnswerAiExameController;
+use App\Http\Controllers\Student\MySubject\MySubjectController;
 use App\Http\Controllers\Teacher\AssignStudents\AssignStudentsController;
 use App\Http\Controllers\Teacher\bugs\bugsController;
 use App\Http\Controllers\Teacher\bugs\ReportTeacherController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\Teacher\StudentChatAi\StudentChateAiController;
 use App\Http\Middleware\CheckStudentAssignedToTeacher;
 use App\Http\Middleware\RoleToken;
 use Illuminate\Support\Facades\Route;
+
 
 
 
@@ -47,7 +49,8 @@ Route::prefix('v1/teacher')->group(function () {
         Route::get('my-reports', [ReportTeacherController::class, 'index']);
         Route::post('my-reports', [ReportTeacherController::class, 'store']);
         Route::get('dashboard', [DashboardTeacherController::class, 'index']);
-
+        // My Subject
+        Route::get('my-subjects', [MySubjectController::class, 'subjectWithPaper']);
 
         // ... other teacher routes for Ai ...
         // get chat ai for teacher

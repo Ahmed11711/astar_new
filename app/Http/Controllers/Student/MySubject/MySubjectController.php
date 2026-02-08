@@ -18,4 +18,13 @@ class MySubjectController extends Controller
         $subject = Subject::whereIn('id', $mySubjectIds)->get();
         return $this->successResponse($subject, 'My Subjects retrieved successfully');
     }
+
+    public function subjectWithPaper(Request $request)
+    {
+        $userId = $request->user_id;
+        $mySubjectIds = $request->student_subject_ids;
+
+        $subject = Subject::with('paper')->whereIn('id', $mySubjectIds)->get();
+        return $this->successResponse($subject, 'My Subjects retrieved successfully');
+    }
 }

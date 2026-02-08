@@ -25,4 +25,9 @@ class Subject extends Model
     {
         return $this->hasMany(Question::class);
     }
+
+    public function paper()
+    {
+        return $this->belongsTo(paper::class);
+    }
 }

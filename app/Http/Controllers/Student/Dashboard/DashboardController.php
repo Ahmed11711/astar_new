@@ -74,6 +74,7 @@ class DashboardController extends Controller
             ->get()
             ->keyBy('question_id');
 
+
         /*
         |--------------------------------------------------------------------------
         | Query 4 — Daily Answers (Charts)
