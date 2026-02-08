@@ -31,6 +31,7 @@ class UpdateExamPaperController extends Controller
         return  $record = $this->repository->allData($id);
     }
 
+    // main function
     // public function update(Request $request, $id)
     // {
     //     $data = $request->validated();
