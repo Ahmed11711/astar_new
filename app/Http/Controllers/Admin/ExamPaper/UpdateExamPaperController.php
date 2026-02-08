@@ -136,10 +136,14 @@ class UpdateExamPaperController extends Controller
             // Update or Insert Questions
             // =========================
             if (!empty($data['questions']) && is_array($data['questions'])) {
+                Log::info("SubQuestixxxxxxxxxxon ID {$data['questions']} updated");
+
                 foreach ($data['questions'] as $qData) {
                     $questionId = $qData['id'] ?? $qData['question_id'] ?? null;
 
                     if ($questionId) {
+                        Log::info("questionId ID {$questionId['questions']} updated");
+
                         $question = $paper->questions()->where('id', $questionId)->first();
                         if ($question) {
                             Log::info("Updating Question ID {$questionId}");
