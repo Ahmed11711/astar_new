@@ -20,14 +20,6 @@ use Illuminate\Support\Facades\Route;
 
 
 
-
-
-
-
-
-
-
-
 Route::prefix('v1/teacher')->group(function () {
     Route::group([
         'middleware' => RoleToken::class,
