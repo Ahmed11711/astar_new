@@ -9,7 +9,7 @@ use App\Repositories\ExamPaper\ExamPaperRepositoryInterface;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Log;
 
 class UpdateExamPaperController extends Controller
 {
@@ -100,22 +100,23 @@ class UpdateExamPaperController extends Controller
     //     }
     // }
 
+
     public function update(Request $request, $id)
     {
-        // تأكد إن الـ request متحقق (Validation)
-        $data = $request->validated();
-
+        $data = $request->all();
         DB::beginTransaction();
 
         try {
             $paper = $this->repository->find($id);
             if (!$paper) {
+                Log::warning("ExamPaper with ID {$id} not found");
                 return $this->errorResponse('ExamPaper not found', 404);
             }
 
             // =========================
             // Update Paper
             // =========================
+            Log::info("Updating ExamPaper ID {$id}");
             $paper->update([
                 'title'            => $data['title'] ?? $paper->title,
                 'subject_id'       => $data['subject_id'] ?? $paper->subject_id,
@@ -128,15 +129,51 @@ class UpdateExamPaperController extends Controller
                 'duration_minutes' => $data['duration_minutes'] ?? $paper->duration_minutes,
             ]);
 
+            Log::info("Paper updated successfully");
+
             // =========================
             // Update or Insert Questions
             // =========================
-            if (isset($data['questions']) && is_array($data['questions'])) {
+            if (!empty($data['questions']) && is_array($data['questions'])) {
                 foreach ($data['questions'] as $qData) {
+                    $questionId = $qData['id'] ?? $qData['question_id'] ?? null;
 
-                    $question = $paper->questions()->updateOrCreate(
-                        ['id' => $qData['id'] ?? $qData['question_id'] ?? null],
-                        [
+                    if ($questionId) {
+                        $question = $paper->questions()->where('id', $questionId)->first();
+                        if ($question) {
+                            Log::info("Updating Question ID {$questionId}");
+                            $question->update([
+                                'subject_id'         => $qData['subject_id'] ?? $paper->subject_id,
+                                'topic_id'           => $qData['topic_id'] ?? null,
+                                'subtopics_id'       => $qData['subtopics_id'] ?? null,
+                                'question_number'    => $qData['question_number'] ?? null,
+                                'question_string'    => $qData['question_string'] ?? null,
+                                'question_type'      => $qData['question_type'] ?? 'mcq',
+                                'question_max_score' => $qData['question_max_score'] ?? 0,
+                                'parent_id'          => $qData['parent_id'] ?? null,
+                                'has_options'        => !empty($qData['options']),
+                                'marking_scheme'     => $qData['marking_scheme'] ?? [],
+                                'is_text_only'       => $qData['is_text_only'] ?? 0,
+                            ]);
+                        } else {
+                            Log::info("Question ID {$questionId} not found, creating new one");
+                            $question = $paper->questions()->create([
+                                'subject_id'         => $qData['subject_id'] ?? $paper->subject_id,
+                                'topic_id'           => $qData['topic_id'] ?? null,
+                                'subtopics_id'       => $qData['subtopics_id'] ?? null,
+                                'question_number'    => $qData['question_number'] ?? null,
+                                'question_string'    => $qData['question_string'] ?? null,
+                                'question_type'      => $qData['question_type'] ?? 'mcq',
+                                'question_max_score' => $qData['question_max_score'] ?? 0,
+                                'parent_id'          => $qData['parent_id'] ?? null,
+                                'has_options'        => !empty($qData['options']),
+                                'marking_scheme'     => $qData['marking_scheme'] ?? [],
+                                'is_text_only'       => $qData['is_text_only'] ?? 0,
+                            ]);
+                        }
+                    } else {
+                        Log::info("Creating new Question with number {$qData['question_number']}");
+                        $question = $paper->questions()->create([
                             'subject_id'         => $qData['subject_id'] ?? $paper->subject_id,
                             'topic_id'           => $qData['topic_id'] ?? null,
                             'subtopics_id'       => $qData['subtopics_id'] ?? null,
@@ -148,17 +185,16 @@ class UpdateExamPaperController extends Controller
                             'has_options'        => !empty($qData['options']),
                             'marking_scheme'     => $qData['marking_scheme'] ?? [],
                             'is_text_only'       => $qData['is_text_only'] ?? 0,
-                        ]
-                    );
-
+                        ]);
+                    }
 
                     // =========================
                     // Update or Insert Options
                     // =========================
-                    if (isset($qData['options']) && is_array($qData['options'])) {
+                    if (!empty($qData['options']) && is_array($qData['options'])) {
                         $optionIds = [];
                         foreach ($qData['options'] as $optData) {
-                            $option = $question->option()->updateOrCreate(
+                            $opt = $question->option()->updateOrCreate(
                                 ['id' => $optData['id'] ?? null],
                                 [
                                     'text'       => $optData['text'] ?? null,
@@ -166,15 +202,14 @@ class UpdateExamPaperController extends Controller
                                     'order'      => $optData['order'] ?? null,
                                 ]
                             );
-                            $optionIds[] = $option->id;
+                            $optionIds[] = $opt->id;
                         }
-
-                        // حذف الخيارات غير الموجودة
                         $question->option()->whereNotIn('id', $optionIds)->delete();
+                        Log::info("Options updated for Question ID {$question->id}");
                     }
 
                     // =========================
-                    // Recursive Sub Questions (Optional)
+                    // Recursive Sub Questions
                     // =========================
                     if (!empty($qData['sub_questions'])) {
                         $this->updateSubQuestions($question, $qData['sub_questions']);
@@ -184,13 +219,13 @@ class UpdateExamPaperController extends Controller
 
             DB::commit();
 
-            // =========================
-            // Return Updated Paper with Questions + Options
-            // =========================
             $updatedPaper = $paper->load(['questions.option']);
+            Log::info("ExamPaper ID {$id} updated successfully with all questions");
+
             return $this->successResponse($updatedPaper, 'ExamPaper updated successfully');
         } catch (\Throwable $e) {
             DB::rollBack();
+            Log::error("Failed to update ExamPaper ID {$id}: {$e->getMessage()}");
             return $this->errorResponse('Failed to update ExamPaper: ' . $e->getMessage(), 500);
         }
     }
@@ -201,9 +236,43 @@ class UpdateExamPaperController extends Controller
     private function updateSubQuestions($parentQuestion, $subQuestions)
     {
         foreach ($subQuestions as $sq) {
-            $subQ = $parentQuestion->subQuestions()->updateOrCreate(
-                ['id' => $sq['id'] ?? $sq['question_id'] ?? null],
-                [
+            $subQId = $sq['id'] ?? $sq['question_id'] ?? null;
+
+            if ($subQId) {
+                $subQ = $parentQuestion->subQuestions()->where('id', $subQId)->first();
+                if ($subQ) {
+                    $subQ->update([
+                        'subject_id'         => $sq['subject_id'] ?? $parentQuestion->subject_id,
+                        'topic_id'           => $sq['topic_id'] ?? $parentQuestion->topic_id,
+                        'subtopics_id'       => $sq['subtopics_id'] ?? $parentQuestion->subtopics_id,
+                        'question_number'    => $sq['question_number'] ?? null,
+                        'question_string'    => $sq['question_string'] ?? null,
+                        'question_type'      => $sq['question_type'] ?? 'mcq',
+                        'question_max_score' => $sq['question_max_score'] ?? 0,
+                        'parent_id'          => $parentQuestion->id,
+                        'has_options'        => !empty($sq['options']),
+                        'marking_scheme'     => $sq['marking_scheme'] ?? [],
+                        'is_text_only'       => $sq['is_text_only'] ?? 0,
+                    ]);
+                    Log::info("SubQuestion ID {$subQId} updated");
+                } else {
+                    $subQ = $parentQuestion->subQuestions()->create([
+                        'subject_id'         => $sq['subject_id'] ?? $parentQuestion->subject_id,
+                        'topic_id'           => $sq['topic_id'] ?? $parentQuestion->topic_id,
+                        'subtopics_id'       => $sq['subtopics_id'] ?? $parentQuestion->subtopics_id,
+                        'question_number'    => $sq['question_number'] ?? null,
+                        'question_string'    => $sq['question_string'] ?? null,
+                        'question_type'      => $sq['question_type'] ?? 'mcq',
+                        'question_max_score' => $sq['question_max_score'] ?? 0,
+                        'parent_id'          => $parentQuestion->id,
+                        'has_options'        => !empty($sq['options']),
+                        'marking_scheme'     => $sq['marking_scheme'] ?? [],
+                        'is_text_only'       => $sq['is_text_only'] ?? 0,
+                    ]);
+                    Log::info("SubQuestion ID {$subQ->id} created");
+                }
+            } else {
+                $subQ = $parentQuestion->subQuestions()->create([
                     'subject_id'         => $sq['subject_id'] ?? $parentQuestion->subject_id,
                     'topic_id'           => $sq['topic_id'] ?? $parentQuestion->topic_id,
                     'subtopics_id'       => $sq['subtopics_id'] ?? $parentQuestion->subtopics_id,
@@ -215,10 +284,11 @@ class UpdateExamPaperController extends Controller
                     'has_options'        => !empty($sq['options']),
                     'marking_scheme'     => $sq['marking_scheme'] ?? [],
                     'is_text_only'       => $sq['is_text_only'] ?? 0,
-                ]
-            );
+                ]);
+                Log::info("SubQuestion ID {$subQ->id} created");
+            }
 
-
+            // Update Options for subQuestions
             if (!empty($sq['options'])) {
                 $optionIds = [];
                 foreach ($sq['options'] as $optData) {
@@ -233,6 +303,7 @@ class UpdateExamPaperController extends Controller
                     $optionIds[] = $opt->id;
                 }
                 $subQ->option()->whereNotIn('id', $optionIds)->delete();
+                Log::info("Options updated for SubQuestion ID {$subQ->id}");
             }
 
             // Recursive deeper
