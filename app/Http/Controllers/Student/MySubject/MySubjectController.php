@@ -22,7 +22,7 @@ class MySubjectController extends Controller
     public function subjectWithPaper(Request $request)
     {
         $userId = $request->user_id;
-        return   $mySubjectIds = $request->student_subject_ids;
+        $mySubjectIds = $request->student_subject_ids;
 
         $subject = Subject::with('paper')->whereIn('id', $mySubjectIds)->get();
         return $this->successResponse($subject, 'My Subjects retrieved successfully');
