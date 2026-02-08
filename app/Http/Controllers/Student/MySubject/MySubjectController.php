@@ -25,7 +25,7 @@ class MySubjectController extends Controller
         $mySubjectIds = $request->student_subject_ids;
 
         $subjects = Subject::with([
-            'paper:id,subject_id,name'
+            'papers:id,subject_id,name'
         ])
             ->whereIn('id', $mySubjectIds)
             ->get();
