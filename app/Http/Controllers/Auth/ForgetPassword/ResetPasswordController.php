@@ -25,8 +25,6 @@ class ResetPasswordController extends Controller
             return $this->errorResponse('Invalid or expired token');
         }
         $user = User::where('email', $tokenData->email)->first();
-
-
         $user->password = Hash::make($request->password);
         $user->save();
 
