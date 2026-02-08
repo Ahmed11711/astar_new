@@ -35,7 +35,7 @@ class RoleToken
             ]);
 
 
-            if ($role === 'student') {
+            if ($role === 'student' || $role == 'teacher') {
                 $user = User::with(['studentAssignments', 'subjects:id'])->findOrFail($userId);
 
                 $request->merge([
