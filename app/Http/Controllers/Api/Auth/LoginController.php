@@ -29,17 +29,13 @@ class LoginController extends Controller
             if (! $token = JWTAuth::attempt($credentials)) {
                 return response()->json(['error' => 'Invalid credentials'], 401);
             }
-
-            // Get the authenticated user.
             $user = auth()->user();
 
             // (optional) Attach the role to the token.
-
             $token = null;
             if ($this->checkOTP($user->email)) {
                 $token = JWTAuth::claims(['role' => $user->role])->fromUser($user);
             }
-
             $user->access_token = $token;
             $user->refresh_token = null;
 
@@ -57,7 +53,6 @@ class LoginController extends Controller
     public function me(Request $request)
     {
         $user = auth('api')->user();
-
         return new MeResource($user);
     }
 

@@ -31,7 +31,6 @@ class CreateAccountController extends Controller
             return $this->successResponse([
                 'payment_required' => true,
                 'payment_url' => $paymentUrl,
-                // 'transaction_id' => $studentPackage->transaction_id,
             ], 'Payment required');
         }
 
