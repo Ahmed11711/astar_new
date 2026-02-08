@@ -236,6 +236,8 @@ class UpdateExamPaperController extends Controller
     // =========================
     private function updateSubQuestions($parentQuestion, $subQuestions)
     {
+        Log::info("SubQuestion ID {$parentQuestion} updated");
+
         foreach ($subQuestions as $sq) {
             $subQId = $sq['id'] ?? $sq['question_id'] ?? null;
 
