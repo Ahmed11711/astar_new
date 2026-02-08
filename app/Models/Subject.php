@@ -28,6 +28,6 @@ class Subject extends Model
 
     public function papers()
     {
-        return $this->hasMany(Paper::class, 'subject_id', 'id');
+        return $this->hasMany(paper::class, 'subject_id', 'id');
     }
 }
