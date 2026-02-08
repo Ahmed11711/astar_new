@@ -26,8 +26,8 @@ class Subject extends Model
         return $this->hasMany(Question::class);
     }
 
-    public function paper()
+    public function papers()
     {
-        return $this->belongsTo(paper::class, 'subject_id');
+        return $this->hasMany(Paper::class, 'subject_id', 'id');
     }
 }
