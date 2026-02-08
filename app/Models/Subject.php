@@ -28,6 +28,6 @@ class Subject extends Model
 
     public function paper()
     {
-        return $this->belongsTo(paper::class, 'subject_id', 'id');
+        return $this->belongsTo(paper::class, 'subject_id');
     }
 }
