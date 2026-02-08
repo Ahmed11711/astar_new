@@ -61,7 +61,7 @@ class ExamPaperRequest extends BaseRequest
             'grade_id'          => 'required|exists:grades,id',
             'title'             => 'required|string|max:255',
             'paper_label'       => 'nullable|string|max:255',
-            'paper_id'          => 'required|exists:papers,id',
+            'paper_id'          => 'nullable|exists:papers,id',
             'year'              => 'nullable|integer',
             'month'             => 'nullable|string',
             'total_marks'       => 'nullable|integer',
