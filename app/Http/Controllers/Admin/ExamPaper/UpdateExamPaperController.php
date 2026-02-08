@@ -135,7 +135,7 @@ class UpdateExamPaperController extends Controller
                 foreach ($data['questions'] as $qData) {
 
                     $question = $paper->questions()->updateOrCreate(
-                        ['id' => $qData['id'] ?? null],
+                        ['id' => $qData['id'] ?? $qData['question_id'] ?? null],
                         [
                             'subject_id'         => $qData['subject_id'] ?? $paper->subject_id,
                             'topic_id'           => $qData['topic_id'] ?? null,
@@ -150,6 +150,7 @@ class UpdateExamPaperController extends Controller
                             'is_text_only'       => $qData['is_text_only'] ?? 0,
                         ]
                     );
+
 
                     // =========================
                     // Update or Insert Options
@@ -201,7 +202,7 @@ class UpdateExamPaperController extends Controller
     {
         foreach ($subQuestions as $sq) {
             $subQ = $parentQuestion->subQuestions()->updateOrCreate(
-                ['id' => $sq['id'] ?? null],
+                ['id' => $sq['id'] ?? $sq['question_id'] ?? null],
                 [
                     'subject_id'         => $sq['subject_id'] ?? $parentQuestion->subject_id,
                     'topic_id'           => $sq['topic_id'] ?? $parentQuestion->topic_id,
@@ -216,6 +217,7 @@ class UpdateExamPaperController extends Controller
                     'is_text_only'       => $sq['is_text_only'] ?? 0,
                 ]
             );
+
 
             if (!empty($sq['options'])) {
                 $optionIds = [];
