@@ -79,9 +79,10 @@ Route::prefix('v1')->group(function () {
 
         Route::apiResource('exams', ExamPaperController::class)
             ->names('exam_paper')
-            ->except(['store', 'show']);
+            ->except(['store', 'show', 'update']);
 
         Route::post('exams', [UpdateExamPaperController::class, 'store']);
         Route::get('exams/{id}', [UpdateExamPaperController::class, 'show']);
+        Route::update('exams/{id}', [UpdateExamPaperController::class, 'update']);
     });
 });

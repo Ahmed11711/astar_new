@@ -42,8 +42,6 @@ class LoginController extends Controller
             $user->refresh_token = null;
             $user->verified = $verified;
 
-
-            // return response()->json(compact('token'));
             return $this->successResponse(
                 new LoginResource($user),
                 'Login Successfully'
