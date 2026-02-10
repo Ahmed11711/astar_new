@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Payment;
 
 use App\Http\Controllers\Controller;
+use App\Http\Service\Student\StudentPackageFeatureService;
 use App\Models\StudentPackage;
 use App\Models\UserPackageFeature;
 use Illuminate\Http\Request;
@@ -12,6 +13,12 @@ use Illuminate\Support\Str;
 
 class KashierPaymentController extends Controller
 {
+    protected $featureService;
+
+    public function __construct(StudentPackageFeatureService $featureService)
+    {
+        $this->featureService = $featureService;
+    }
     public function create(Request $request)
     {
         $amount = '100.00';
@@ -117,10 +124,12 @@ class KashierPaymentController extends Controller
     public function updateAllMyPackage($studentPackage)
     {
         $studentId = $studentPackage->student_id;
+        $packageId = $studentPackage->package_id;
         StudentPackage::where('student_id', $studentId)
             ->where('active', true)
             ->update(['active' => false]);
         UserPackageFeature::where('user_id', $studentId)
             ->update(['active' => false]);
+        $this->featureService->createFeaturesForUser($studentId, $packageId);
     }
 }
