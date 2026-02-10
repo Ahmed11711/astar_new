@@ -83,6 +83,6 @@ Route::prefix('v1')->group(function () {
 
         Route::post('exams', [UpdateExamPaperController::class, 'store']);
         Route::get('exams/{id}', [UpdateExamPaperController::class, 'show']);
-        Route::put('exams/{id}', [UpdateExamPaperController::class, 'update']);
+        Route::patch('exams/{id}', [UpdateExamPaperController::class, 'update']);
     });
 });
