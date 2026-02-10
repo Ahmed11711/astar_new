@@ -157,7 +157,7 @@ class UpdateExamPaperController extends Controller
                                 'question_max_score' => $qData['question_max_score'] ?? 0,
                                 'parent_id'          => $qData['parent_id'] ?? null,
                                 'has_options'        => !empty($qData['options']),
-                                'marking_scheme'     => $qData['marking_scheme'] ?? [],
+                                'marking_scheme'     => isset($qData['marking_scheme']) ? json_encode($qData['marking_scheme']) : json_encode([]),
                                 'is_text_only'       => $qData['is_text_only'] ?? 0,
                             ]);
                         } else {
@@ -172,7 +172,7 @@ class UpdateExamPaperController extends Controller
                                 'question_max_score' => $qData['question_max_score'] ?? 0,
                                 'parent_id'          => $qData['parent_id'] ?? null,
                                 'has_options'        => !empty($qData['options']),
-                                'marking_scheme'     => $qData['marking_scheme'] ?? [],
+                                'marking_scheme'     => isset($qData['marking_scheme']) ? json_encode($qData['marking_scheme']) : json_encode([]),
                                 'is_text_only'       => $qData['is_text_only'] ?? 0,
                             ]);
                         }
@@ -188,7 +188,7 @@ class UpdateExamPaperController extends Controller
                             'question_max_score' => $qData['question_max_score'] ?? 0,
                             'parent_id'          => $qData['parent_id'] ?? null,
                             'has_options'        => !empty($qData['options']),
-                            'marking_scheme'     => $qData['marking_scheme'] ?? [],
+                            'marking_scheme'     => isset($qData['marking_scheme']) ? json_encode($qData['marking_scheme']) : json_encode([]),
                             'is_text_only'       => $qData['is_text_only'] ?? 0,
                         ]);
                     }
@@ -258,7 +258,7 @@ class UpdateExamPaperController extends Controller
                         'question_max_score' => $sq['question_max_score'] ?? 0,
                         'parent_id'          => $parentQuestion->id,
                         'has_options'        => !empty($sq['options']),
-                        'marking_scheme'     => $sq['marking_scheme'] ?? [],
+                        'marking_scheme'     => isset($qData['marking_scheme']) ? json_encode($qData['marking_scheme']) : json_encode([]),
                         'is_text_only'       => $sq['is_text_only'] ?? 0,
                     ]);
                     Log::info("SubQuestion ID {$subQId} updated");
@@ -273,7 +273,7 @@ class UpdateExamPaperController extends Controller
                         'question_max_score' => $sq['question_max_score'] ?? 0,
                         'parent_id'          => $parentQuestion->id,
                         'has_options'        => !empty($sq['options']),
-                        'marking_scheme'     => $sq['marking_scheme'] ?? [],
+                        'marking_scheme'     => isset($qData['marking_scheme']) ? json_encode($qData['marking_scheme']) : json_encode([]),
                         'is_text_only'       => $sq['is_text_only'] ?? 0,
                     ]);
                     Log::info("SubQuestion ID {$subQ->id} created");
@@ -289,7 +289,7 @@ class UpdateExamPaperController extends Controller
                     'question_max_score' => $sq['question_max_score'] ?? 0,
                     'parent_id'          => $parentQuestion->id,
                     'has_options'        => !empty($sq['options']),
-                    'marking_scheme'     => $sq['marking_scheme'] ?? [],
+                    'marking_scheme'     => isset($qData['marking_scheme']) ? json_encode($qData['marking_scheme']) : json_encode([]),
                     'is_text_only'       => $sq['is_text_only'] ?? 0,
                 ]);
                 Log::info("SubQuestion ID {$subQ->id} created");
