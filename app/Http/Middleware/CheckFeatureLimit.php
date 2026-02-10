@@ -16,6 +16,7 @@ class CheckFeatureLimit
         try {
             $feature = UserPackageFeature::query()
                 ->where('user_id', $userId)
+                ->where('active', 1)
                 ->whereHas('feature', function ($q) use ($featureKey) {
                     $q->where('key_feature', $featureKey);
                 })

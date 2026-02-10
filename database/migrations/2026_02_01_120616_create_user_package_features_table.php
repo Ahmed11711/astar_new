@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('package_feature_id')->constrained('feature_packages')->onDelete('cascade');
             $table->integer('total_count')->default(0);
             $table->integer('remaining_count')->default(0);
+            $table->boolean('active');
             $table->timestamps();
         });
     }

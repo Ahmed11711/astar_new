@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Payment;
 
 use App\Http\Controllers\Controller;
 use App\Models\StudentPackage;
+use App\Models\UserPackageFeature;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -118,6 +119,8 @@ class KashierPaymentController extends Controller
         $studentId = $studentPackage->student_id;
         StudentPackage::where('student_id', $studentId)
             ->where('active', true)
+            ->update(['active' => false]);
+        UserPackageFeature::where('user_id', $studentId)
             ->update(['active' => false]);
     }
 }
