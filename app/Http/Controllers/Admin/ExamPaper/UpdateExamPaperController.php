@@ -334,7 +334,7 @@ class UpdateExamPaperController extends Controller
             }
 
             // =========================
-            // Update ExamPaper
+            // Update Paper
             // =========================
             Log::info("Updating ExamPaper ID {$id}");
             $paper->update([
@@ -352,11 +352,11 @@ class UpdateExamPaperController extends Controller
             Log::info("Paper updated successfully");
 
             // =========================
-            // Update Existing Questions Only
+            // Update or Insert Questions
             // =========================
             if (!empty($data['questions']) && is_array($data['questions'])) {
                 foreach ($data['questions'] as $qData) {
-                    $this->updateQuestionOnly($paper, $qData);
+                    $this->updateOrCreateQuestion($paper, $qData);
                 }
             }
 
@@ -374,22 +374,16 @@ class UpdateExamPaperController extends Controller
     }
 
     // =========================
-    // Helper: Update Existing Questions Only
+    // Helper: Create or Update a Question
     // =========================
-    private function updateQuestionOnly($paper, $qData, $parentId = null)
+    private function updateOrCreateQuestion($paper, $qData, $parentId = null)
     {
         $questionId = $qData['id'] ?? $qData['question_id'] ?? null;
 
-        if (!$questionId) {
-            Log::warning("Skipping question update: ID not provided");
-            return null; // ما نعملش create
-        }
-
-        $question = $paper->questions()->where('id', $questionId)->first();
-
-        if (!$question) {
-            Log::warning("Question ID {$questionId} not found, skipping update");
-            return null; // ما نعملش create
+        if ($questionId) {
+            $question = $paper->questions()->where('id', $questionId)->first();
+        } else {
+            $question = null;
         }
 
         $questionData = [
@@ -406,11 +400,16 @@ class UpdateExamPaperController extends Controller
             'is_text_only'       => $qData['is_text_only'] ?? 0,
         ];
 
-        $question->update($questionData);
-        Log::info("Updated Question ID {$question->id}");
+        if ($question) {
+            $question->update($questionData);
+            Log::info("Updated Question ID {$question->id}");
+        } else {
+            $question = $paper->questions()->create($questionData);
+            Log::info("Created Question ID {$question->id}");
+        }
 
         // =========================
-        // Update Options
+        // Update or Insert Options
         // =========================
         if (!empty($qData['options']) && is_array($qData['options'])) {
             $optionIds = [];
@@ -434,7 +433,7 @@ class UpdateExamPaperController extends Controller
         // =========================
         if (!empty($qData['sub_questions']) && is_array($qData['sub_questions'])) {
             foreach ($qData['sub_questions'] as $subQData) {
-                $this->updateQuestionOnly($paper, $subQData, $question->id);
+                $this->updateOrCreateQuestion($paper, $subQData, $question->id);
             }
         }
 
