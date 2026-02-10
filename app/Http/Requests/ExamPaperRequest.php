@@ -96,10 +96,10 @@ class ExamPaperRequest extends BaseRequest
             'questions.*.sub_questions' => 'array',
 
             'questions.*.new_images'     => 'array',
-            'questions.*.new_images.*'   => 'file|mimes:jpeg,png,jpg,webp|max:4096',
+            'questions.*.new_images.*'   => 'file|mimes:jpeg,png,jpg,webp',
 
             'questions.*.new_audios'     => 'array',
-            'questions.*.new_audios.*'   => 'file|mimes:mp3,wav,ogg|max:8192',
+            'questions.*.new_audios.*'   => 'file|mimes:mp3,wav,ogg',
         ];
     }
 }
