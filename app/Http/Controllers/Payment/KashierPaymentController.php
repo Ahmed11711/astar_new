@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Payment;
 
 use App\Http\Controllers\Controller;
 use App\Http\Service\Student\StudentPackageFeatureService;
+use App\Models\Packages;
 use App\Models\StudentPackage;
 use App\Models\UserPackageFeature;
 use Illuminate\Http\Request;
@@ -130,6 +131,9 @@ class KashierPaymentController extends Controller
             ->update(['active' => false]);
         UserPackageFeature::where('user_id', $studentId)
             ->update(['active' => false]);
-        $this->featureService->createFeaturesForUser($studentId, $packageId);
+
+        $package = Packages::select('id', 'price', 'duration_days')
+            ->find($packageId);
+        $this->featureService->createFeaturesForUser($studentId, $package);
     }
 }
