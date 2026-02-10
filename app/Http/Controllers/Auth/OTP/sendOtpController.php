@@ -39,8 +39,7 @@ class sendOtpController extends Controller
             ->first();
 
         if ($userOtp) {
-            $userOtp->active = true;
-            $userOtp->save();
+            $this->updateAllAccounts($email);
             return  $this->successResponse(null, 'OTP is valid.');
         } else {
             return $this->errorResponse('OTP is invalid or expired.', 400);
@@ -56,5 +55,11 @@ class sendOtpController extends Controller
             'otp_code' => $otp,
             'expires_at' => now()->addMinutes(10),
         ]);
+    }
+
+    private function updateAllAccounts($email)
+    {
+        UserOtp::where('email', $email)
+            ->update(['active' => 1]);
     }
 }

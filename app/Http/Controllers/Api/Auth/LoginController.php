@@ -33,11 +33,14 @@ class LoginController extends Controller
 
             // (optional) Attach the role to the token.
             $token = null;
+            $verified  = false;
             if ($this->checkOTP($user->email)) {
                 $token = JWTAuth::claims(['role' => $user->role])->fromUser($user);
+                $verified  = true;
             }
             $user->access_token = $token;
             $user->refresh_token = null;
+            $user->verified = $verified;
 
 
             // return response()->json(compact('token'));
