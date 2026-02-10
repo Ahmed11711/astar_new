@@ -67,7 +67,7 @@ class PakageController extends Controller
     ) {
         $data = $request->validated();
         $userId = $request->user_id;
-        $email = $request->user_email ?? 'test@gmail.com';
+        $email = $request->user_email;
 
         $package = Packages::findOrFail($data['package_id']);
 
@@ -84,9 +84,9 @@ class PakageController extends Controller
             }
         }
 
-        StudentPackage::where('student_id', $userId)
-            ->where('active', true)
-            ->update(['active' => false]);
+        // StudentPackage::where('student_id', $userId)
+        //     ->where('active', true)
+        //     ->update(['active' => false]);
 
         $studentPackage = StudentPackage::create([
             'student_id'     => $userId,

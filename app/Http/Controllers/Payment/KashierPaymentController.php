@@ -86,6 +86,7 @@ class KashierPaymentController extends Controller
         if ($transactionId) {
             $studentPackage = StudentPackage::where('transaction_id', $transactionId)->first();
             if ($studentPackage) {
+                $this->updateAllMyPackage($studentPackage);
                 $studentPackage->status = 'paid';
                 $studentPackage->payment_response = $data;
                 $studentPackage->active = true;
@@ -111,5 +112,12 @@ class KashierPaymentController extends Controller
             'message' => 'Payment Failed (Redirect)',
             'data' => $data
         ]);
+    }
+    public function updateAllMyPackage($studentPackage)
+    {
+        $studentId = $studentPackage->student_id;
+        StudentPackage::where('student_id', $studentId)
+            ->where('active', true)
+            ->update(['active' => false]);
     }
 }
