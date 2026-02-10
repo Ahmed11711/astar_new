@@ -92,6 +92,10 @@ class KashierPaymentController extends Controller
         $data = $request->all();
         $transactionId = $data['merchantOrderId'] ?? null;
 
+        if ($data['paymentStatus'] == "FAILED") {
+            return null;
+        }
+
         if ($transactionId) {
             $studentPackage = StudentPackage::where('transaction_id', $transactionId)->first();
             if ($studentPackage) {
