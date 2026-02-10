@@ -362,7 +362,7 @@ class UpdateExamPaperController extends Controller
 
             DB::commit();
 
-            $updatedPaper = $paper->load(['questions.option']);
+            $updatedPaper = $paper->load(['questions.options']);
             Log::info("ExamPaper ID {$id} updated successfully with all questions");
 
             return $this->successResponse($updatedPaper, 'ExamPaper updated successfully');
