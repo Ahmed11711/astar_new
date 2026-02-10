@@ -31,7 +31,7 @@ Route::prefix('v1/student')->group(function () {
     ], function () {
         Route::apiResource('chat-ai', AiChateController::class);
         Route::get("my-package", [PakageController::class, 'getPackageByAccount']);
-        Route::post("upgrade-my-package", [PakageController::class, 'upgrade']);
+        Route::post("upgrade-my-package", [PakageController::class, 'upgrade'])->middleware(CheckFeatureLimit::class . ':chat_ai');;
         Route::get('dashboard', [DashboardController::class, 'index']);
         Route::get('dashboard-paper-scores', [DashboardController::class, 'PaperScores']);
         Route::get('dashboard-chart', [DashboardController::class, 'topicProgressPerDay']);
