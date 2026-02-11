@@ -18,26 +18,25 @@ class ResetPasswordController extends Controller
     public function reset(RestPasswordRequest $request)
     {
         $request->validated();
-        $token = $request->token;
-        $email = $request->email;
 
-        $user = User::where('email', $email)->first();
-        if (!$user) {
-            return response()->json(['message' => 'Email not found'], 404);
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->password = Hash::make($password);
+                $user->save();
+            }
+        );
+
+        if ($status === Password::PASSWORD_RESET) {
+            return response()->json([
+                'message' => 'Password reset successfully!',
+                'status' => 'success',
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Invalid or expired token',
+                'status' => 'error',
+            ]);
         }
-        $tokenData = Password::tokenExists($user, $token);
-
-        if (!$tokenData) {
-            return $this->errorResponse('Invalid or expired token');
-        }
-        $user->password = Hash::make($request->password);
-        $user->save();
-
-        DB::table('password_reset_tokens')->where('email', $user->email)->delete();
-
-        return response()->json([
-            'message' => 'Password reset successfully!',
-            'status' => 'success',
-        ]);
     }
 }
