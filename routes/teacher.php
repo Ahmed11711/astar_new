@@ -33,17 +33,22 @@ Route::prefix('v1/teacher')->group(function () {
         Route::get('showStudentExams/{studentId}', [MyStudentController::class, 'showStudentExams']);
         Route::post('getOneQuiez', [MyStudentController::class, 'getOneQuiez']);
         Route::get('getAllQuizzesStatistics', [MyExameTeacherController::class, 'teacherExamsDashboard']);
-        Route::get('assign-student', [AssignStudentsController::class, 'index']);
-        Route::post('assign-student', [AssignStudentsController::class, 'assignStudent']);
-        Route::post('remove-assign-student', [AssignStudentsController::class, 'removeassignStudent']);
-        Route::get('my-bugs', [bugsController::class, 'index']);
-        Route::post('my-bugs', [bugsController::class, 'store']);
-        Route::get('my-reports', [ReportTeacherController::class, 'index']);
-        Route::post('my-reports', [ReportTeacherController::class, 'store']);
+
         Route::get('dashboard', [DashboardTeacherController::class, 'index']);
         // My Subject
         Route::get('my-subjects', [MySubjectController::class, 'subjectWithPaper']);
 
+
+        // assign 
+        Route::get('assign-student', [AssignStudentsController::class, 'index']);
+        Route::post('assign-student', [AssignStudentsController::class, 'assignStudent']);
+        Route::post('remove-assign-student', [AssignStudentsController::class, 'removeassignStudent']);
+
+        // bugs and reports
+        Route::get('my-bugs', [bugsController::class, 'index']);
+        Route::post('my-bugs', [bugsController::class, 'store']);
+        Route::get('my-reports', [ReportTeacherController::class, 'index']);
+        Route::post('my-reports', [ReportTeacherController::class, 'store']);
         // ... other teacher routes for Ai ...
         // get chat ai for teacher
         Route::post('student-all-chat-ai', [StudentChateAiController::class, 'index']);

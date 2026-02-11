@@ -19,7 +19,9 @@ class ResetPasswordController extends Controller
         $request->validated();
         $token = $request->token;
 
-        $tokenData = DB::table('password_reset_tokens')->where('token', $token)->first();
+        $hashedToken = Hash::make($token);
+
+        $tokenData = DB::table('password_reset_tokens')->where('token', $hashedToken)->first();
 
         if (!$tokenData) {
             return $this->errorResponse('Invalid or expired token');
