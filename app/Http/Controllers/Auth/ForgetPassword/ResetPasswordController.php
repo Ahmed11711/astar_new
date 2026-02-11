@@ -19,16 +19,17 @@ class ResetPasswordController extends Controller
     {
         $request->validated();
         $token = $request->token;
+        $email = $request->email;
 
-        $hashedToken = Hash::make($token);
-        Log::alert("ssss", [$hashedToken]);
-
-        $tokenData = DB::table('password_reset_tokens')->where('token', $hashedToken)->first();
+        $user = User::where('email', $email)->first();
+        if (!$user) {
+            return response()->json(['message' => 'Email not found'], 404);
+        }
+        $tokenData = Password::tokenExists($user, $token);
 
         if (!$tokenData) {
             return $this->errorResponse('Invalid or expired token');
         }
-        $user = User::where('email', $tokenData->email)->first();
         $user->password = Hash::make($request->password);
         $user->save();
 
