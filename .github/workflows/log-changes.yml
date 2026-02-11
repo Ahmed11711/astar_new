@@ -3,13 +3,13 @@ name: Daily Push Logger
 on:
   push:
     branches:
-      - master  
-    workflow_dispatch:
-
+      - master
+  workflow_dispatch:
 
 jobs:
   log-changes:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -28,5 +28,5 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "🤖 Update daily activity log"
-          branch: main
+          branch: master
           file_pattern: 'daily_activity_log.md'
