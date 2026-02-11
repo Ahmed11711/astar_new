@@ -9,6 +9,7 @@ use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 
 class ResetPasswordController extends Controller
@@ -20,6 +21,7 @@ class ResetPasswordController extends Controller
         $token = $request->token;
 
         $hashedToken = Hash::make($token);
+        Log::alert("ssss", [$hashedToken]);
 
         $tokenData = DB::table('password_reset_tokens')->where('token', $hashedToken)->first();
 
