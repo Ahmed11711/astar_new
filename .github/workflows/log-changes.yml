@@ -29,4 +29,4 @@ jobs:
         with:
           commit_message: "🤖 Update daily activity log"
           branch: main
-          add: 'daily_activity_log.md'
+          file_pattern: 'daily_activity_log.md'
