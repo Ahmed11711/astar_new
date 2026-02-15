@@ -75,6 +75,7 @@ class ExamPaperRequest extends BaseRequest
 
             'questions'                 => 'required|array',
             'questions.*.question_type' => 'required|string',
+            'questions.*.question_name' => 'nullable|string|max:255',
             'questions.*.question_string' => 'nullable|string',
             'questions.*.question_number' => 'required|string',
             'questions.*.question_max_score' => 'nullable|integer',
@@ -82,6 +83,7 @@ class ExamPaperRequest extends BaseRequest
             'questions.*.topic_id' => 'required|integer|exists:topics,id',
             'questions.*.subtopics_id' => 'required|integer|exists:subtopics,id',
             'questions.*.is_text_only' => 'nullable|boolean',
+
 
 
             'questions.*.options'                  => 'array',

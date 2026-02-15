@@ -74,6 +74,7 @@ class ExamPaperService
                 'subtopics_id'       => $q['subtopics_id'] ?? null,
                 'question_type'      => $q['question_type'],
                 'question_string'    => $q['question_string'] ?? null,
+                'question_name'      => $q['question_name'] ?? null,
                 'question_number'    => $q['question_number'],
                 'question_max_score' => $q['question_max_score'] ?? null,
                 'is_text_only'  => $q['is_text_only'] ?? null,
