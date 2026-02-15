@@ -224,7 +224,7 @@ class DashboardController extends Controller
                 'subject_total_marks'       => $topicsData->sum('total_marks'),
                 'subject_student_marks'     => $topicsData->sum('student_marks'),
                 'average_score'             => $topicsData->sum('total_marks') > 0
-                    ? round(($topicsData->sum('student_marks') / $topicsData->sum('total_marks')) * 100, 2)
+                    ? round(($topicsData->sum('score') / $topicsData->sum('total_marks')) * 100, 2)
                     : 0,
             ];
         })->values();
