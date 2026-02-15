@@ -122,8 +122,18 @@ abstract class BaseController extends Controller
         }
 
         // ✅ relation_id filter
+        // ✅ relation_id filter
         if (str_ends_with($key, '_id')) {
-          $relation = str_replace('_id', '', $key);
+
+          $base = str_replace('_id', '', $key);
+
+          // try exact
+          $relation = $base;
+
+          // try plural if not found
+          if (!in_array($relation, $this->relations)) {
+            $relation = \Illuminate\Support\Str::plural($base);
+          }
 
           if (
             in_array($relation, $this->relations) &&
@@ -138,6 +148,7 @@ abstract class BaseController extends Controller
 
           continue;
         }
+
 
         // ✅ relation.column filter
         if (str_contains($key, '.')) {
