@@ -17,6 +17,8 @@ class UserResource extends JsonResource
             'password' => $this->password,
             'grade_id' => optional($this->grades->first())->id,
             'grade' => optional($this->grades->first())->name,
+            'subject_id' => optional($this->subjects->first())->id,
+            'subject' => optional($this->subjects->first())->name,
 
 
             'phone' => $this->phone,
