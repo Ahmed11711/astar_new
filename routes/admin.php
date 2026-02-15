@@ -82,6 +82,7 @@ Route::prefix('v1')->group(function () {
             ->except(['store', 'show', 'update']);
 
         Route::post('exams', [UpdateExamPaperController::class, 'store']);
+        Route::delete('exams', [UpdateExamPaperController::class, 'destroy']);
         Route::get('exams/{id}', [UpdateExamPaperController::class, 'show']);
         Route::patch('exams/{id}', [UpdateExamPaperController::class, 'update']);
     });
