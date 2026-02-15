@@ -134,21 +134,43 @@ abstract class BaseController extends Controller
     return $this->successResponse(new $this->resourceClass($record), 'Record updated successfully');
   }
 
-  public function destroy($id): JsonResponse
+  // public function destroy($id): JsonResponse
+  // {
+  //   try {
+  //     DB::beginTransaction();
+
+  //     $deletedCount = $this->repository->delete($id);
+
+  //     DB::commit();
+  //   } catch (\Throwable $e) {
+  //     DB::rollBack();
+  //     Log::error("Error deleting {$this->collectionName}: " . $e->getMessage());
+  //     return $this->errorResponse("Failed to delete record(s)", 500);
+  //   }
+
+  //   return $this->successResponse(null, "$deletedCount record(s) deleted successfully");
+  // }
+
+  public function destroy($ids): JsonResponse
   {
     try {
       DB::beginTransaction();
 
-      $deletedCount = $this->repository->delete($id);
+      $idsArray = is_array($ids) ? $ids : [$ids];
+
+      $deletedCount = $this->repository->deleteMultiple($idsArray);
 
       DB::commit();
     } catch (\Throwable $e) {
       DB::rollBack();
       Log::error("Error deleting {$this->collectionName}: " . $e->getMessage());
-      return $this->errorResponse("Failed to delete record(s)", 500);
+      return $this->errorResponse("Can't delete record(s)", 500);
     }
 
-    return $this->successResponse(null, "$deletedCount record(s) deleted successfully");
+    return $this->successResponse(
+      null,
+      "$deletedCount record(s) deleted successfully"
+    );
   }
 
   protected function handleFileUploads(Request $request, array $validated, $existingRecord = null): array
