@@ -206,14 +206,26 @@ class DashboardController extends Controller
                 ];
             })->values();
 
+            // return [
+            //     'subject_id'               => $subject->id,
+            //     'subject_name'             => $subject->name,
+            //     'topics'                   => $topicsData,
+            //     'subject_total_questions'  => $topicsData->sum('total_questions'),
+            //     'subject_answered_questions' => $topicsData->sum('answered_questions'),
+            //     'subject_total_marks'      => $topicsData->sum('total_marks'),
+            //     'subject_student_marks'    => $topicsData->sum('student_marks'),
+            // ];
             return [
-                'subject_id'               => $subject->id,
-                'subject_name'             => $subject->name,
-                'topics'                   => $topicsData,
-                'subject_total_questions'  => $topicsData->sum('total_questions'),
+                'subject_id'                => $subject->id,
+                'subject_name'              => $subject->name,
+                'topics'                    => $topicsData,
+                'subject_total_questions'   => $topicsData->sum('total_questions'),
                 'subject_answered_questions' => $topicsData->sum('answered_questions'),
-                'subject_total_marks'      => $topicsData->sum('total_marks'),
-                'subject_student_marks'    => $topicsData->sum('student_marks'),
+                'subject_total_marks'       => $topicsData->sum('total_marks'),
+                'subject_student_marks'     => $topicsData->sum('student_marks'),
+                'average_score'             => $topicsData->sum('total_marks') > 0
+                    ? round(($topicsData->sum('student_marks') / $topicsData->sum('total_marks')) * 100, 2)
+                    : 0,
             ];
         })->values();
 
