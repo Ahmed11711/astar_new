@@ -246,24 +246,13 @@ class DashboardController extends Controller
 
         // return response()->json($student_attempts);
 
-        $student_attempts = DB::table('student_attempts')
+        $$student_attempts = DB::table('student_attempts')
             ->where('student_attempts.user_id', $userId)
             ->join('papers', 'student_attempts.paper_id', '=', 'papers.id')
-            ->join('exam_papers', 'student_attempts.exam_id', '=', 'exam_papers.id')
-            ->select(
-                'student_attempts.paper_id',
-                'papers.name as paper_name',
-                'student_attempts.exam_id',
-                'exam_papers.title as exam_name',
-                DB::raw('MAX(student_attempts.score) as score'),
-                DB::raw('MAX(student_attempts.max_score) as max_score'),
-                'student_attempts.grading_source',
-                'student_attempts.time_remaining',
-                'student_attempts.started_at',
-                'student_attempts.created_at'
-            )
-            ->groupBy('student_attempts.paper_id', 'papers.name', 'student_attempts.exam_id', 'exam_papers.title', 'student_attempts.grading_source', 'student_attempts.time_remaining', 'student_attempts.started_at', 'student_attempts.created_at')
+            ->select('student_attempts.paper_id', 'papers.name as paper_name')
+            ->distinct()
             ->get();
+
         return response()->json($student_attempts);
     }
 }
