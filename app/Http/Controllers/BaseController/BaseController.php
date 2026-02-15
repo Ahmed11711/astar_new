@@ -194,13 +194,17 @@ abstract class BaseController extends Controller
 
   //   return $this->successResponse(null, "$deletedCount record(s) deleted successfully");
   // }
-
-  public function destroy($ids): JsonResponse
+  public function destroy(Request $request): JsonResponse
   {
     try {
       DB::beginTransaction();
 
-      $idsArray = is_array($ids) ? $ids : [$ids];
+      $ids = $request->query('ids', null);
+      if ($ids) {
+        $idsArray = is_array($ids) ? $ids : explode(',', $ids);
+      } else {
+        return $this->errorResponse("No IDs provided", 400);
+      }
 
       $deletedCount = $this->repository->deleteMultiple($idsArray);
 
@@ -216,6 +220,7 @@ abstract class BaseController extends Controller
       "$deletedCount record(s) deleted successfully"
     );
   }
+
 
   protected function handleFileUploads(Request $request, array $validated, $existingRecord = null): array
   {
