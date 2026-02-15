@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 abstract class BaseController extends Controller
 {
@@ -74,6 +75,7 @@ abstract class BaseController extends Controller
   //   }
   // }
 
+
   public function index(Request $request): JsonResponse
   {
     try {
@@ -81,74 +83,44 @@ abstract class BaseController extends Controller
       $model = $query->getModel();
       $table = $model->getTable();
 
-      // eager load relations
       if (!empty($this->relations)) {
         $query->with($this->relations);
       }
 
-      /*
-        |--------------------------------
-        | Search (all columns except meta)
-        |--------------------------------
-        */
+      // search
       if ($search = $request->input('search')) {
         $columns = Schema::getColumnListing($table);
         $columns = array_diff($columns, ['id', 'created_at', 'updated_at', 'deleted_at']);
 
         $query->where(function ($q) use ($columns, $search) {
-          foreach ($columns as $column) {
-            $q->orWhere($column, 'like', "%{$search}%");
+          foreach ($columns as $col) {
+            $q->orWhere($col, 'like', "%{$search}%");
           }
         });
       }
 
-      /*
-        |--------------------------------
-        | Dynamic Filters
-        |--------------------------------
-        */
+      // filters
       $excluded = ['search', 'page', 'per_page', 'limit', 'offset', 'sort', 'order'];
 
       foreach ($request->except($excluded) as $key => $value) {
 
         if ($value === null || $value === '') continue;
 
-        // case 1: column in table
         if (Schema::hasColumn($table, $key)) {
           $query->where($key, $value);
           continue;
         }
 
-        // case 2: relation_id => filter relation by id
         if (str_ends_with($key, '_id')) {
           $relation = str_replace('_id', '', $key);
 
           if (in_array($relation, $this->relations) && method_exists($model, $relation)) {
             $query->whereHas($relation, fn($q) => $q->where('id', $value));
           }
-
-          continue;
-        }
-
-        // case 3: relation column filter ?relation.name=xxx
-        if (str_contains($key, '.')) {
-          [$relation, $column] = explode('.', $key);
-
-          if (in_array($relation, $this->relations) && method_exists($model, $relation)) {
-            $query->whereHas(
-              $relation,
-              fn($q) =>
-              $q->where($column, $value)
-            );
-          }
         }
       }
 
-      /*
-        |--------------------------------
-        | Sorting
-        |--------------------------------
-        */
+      // sorting
       $sort = $request->input('sort', 'created_at');
       $order = $request->input('order', 'desc');
 
@@ -157,26 +129,35 @@ abstract class BaseController extends Controller
       }
 
       /*
-        |--------------------------------
-        | Pagination OR limit/offset
-        |--------------------------------
+        ======================
+        ALWAYS RETURN PAGINATOR
+        ======================
         */
 
       if ($request->has('limit')) {
-        $data = $query
-          ->limit($request->limit)
-          ->offset($request->offset ?? 0)
+
+        $limit  = (int)$request->limit;
+        $offset = (int)($request->offset ?? 0);
+
+        $total = $query->count();
+
+        $items = $query->limit($limit)
+          ->offset($offset)
           ->get();
+
+        $data = new LengthAwarePaginator(
+          $items,
+          $total,
+          $limit,
+          floor($offset / $limit) + 1,
+          ['path' => request()->url(), 'query' => request()->query()]
+        );
       } else {
+
         $perPage = $request->input('per_page', 10);
         $data = $query->paginate($perPage);
       }
 
-      /*
-        |--------------------------------
-        | Resource
-        |--------------------------------
-        */
       if (class_exists($this->resourceClass)) {
         $data = $this->resourceClass::collection($data);
       }
@@ -190,6 +171,7 @@ abstract class BaseController extends Controller
       return $this->errorResponse("Failed to fetch data", 500);
     }
   }
+
 
 
 
