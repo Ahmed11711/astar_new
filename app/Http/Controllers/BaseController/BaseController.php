@@ -82,6 +82,7 @@ abstract class BaseController extends Controller
       $model = $query->getModel();
       $table = $model->getTable();
 
+      // Load relations if defined
       if (!empty($this->relations)) {
         $query->with($this->relations);
       }
@@ -122,47 +123,32 @@ abstract class BaseController extends Controller
         }
 
         // ✅ relation_id filter
-        // ✅ relation_id filter
         if (str_ends_with($key, '_id')) {
 
           $base = str_replace('_id', '', $key);
-
-          // try exact
           $relation = $base;
 
-          // try plural if not found
           if (!in_array($relation, $this->relations)) {
             $relation = \Illuminate\Support\Str::plural($base);
           }
 
-          if (
-            in_array($relation, $this->relations) &&
-            method_exists($model, $relation)
-          ) {
-            $query->whereHas(
-              $relation,
-              fn($q) =>
-              $q->where('id', $value)
-            );
+          if (in_array($relation, $this->relations) && method_exists($model, $relation)) {
+            $query->whereHas($relation, function ($q) use ($value) {
+              $q->where($q->getModel()->getTable() . '.id', $value);
+            });
           }
 
           continue;
         }
 
-
         // ✅ relation.column filter
         if (str_contains($key, '.')) {
           [$relation, $col] = explode('.', $key);
 
-          if (
-            in_array($relation, $this->relations) &&
-            method_exists($model, $relation)
-          ) {
-            $query->whereHas(
-              $relation,
-              fn($q) =>
-              $q->where($col, $value)
-            );
+          if (in_array($relation, $this->relations) && method_exists($model, $relation)) {
+            $query->whereHas($relation, function ($q) use ($col, $value) {
+              $q->where($q->getModel()->getTable() . '.' . $col, $value);
+            });
           }
         }
       }
@@ -210,6 +196,7 @@ abstract class BaseController extends Controller
       return $this->errorResponse("Failed to fetch data", 500);
     }
   }
+
 
 
 
