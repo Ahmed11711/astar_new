@@ -17,10 +17,13 @@ class UserController extends BaseController
         $this->initService(
             repository: $repository,
             collectionName: 'User'
+
         );
+
 
         $this->storeRequestClass = UserStoreRequest::class;
         $this->updateRequestClass = UserUpdateRequest::class;
         $this->resourceClass = UserResource::class;
+        $this->relations = ['grades', 'subjects'];
     }
 }
