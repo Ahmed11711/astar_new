@@ -78,38 +78,113 @@ abstract class BaseController extends Controller
   {
     try {
       $query = $this->repository->query();
+      $model = $query->getModel();
+      $table = $model->getTable();
 
+      // eager load relations
       if (!empty($this->relations)) {
         $query->with($this->relations);
       }
 
+      /*
+        |--------------------------------
+        | Search (all columns except meta)
+        |--------------------------------
+        */
       if ($search = $request->input('search')) {
-        $query->where(function ($q) use ($search) {
-          $table = $q->getModel()->getTable();
-          $stringColumns = Schema::getColumnListing($table);
-          $stringColumns = array_filter($stringColumns, fn($col) => !in_array($col, ['id', 'created_at', 'updated_at', 'deleted_at']));
-          foreach ($stringColumns as $column) {
+        $columns = Schema::getColumnListing($table);
+        $columns = array_diff($columns, ['id', 'created_at', 'updated_at', 'deleted_at']);
+
+        $query->where(function ($q) use ($columns, $search) {
+          foreach ($columns as $column) {
             $q->orWhere($column, 'like', "%{$search}%");
           }
         });
       }
 
-      $excluded = ['search', 'page', 'per_page'];
+      /*
+        |--------------------------------
+        | Dynamic Filters
+        |--------------------------------
+        */
+      $excluded = ['search', 'page', 'per_page', 'limit', 'offset', 'sort', 'order'];
+
       foreach ($request->except($excluded) as $key => $value) {
+
         if ($value === null || $value === '') continue;
-        if (Schema::hasColumn($query->getModel()->getTable(), $key)) {
+
+        // case 1: column in table
+        if (Schema::hasColumn($table, $key)) {
           $query->where($key, $value);
+          continue;
+        }
+
+        // case 2: relation_id => filter relation by id
+        if (str_ends_with($key, '_id')) {
+          $relation = str_replace('_id', '', $key);
+
+          if (in_array($relation, $this->relations) && method_exists($model, $relation)) {
+            $query->whereHas($relation, fn($q) => $q->where('id', $value));
+          }
+
+          continue;
+        }
+
+        // case 3: relation column filter ?relation.name=xxx
+        if (str_contains($key, '.')) {
+          [$relation, $column] = explode('.', $key);
+
+          if (in_array($relation, $this->relations) && method_exists($model, $relation)) {
+            $query->whereHas(
+              $relation,
+              fn($q) =>
+              $q->where($column, $value)
+            );
+          }
         }
       }
 
-      $perPage = $request->input('per_page', 10);
-      $data = $query->latest()->paginate($perPage);
+      /*
+        |--------------------------------
+        | Sorting
+        |--------------------------------
+        */
+      $sort = $request->input('sort', 'created_at');
+      $order = $request->input('order', 'desc');
 
+      if (Schema::hasColumn($table, $sort)) {
+        $query->orderBy($sort, $order);
+      }
+
+      /*
+        |--------------------------------
+        | Pagination OR limit/offset
+        |--------------------------------
+        */
+
+      if ($request->has('limit')) {
+        $data = $query
+          ->limit($request->limit)
+          ->offset($request->offset ?? 0)
+          ->get();
+      } else {
+        $perPage = $request->input('per_page', 10);
+        $data = $query->paginate($perPage);
+      }
+
+      /*
+        |--------------------------------
+        | Resource
+        |--------------------------------
+        */
       if (class_exists($this->resourceClass)) {
         $data = $this->resourceClass::collection($data);
       }
 
-      return $this->successResponsePaginate($data, "{$this->collectionName} list retrieved successfully");
+      return $this->successResponsePaginate(
+        $data,
+        "{$this->collectionName} list retrieved successfully"
+      );
     } catch (\Throwable $e) {
       Log::error("Error in {$this->collectionName} index: " . $e->getMessage());
       return $this->errorResponse("Failed to fetch data", 500);
