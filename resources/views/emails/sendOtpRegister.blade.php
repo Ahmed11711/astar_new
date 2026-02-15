@@ -17,7 +17,7 @@
         <tr>
             <td style="padding:30px; color:#333;">
                 <h2>Hello 👋</h2>
-                <p>You requested to reset your password. Use the OTP code below to set a new password:</p>
+                <p>You requested a verification code. Use the code below to proceed:</p>
 
                 <!-- OTP Code Display -->
                 <div style="text-align:center; margin:40px 0;">
