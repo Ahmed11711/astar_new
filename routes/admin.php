@@ -79,7 +79,7 @@ Route::prefix('v1')->group(function () {
 
         Route::apiResource('exams', ExamPaperController::class)
             ->names('exam_paper')
-            ->except(['store', 'show', 'update', 'delete']);
+            ->except(['store', 'show', 'update', 'destroy']);
 
         Route::post('exams', [UpdateExamPaperController::class, 'store']);
         Route::delete('exams', [UpdateExamPaperController::class, 'destroy']);
