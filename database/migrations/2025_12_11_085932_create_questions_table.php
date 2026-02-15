@@ -6,43 +6,44 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
- /**
-  * Run the migrations.
-  */
- public function up()
- {
-  Schema::create('questions', function (Blueprint $table) {
-   $table->id();
+    /**
+     * Run the migrations.
+     */
+    public function up()
+    {
+        Schema::create('questions', function (Blueprint $table) {
+            $table->id();
 
-   $table->foreignId('exam_paper_id')->constrained()->cascadeOnDelete();
-   $table->foreignId('subject_id')->constrained()->cascadeOnDelete();
-   $table->foreignId('topic_id')->nullable()->constrained()->nullOnDelete();
-   $table->foreignId('subtopics_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('exam_paper_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('subject_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('topic_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('subtopics_id')->nullable()->constrained()->nullOnDelete();
 
-   $table->string('question_number')->nullable(); // ممكن يكون 1, 1.1 handled at app level
-   $table->longText('question_string')->nullable();
-   $table->string('question_type'); // mcq, written, tf, match, etc.
-   $table->integer('question_max_score')->nullable();
+            $table->string('question_number')->nullable();
+            $table->longText('question_string')->nullable();
+            $table->longText('question_name')->nullable();
 
-   // self-referencing parent id -> يدعم infinite nesting
-   $table->foreignId('parent_id')->nullable()->constrained('questions')->nullOnDelete();
+            $table->string('question_type');
+            $table->integer('question_max_score')->nullable();
 
-   $table->boolean('has_options')->default(false);
-   $table->json('marking_scheme')->nullable(); // lightweight fallback
-   $table->timestamps();
+            $table->foreignId('parent_id')->nullable()->constrained('questions')->nullOnDelete();
 
-   // index for fast tree queries & ordering
-   $table->index(['exam_paper_id', 'parent_id']);
-   $table->index('question_number');
-  });
- }
+            $table->boolean('has_options')->default(false);
+            $table->json('marking_scheme')->nullable();
+            $table->timestamps();
+
+            // index for fast tree queries & ordering
+            $table->index(['exam_paper_id', 'parent_id']);
+            $table->index('question_number');
+        });
+    }
 
 
- /**
-  * Reverse the migrations.
-  */
- public function down(): void
- {
-  Schema::dropIfExists('questions');
- }
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('questions');
+    }
 };
