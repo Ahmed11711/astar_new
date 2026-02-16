@@ -289,37 +289,20 @@ class DashboardController extends Controller
     {
         $userId = $request->user_id;
 
-        // 🔹 تفاصيل المحاولات
-        $attempts = DB::table('student_attempts')
+        $student_attempts = DB::table('student_attempts')
             ->where('student_attempts.user_id', $userId)
             ->join('exam_papers', 'student_attempts.exam_id', '=', 'exam_papers.id')
             ->join('papers', 'exam_papers.paper_id', '=', 'papers.id')
+
             ->select(
-                'student_attempts.id as attempt_id',
-                'student_attempts.exam_id',
                 'papers.id as paper_id',
                 'papers.name as paper_name',
-                'student_attempts.score',
-                'exam_papers.total_marks',
-                DB::raw('ROUND((student_attempts.score / NULLIF(exam_papers.total_marks,0)) * 100, 2) as percentage')
+                DB::raw('AVG(student_attempts.score / NULLIF(exam_papers.total_marks,0)) * 100 as average_percentage')
             )
-            ->orderBy('student_attempts.id')
+
+            ->groupBy('papers.id', 'papers.name')
             ->get();
 
-        // 🔹 الإحصائيات
-        $stats = DB::table('student_attempts')
-            ->where('student_attempts.user_id', $userId)
-            ->join('exam_papers', 'student_attempts.exam_id', '=', 'exam_papers.id')
-            ->selectRaw('
-            COUNT(*) as attempts_count,
-            ROUND(AVG(student_attempts.score / NULLIF(exam_papers.total_marks,0)) * 100, 2) as average_percentage
-        ')
-            ->first();
-
-        return response()->json([
-            'attempts_count' => $stats->attempts_count ?? 0,
-            'average_percentage' => $stats->average_percentage ?? 0,
-            'attempts' => $attempts,
-        ]);
+        return response()->json($student_attempts);
     }
 }
