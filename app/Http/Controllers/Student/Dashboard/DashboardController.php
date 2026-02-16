@@ -278,7 +278,7 @@ class DashboardController extends Controller
             ->select(
                 'student_attempts.paper_id',
                 'papers.name as paper_name',
-                DB::raw('AVG(student_attempts.score) as average_score')
+                DB::raw('AVG(student_attempts.score / papers.total_score) * 100 as average_percentage')
             )
             ->groupBy('student_attempts.paper_id', 'papers.name')
             ->get();
