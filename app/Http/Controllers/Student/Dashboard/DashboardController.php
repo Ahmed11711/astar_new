@@ -289,7 +289,7 @@ class DashboardController extends Controller
     {
         $userId = $request->user_id;
 
-        // 🔹 تفاصيل كل المحاولات
+        // 🔹 تفاصيل المحاولات
         $attempts = DB::table('student_attempts')
             ->where('student_attempts.user_id', $userId)
             ->join('exam_papers', 'student_attempts.exam_id', '=', 'exam_papers.id')
@@ -310,10 +310,10 @@ class DashboardController extends Controller
         $stats = DB::table('student_attempts')
             ->where('student_attempts.user_id', $userId)
             ->join('exam_papers', 'student_attempts.exam_id', '=', 'exam_papers.id')
-            ->select(
-                DB::raw('COUNT(*) as attempts_count'),
-                DB::raw('ROUND(AVG(student_attempts.score / NULLIF(exam_papers.total_marks,0)) * 100, 2 as average_percentage)')
-            )
+            ->selectRaw('
+            COUNT(*) as attempts_count,
+            ROUND(AVG(student_attempts.score / NULLIF(exam_papers.total_marks,0)) * 100, 2) as average_percentage
+        ')
             ->first();
 
         return response()->json([
