@@ -109,9 +109,9 @@ class DashboardTeacherController extends Controller
         |----------------------------------------------------------------------
         */
         return response()->json([
-            'papers_performance'   => $papers,
-            'subjects_performance' => $subjects,
-            'quizzes_performance'  => $quizzes,
+            'papers'   => $papers,
+            'subjects' => $subjects,
+            'quizzes'  => $quizzes,
             'number_of_exams_solved' => $totalAttempts,
             'total_users'          => $totalUsers,
         ]);
