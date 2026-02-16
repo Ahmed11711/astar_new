@@ -268,19 +268,40 @@ class DashboardController extends Controller
     //     return response()->json($student_attempts);
     // }
 
+    // public function PaperScores(Request $request)
+    // {
+    //     $userId = $request->user_id;
+
+    //     $student_attempts = DB::table('student_attempts')
+    //         ->where('student_attempts.user_id', $userId)
+    //         ->join('papers', 'student_attempts.paper_id', '=', 'papers.id')
+    //         ->select(
+    //             'student_attempts.paper_id',
+    //             'papers.name as paper_name',
+    //             DB::raw('AVG(student_attempts.score) as average_score')
+    //         )
+    //         ->groupBy('student_attempts.paper_id', 'papers.name')
+    //         ->get();
+
+    //     return response()->json($student_attempts);
+    // }
     public function PaperScores(Request $request)
     {
         $userId = $request->user_id;
 
         $student_attempts = DB::table('student_attempts')
             ->where('student_attempts.user_id', $userId)
-            ->join('papers', 'student_attempts.paper_id', '=', 'papers.id')
+
+            ->join('exam_papers', 'student_attempts.exam_id', '=', 'exam_papers.id')
+            ->join('papers', 'exam_papers.paper_id', '=', 'papers.id')
+
             ->select(
-                'student_attempts.paper_id',
+                'papers.id as paper_id',
                 'papers.name as paper_name',
-                DB::raw('AVG(student_attempts.score / papers.total_score) * 100 as average_percentage')
+                DB::raw('AVG(student_attempts.score / NULLIF(exam_papers.total_mark,0)) * 100 as average_percentage')
             )
-            ->groupBy('student_attempts.paper_id', 'papers.name')
+
+            ->groupBy('papers.id', 'papers.name')
             ->get();
 
         return response()->json($student_attempts);
