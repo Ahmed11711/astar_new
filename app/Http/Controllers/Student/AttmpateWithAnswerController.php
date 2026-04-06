@@ -43,4 +43,26 @@ class AttmpateWithAnswerController extends Controller
 
         return $this->successResponse($attempt);
     }
+
+    public function poll(Request $request)
+    {
+        $userId    = $request->query('userId');
+        $attemptId = $request->query('attemptId');
+
+        $activeAttempt = StudentAttamp::query()
+            ->where('user_id', $userId)
+            ->where('id', $attemptId)
+            ->first();
+
+        $hasScore = false;
+
+        if ($activeAttempt) {
+            $hasScore = !is_null($activeAttempt->score)
+                || !is_null($activeAttempt->max_score);
+        }
+
+        return response()->json([
+            'update' => $hasScore
+        ]);
+    }
 }

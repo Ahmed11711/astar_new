@@ -14,29 +14,19 @@ class CheckJwtToken
     public function handle(Request $request, Closure $next)
     {
         try {
-            $user = JWTAuth::parseToken()->authenticate();
+            $payload = JWTAuth::parseToken()->getPayload();
 
-            if (!$user) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'User not found'
-                ], 404);
-            }
+            $request->merge([
+                'auth_user_id' => $payload->get('user_id'),
+                'auth_email'   => $payload->get('email'),
+                'auth_role'    => $payload->get('role'),
+            ]);
         } catch (TokenExpiredException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Token expired'
-            ], 401);
+            return response()->json(['success' => false, 'message' => 'Token expired'], 401);
         } catch (TokenInvalidException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Token invalid'
-            ], 401);
+            return response()->json(['success' => false, 'message' => 'Token invalid'], 401);
         } catch (JWTException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Token not provided'
-            ], 401);
+            return response()->json(['success' => false, 'message' => 'Token not provided'], 401);
         }
 
         return $next($request);

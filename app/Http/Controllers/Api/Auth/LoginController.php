@@ -53,7 +53,7 @@ class LoginController extends Controller
 
     public function me(Request $request)
     {
-        $user = auth('api')->user();
+        $user = auth('api')->user()->load(['subjects', 'grades']);
         return new MeResource($user);
     }
 

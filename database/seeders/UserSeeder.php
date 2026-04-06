@@ -5,60 +5,68 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
 
 class UserSeeder extends Seeder
 {
- /**
-  * Run the database seeds.
-  */
- public function run(): void
- {
-  $now = now();
+    public function run(): void
+    {
+        $now = Carbon::now();
 
-  DB::table('users')->insert([
-   [
-    'username'       => 'admin',
-    'first_name'     => 'Super',
-    'last_name'      => 'Admin',
-    'email'          => 'admin@example.com',
-    'password'       => Hash::make('password123'),
-    'phone'          => '01000000000',
-    'is_email_verified' => true,
-    'student_type'   => 'individual',
-    'role'           => 'admin',
-    'is_active'      => true,
-    'created_at'     => $now,
-    'updated_at'     => $now,
-   ],
-   [
-    'username'       => 'teacher1',
-    'first_name'     => 'John',
-    'last_name'      => 'Doe',
-    'email'          => 'teacher1@example.com',
-    'password'       => Hash::make('password123'),
-    'phone'          => '01011111111',
-    'is_email_verified' => true,
-    'student_type'   => 'teacher',
-    'role'           => 'teacher',
-    'is_active'      => true,
-    'created_at'     => $now,
-    'updated_at'     => $now,
-   ],
-   [
-    'username'       => 'student1',
-    'first_name'     => 'Jane',
-    'last_name'      => 'Smith',
-    'email'          => 'student1@example.com',
-    'password'       => Hash::make('password123'),
-    'phone'          => '01022222222',
-    'is_email_verified' => false,
-    'student_type'   => 'school',
-    'role'           => 'student',
-    'is_active'      => true,
-    'created_at'     => $now,
-    'updated_at'     => $now,
-   ],
-  ]);
- }
+        $users = [
+            [
+                'username'   => 'admin_user',
+                'first_name' => 'System',
+                'last_name'  => 'Admin',
+                'email'      => 'admin@example.com',
+                'role'       => 'admin',
+                'phone'      => '01000000001',
+            ],
+            [
+                'username'   => 'teacher_pro',
+                'first_name' => 'Sarah',
+                'last_name'  => 'Teacher',
+                'email'      => 'teacher@example.com',
+                'role'       => 'teacher',
+                'phone'      => '01000000002',
+            ],
+            [
+                'username'   => 'high_school_alpha',
+                'first_name' => 'Green',
+                'last_name'  => 'School',
+                'email'      => 'school@example.com',
+                'role'       => 'student',
+                'phone'      => '01000000003',
+            ],
+            [
+                'username'   => 'data_wizard',
+                'first_name' => 'Mark',
+                'last_name'  => 'Entry',
+                'email'      => 'dataentry@example.com',
+                'role'       => 'data_entry',
+                'phone'      => '01000000004',
+            ],
+        ];
+
+        foreach ($users as $user) {
+            DB::table('users')->insert(array_merge($user, [
+                'password'          => Hash::make('password123'),
+                'is_email_verified' => true,
+                'student_type'      => $user['role'] === 'student' ? 'school' : 'individual',
+                'is_active'         => true,
+                'created_at'        => $now,
+                'updated_at'        => $now,
+            ]));
+
+            // 3. إنشاء سجل OTP لكل مستخدم تلقائياً
+            DB::table('user_otps')->insert([
+                'email'      => $user['email'],
+                'otp_code'   => rand(1111, 9999), // كود عشوائي
+                'expires_at' => Carbon::now()->addHours(1),
+                'active'     => 1, // نشط كما طلبت
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ]);
+        }
+    }
 }

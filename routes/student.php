@@ -41,7 +41,9 @@ Route::prefix('v1/student')->group(function () {
         // Route::get('past-paper/{examPaper}', [PastPapersController::class, 'show'])->middleware(CheckFeatureLimit::class . ':attampted');
         Route::get('past-paper/attempt/{attemptId}', [PastPapersController::class, 'showByAttempt']);
 
-        Route::post('attamepate', [AttmpateWithAnswerController::class, 'createAttamepate']);
+        // Route::post('attamepate', [AttmpateWithAnswerController::class, 'createAttamepate'])
+        Route::post('attamepate', [AttmpateWithAnswerController::class, 'createAttamepate'])->middleware(CheckFeatureLimit::class . ':attampted');
+
         Route::get('attamepate', [AttmpateWithAnswerController::class, 'index']);
         Route::post('answers', [AnswerController::class, 'saveAnswersOptimized']);
         Route::post('asnwers-topicwise', [AnswerController::class, 'saveAnswersAutoAttempt']);
@@ -52,5 +54,6 @@ Route::prefix('v1/student')->group(function () {
 
         // Feadback Answer
         Route::post('feadback-answer', [FeadBackAnswerController::class, 'index']);
+        Route::get('/attempt-updates/poll', [AttmpateWithAnswerController::class, 'poll']);
     });
 });

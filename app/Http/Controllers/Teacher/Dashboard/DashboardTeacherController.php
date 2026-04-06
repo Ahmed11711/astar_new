@@ -5,12 +5,15 @@ namespace App\Http\Controllers\Teacher\Dashboard;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
 
 class DashboardTeacherController extends Controller
 {
     public function index(Request $request)
     {
         $teacherId = $request->user_id;
+
 
         /*
         |----------------------------------------------------------------------
@@ -103,6 +106,10 @@ class DashboardTeacherController extends Controller
             ->distinct('student_id')
             ->count('student_id');
 
+        $totalQuizzes = DB::table('exam_papers')
+            ->where('created_by', $teacherId)
+            ->where('exam_type', 'quiz')
+            ->count();
         /*
         |----------------------------------------------------------------------
         | Response
@@ -114,6 +121,7 @@ class DashboardTeacherController extends Controller
             'quizzes'  => $quizzes,
             'number_of_exams_solved' => $totalAttempts,
             'total_users'          => $totalUsers,
+            'totalQuizzes' => $totalQuizzes,
         ]);
     }
 }
